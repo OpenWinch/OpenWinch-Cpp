@@ -1,0 +1,45 @@
+#include <iostream>
+
+// #include <stdio.h>
+// #include <string.h>
+// #include <stdint.h>
+// #include <errno.h>
+// #include <stdlib.h>
+// #include <time.h>
+
+#include "tachometer.hpp"
+#include "logger.hpp"
+
+int main(int argc, char *argv[])  {
+  int i = 0;
+  int j = 0;
+
+  Tachometer &tacho = Tachometer::get();
+  // clock_t tic = clock();
+  Logger &logger = Logger::get();
+  logger.info("test %d %d", i, j);
+
+  std::cout << "Start.." << std::endl;
+  while (1) {
+    ++j;
+
+    // clock_t toc = clock();
+    // double delta = (int)(toc - tic);
+    //printf("d=%f", delta);
+    // if ( (delta / CLOCKS_PER_SEC) >= 1.0 ) {
+    //   tic = clock();
+      // tacho_hallSensor_t hallU = tacho_get_hall_sensorU();
+      // printf("CPU: %dkHz  GPIO : %dHz \n", j/1000, i);
+      // printf("U: %d  W: %d  V: %d \n",
+      //           tacho_get_rpm(hallU.pulseTime),
+      //           tacho_get_rpm(tacho_get_hall_sensorW().pulseTime),
+      //           tacho_get_rpm(tacho_get_hall_sensorV().pulseTime));
+      // tacho_hall_debug(hallU);
+    //   i = 0;
+    //   j = 0;
+    // }
+
+  }
+
+  return 0;
+}
