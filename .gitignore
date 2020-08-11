@@ -85,3 +85,9 @@ dkms.conf
 
 ### Extra ###
 *.log
+
+build/
+include/template.h
+lib/
+tmp/
+
