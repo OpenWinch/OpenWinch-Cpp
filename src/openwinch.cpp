@@ -9,16 +9,21 @@
 
 #include "tachometer.hpp"
 #include "logger.hpp"
+#include "hardware.hpp"
+#include "controller.hpp"
 
 int main(int argc, char *argv[])  {
   int i = 0;
   int j = 0;
 
   Tachometer &tacho = Tachometer::get();
-  // clock_t tic = clock();
   Logger &logger = Logger::get();
-  logger.info("test %d %d", i, j);
+  
+  Emulator emu(nullptr);
+  emu.initialize();
+  emu.setThrottleValue(5);
 
+  // clock_t tic = clock();
   std::cout << "Start.." << std::endl;
   while (1) {
     ++j;

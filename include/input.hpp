@@ -9,13 +9,25 @@
 
 class InputType {
  public:
-  enum Value {
+  enum ValueInputType {
     UP = 1,
     RIGHT = 2,
     DOWN = 3,
     LEFT = 4,
     ENTER = InputType::DOWN,
   };
+
+  InputType() = default;
+  explicit constexpr InputType(ValueInputType aValue) : value(aValue) { }
+
+  constexpr bool operator==(InputType a) const { return value == a.value; }
+  constexpr bool operator!=(InputType a) const { return value != a.value; }
+
+  ModeType list();
+
+ private:
+  ValueInputType value;
+
 };
 
 #endif  // INPUT_HPP_

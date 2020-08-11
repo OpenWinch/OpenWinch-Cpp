@@ -9,14 +9,14 @@
 
 class ModeType {
  public:
-  enum Value {
+  enum ValueModeType {
     OneWay = 1,
     TwoWay = 2,
     Infinity = 3
   };
 
   ModeType() = default;
-  explicit constexpr ModeType(Value aValue) : value(aValue) { }
+  explicit constexpr ModeType(ValueModeType aValue) : value(aValue) { }
 
   constexpr bool operator==(ModeType a) const { return value == a.value; }
   constexpr bool operator!=(ModeType a) const { return value != a.value; }
@@ -24,7 +24,8 @@ class ModeType {
   ModeType list();
 
  private:
-  Value value;
+  ValueModeType value;
+
 };
 
 class ModeEngine {

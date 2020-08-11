@@ -11,7 +11,7 @@
 
 class State {
  public:
-  enum Value {
+  enum ValueState {
     UNKNOWN = -999,
     BOOTED = -2,
     ERROR = -1,
@@ -29,7 +29,7 @@ class State {
   static bool checkBoot(State current);
 
   State() = default;
-  explicit constexpr State(Value aValue) : value(aValue) { }
+  explicit constexpr State(ValueState aValue) : value(aValue) { }
 
   bool isRun();
   bool isStop();
@@ -49,7 +49,7 @@ class State {
 // #endif
 
  private:
-  Value value;
+  ValueState value;
 
 };
 #endif

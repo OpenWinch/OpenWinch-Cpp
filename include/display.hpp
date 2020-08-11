@@ -9,12 +9,22 @@
 
 class GuiType {
  public:
-  enum Value {
+  enum ValueGuiType {
     DISABLE = 0,
     SH1106_I2C = 1,
     VGA = 100,
     CAPTURE = 101
   };
+
+  GuiType() = default;
+  explicit constexpr GuiType(ValueGuiType aValue) : value(aValue) { }
+
+  constexpr bool operator==(GuiType a) const { return value == a.value; }
+  constexpr bool operator!=(GuiType a) const { return value != a.value; }
+
+ private:
+  ValueGuiType value;
+
 };
 
 class Gui {

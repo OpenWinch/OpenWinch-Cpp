@@ -31,8 +31,8 @@ class Tachometer {
  public:
 
   static Tachometer& get() {
-    static Tachometer logger;
-    return logger;
+    static Tachometer tacho;
+    return tacho;
   }
 
   void hall_debug(tacho_hallSensor_t sensor);
