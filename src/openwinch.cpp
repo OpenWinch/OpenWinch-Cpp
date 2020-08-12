@@ -16,12 +16,17 @@ int main(int argc, char *argv[])  {
   int i = 0;
   int j = 0;
 
-  Tachometer &tacho = Tachometer::get();
   Logger &logger = Logger::get();
+  Tachometer &tacho = Tachometer::get();
+
+  Winch *winch = new Winch();
+  winch->start();
+
+  Emulator *emu = new Emulator(winch);
+  emu->initialize();
+  emu->setThrottleValue(5);
+
   
-  Emulator emu(nullptr);
-  emu.initialize();
-  emu.setThrottleValue(5);
 
   // clock_t tic = clock();
   std::cout << "Start.." << std::endl;

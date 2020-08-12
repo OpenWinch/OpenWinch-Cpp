@@ -9,9 +9,12 @@
 
 #ifdef __cplusplus
 
+#include <cstdint>
+#include <string>
+
 class State {
  public:
-  enum ValueState {
+  enum ValueState : int16_t {
     UNKNOWN = -999,
     BOOTED = -2,
     ERROR = -1,
@@ -28,28 +31,40 @@ class State {
   static bool checkInit(State current);
   static bool checkBoot(State current);
 
-  State() = default;
-  explicit constexpr State(ValueState aValue) : value(aValue) { }
-
   bool isRun();
   bool isStop();
   bool isFault();
   bool isInit();
   bool isBoot();
 
-// #if Enable switch (State) use case:
-//   operator Value() const { return value; }  // Allow switch and comparisons.
+//   operator ValueState() const { return value; }  // Allow switch and comparisons.
 //                                             // note: Putting constexpr here causes
 //                                             // clang to stop warning on incomplete
 //                                             // case handling.
-//   explicit operator bool() = delete;        // Prevent usage: if(fruit)
-// #else
-  constexpr bool operator==(State a) const { return value == a.value; }
-  constexpr bool operator!=(State a) const { return value != a.value; }
-// #endif
+
+  explicit operator bool() = delete;        // Prevent usage: if(value)
+  constexpr State(const ValueState& v) : value{v} {} //not explicit here.
+  constexpr operator ValueState() const { return value; }
+  constexpr State& operator=(ValueState v) { value = v; return *this;}
+  constexpr bool operator==(const ValueState v) const { return value == v; }
+  constexpr bool operator!=(const ValueState v) const { return value != v; }
+
+  operator std::string() const {
+    switch (value) {
+      case UNKNOWN: return "UNKNOWN";
+      case BOOTED:  return "BOOTED";
+      case ERROR:   return "ERROR";
+      case INIT:    return "INIT";
+      case IDLE:    return "IDLE";
+      case START:   return "START";
+      case RUNNING: return "RUNNING";
+      case STOP:    return "STOP";
+    };
+  }
 
  private:
   ValueState value;
+  State() = default;
 
 };
 #endif

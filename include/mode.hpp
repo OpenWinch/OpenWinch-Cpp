@@ -7,62 +7,77 @@
 #ifndef MODE_HPP_
 #define MODE_HPP_
 
+#include <cstdint>
+#include <vector>
+
+class Board;
+class Winch;
+class Logger;
+
 class ModeType {
  public:
-  enum ValueModeType {
+  enum ValueModeType : uint8_t {
     OneWay = 1,
     TwoWay = 2,
     Infinity = 3
   };
 
-  ModeType() = default;
-  explicit constexpr ModeType(ValueModeType aValue) : value(aValue) { }
+  explicit operator bool() = delete;        // Prevent usage: if(value)
+  constexpr ModeType(const ValueModeType& v) : value{v} {} //not explicit here.
+  constexpr operator ValueModeType() const { return value; }
+  constexpr ModeType& operator=(ValueModeType v) { value = v; return *this;}
+  constexpr bool operator==(const ValueModeType v) const { return value == v; }
+  constexpr bool operator!=(const ValueModeType v) const { return value != v; }
 
-  constexpr bool operator==(ModeType a) const { return value == a.value; }
-  constexpr bool operator!=(ModeType a) const { return value != a.value; }
-
-  ModeType list();
+  std::vector<ModeType> list();
 
  private:
   ValueModeType value;
-
+  ModeType() = default;
+  
 };
 
 class ModeEngine {
  public:
-  ModeEngine();
+  explicit ModeEngine(Board*, Winch*);
   void applyThrottleValue();
   float getDistance();
-  uint32_t getSpeedCurrent();
+  unsigned int getSpeedCurrent();
   void runControlLoop();
 
-
  protected:
-  void board = nullptr;
-  void winch = nullptr;
-  uint32_t speed_current = 0;
+  Logger *logger = nullptr;
+  Board *board = nullptr;
+  Winch *winch = nullptr;
+  unsigned int speed_current = 0;
 
-  void extraMode();
+  virtual void extraMode() = 0;
   bool isBeginSecurity();
 
  private:
-  uint32_t security_begin = 20;
-  uint32_t speed_ratio = 1;
-  uint32_t velocity_start = 1;
-  uint32_t velocity_stop = 3;
+  unsigned int security_begin = 20;
+  unsigned int speed_ratio = 1;
+  unsigned int velocity_start = 1;
+  unsigned int velocity_stop = 3;
 
   void initialize();
   void starting();
   void stopping();
   void fault();
-  
 };
 
 class OneWayMode: public ModeEngine {
-
+ public:
+  explicit OneWayMode(Board*, Winch*);
+  
+ protected:
+  void extraMode() override;
 };
 
 class TwoWayMode: public ModeEngine {
+ public:
+  explicit TwoWayMode(Board*, Winch*);
+
  private:
   int security_end = 20;
   int standby_duration = 5;
@@ -70,17 +85,21 @@ class TwoWayMode: public ModeEngine {
 
  protected:
   bool isEndSecurity();
-  void extraMode();
+  void extraMode() override;
 };
 
 class InfinityMode: public ModeEngine {
+ public:
+  explicit InfinityMode(Board*, Winch*);
 
+ protected:
+  void extraMode() override;
 };
 
-class ModeFactory {
- public:
-  static ModeEngine modeFactory();
-  static ModeType getMode();
-}
+// class ModeFactory {
+//  public:
+//   static ModeEngine modeFactory();
+//   static ModeType getMode();
+// };
 
 #endif  // MODE_HPP_

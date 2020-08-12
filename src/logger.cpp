@@ -20,7 +20,7 @@ void Logger::info(const char *msg, ...) {
     va_end(args);
 }
 
-void Logger::debug(const char *msg, ...) {
+void Logger::debug(const char* msg...) {
     va_list args;
     va_start(args, msg);
     slog(0, SLOG_DEBUG, msg, args);

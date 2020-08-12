@@ -1,9 +1,9 @@
 #include "hardware.hpp"
 
+#include "controller.hpp"
+#include "logger.hpp"
 
-Board::Board(Winch *winch) {
-  this->winch = winch;
-
+Board::Board(Winch *_winch) : winch{_winch}  {
   this->logger = &Logger::get();
   this->logger->debug("IO : Initialize board...");
 }
@@ -44,7 +44,7 @@ int Board::getRotationFromEnd() {
 
 
 
-Emulator::Emulator(Winch *winch) : Board(winch) { }
+Emulator::Emulator(Winch *_winch) : Board{_winch} { }
 
 void Emulator::initialize() {
   Board::initialize();
@@ -70,7 +70,7 @@ void Emulator::setThrottleValue(int value) {
   }
 }
 
-float Emulator::getThrottleValue() {
+int Emulator::getThrottleValue() {
   this->logger->debug("IO : Throttle to %d", this->value);
   return this->value;
 }

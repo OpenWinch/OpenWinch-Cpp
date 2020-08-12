@@ -7,9 +7,11 @@
 #ifndef INPUT_HPP_
 #define INPUT_HPP_
 
+#include <cstdint>
+
 class InputType {
  public:
-  enum ValueInputType {
+  enum ValueInputType : uint8_t {
     UP = 1,
     RIGHT = 2,
     DOWN = 3,
@@ -17,16 +19,18 @@ class InputType {
     ENTER = InputType::DOWN,
   };
 
-  InputType() = default;
-  explicit constexpr InputType(ValueInputType aValue) : value(aValue) { }
+  explicit operator bool() = delete;        // Prevent usage: if(value)
+  constexpr InputType(const ValueInputType& v) : value{v} {} //not explicit here.
+  constexpr operator ValueInputType() const { return value; }
+  constexpr InputType& operator=(ValueInputType v) { value = v; return *this;}
+  constexpr bool operator==(const ValueInputType v) const { return value == v; }
+  constexpr bool operator!=(const ValueInputType v) const { return value != v; }
 
-  constexpr bool operator==(InputType a) const { return value == a.value; }
-  constexpr bool operator!=(InputType a) const { return value != a.value; }
-
-  ModeType list();
+  InputType list();
 
  private:
   ValueInputType value;
+  InputType() = default;
 
 };
 

@@ -7,28 +7,38 @@
 #ifndef DISPLAY_HPP_
 #define DISPLAY_HPP_
 
+#include <cstdint>
+
+class Winch;
+class InputType;
+
 class GuiType {
  public:
-  enum ValueGuiType {
+  enum ValueGuiType : uint8_t {
     DISABLE = 0,
     SH1106_I2C = 1,
     VGA = 100,
     CAPTURE = 101
   };
 
-  GuiType() = default;
-  explicit constexpr GuiType(ValueGuiType aValue) : value(aValue) { }
-
-  constexpr bool operator==(GuiType a) const { return value == a.value; }
-  constexpr bool operator!=(GuiType a) const { return value != a.value; }
+  explicit operator bool() = delete;        // Prevent usage: if(value)
+  constexpr GuiType(const ValueGuiType& v) : value{v} {} //not explicit here.
+  constexpr operator ValueGuiType() const { return value; }
+  constexpr GuiType& operator=(ValueGuiType v) { value = v; return *this;}
+  constexpr bool operator==(const ValueGuiType v) const { return value == v; }
+  constexpr bool operator!=(const ValueGuiType v) const { return value != v; }
 
  private:
   ValueGuiType value;
+  GuiType() = default;
 
 };
 
 class Gui {
-
+ public:
+  Gui(Winch*);
+  void boot();
+  void enter(InputType);
 };
 
 class ScreenBase {

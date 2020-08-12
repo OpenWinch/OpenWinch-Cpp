@@ -7,6 +7,6 @@
 #ifndef VERSION_HPP_
 #define VERSION_HPP_
 
-#define __VERSION__ "0.2.0"
+#define VERSION "0.2.0"
 
 #endif  // VERSION_HPP_

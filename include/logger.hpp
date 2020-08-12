@@ -9,6 +9,8 @@
 
 #ifdef __cplusplus
 
+#include <cstdarg>
+
 class Logger {
 
  public:
@@ -21,7 +23,7 @@ class Logger {
   }
 
   void info(const char*, ...);
-  void debug(const char*, ...);
+  void debug(const char* ...);
   void warning(const char*, ...);
   void error(const char*, ...);
   void fatal(const char*, ...);
