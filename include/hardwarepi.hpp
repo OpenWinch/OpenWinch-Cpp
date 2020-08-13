@@ -1,8 +1,10 @@
-/*
-  hardware_pi.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file hardware_pi.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef HARDWAREPI_HPP_
 #define HARDWAREPI_HPP_

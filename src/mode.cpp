@@ -1,3 +1,11 @@
+/**
+ * @file mode.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
+
 #include "mode.hpp"
 #include "controller.hpp"
 #include "hardware.hpp"
@@ -12,9 +20,13 @@ ModeEngine::ModeEngine(Board *_board, Winch *_winch) : board(_board), winch(_win
 }
 
 void ModeEngine::applyThrottleValue() {
-  this->logger->debug("Calculate & apply throttle value.");
+  this->logger->live("Calculate throttle value.");
   uint32_t value = this->speed_ratio * this->speed_current;
-  this->board->setThrottleValue(value);
+
+  if (this->board->getThrottleValue() != value) {
+    this->logger->debug("Apply throttle value.");
+    this->board->setThrottleValue(value);
+  }
 }
 
 // Move to Board or Winch
@@ -23,7 +35,7 @@ float ModeEngine::getDistance() {
   return -999; //rotate2distance(this->board->getRotationFromBegin());
 }
 
-unsigned int ModeEngine::getSpeedCurrent() {
+uint8_t ModeEngine::getSpeedCurrent() {
   return this->speed_current;
 }
 
@@ -32,7 +44,7 @@ void ModeEngine::runControlLoop() {
   this->logger->debug("Starting Control Loop.");
 
   while (true) {
-      this->logger->debug("Current state : %s - speed : %s - limit : %s",
+      this->logger->live("Current state : %s - speed : %s - limit : %s",
                           std::string(this->winch->getState()).c_str(),
                           std::to_string(this->speed_current).c_str(),
                           std::to_string(this->board->getRotationFromBegin()).c_str());

@@ -1,8 +1,10 @@
-/*
-  input.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file input.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef INPUT_HPP_
 #define INPUT_HPP_

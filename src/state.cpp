@@ -1,29 +1,31 @@
-/*
-  tachometer.h - setting variables for OpenWinch
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file state.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #include "state.hpp"
 
 bool State::checkRun(State current) {
-    return (State::RUNNING == current.value || State::START == current.value);
+    return (State::RUNNING == current|| State::START == current);
 }
 
 bool State::checkStop(State current) {
-    return (State::STOP == current.value || State::IDLE == current.value);
+    return (State::STOP == current || State::IDLE == current);
 }
 
 bool State::checkFault(State current) {
-    return (State::ERROR == current.value);
+    return (State::ERROR == current);
 }
 
 bool State::checkInit(State current) {
-    return (State::INIT == current.value);
+    return (State::INIT == current);
 }
 
 bool State::checkBoot(State current) {
-    return (State::UNKNOWN != current.value);
+    return (State::UNKNOWN != current);
 }
 
 bool State::isRun() {

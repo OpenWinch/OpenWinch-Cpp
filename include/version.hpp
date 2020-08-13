@@ -1,8 +1,10 @@
-/*
-  version.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file version.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef VERSION_HPP_
 #define VERSION_HPP_

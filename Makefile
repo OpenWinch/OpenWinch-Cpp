@@ -16,7 +16,7 @@ CXXFLAGS				+= -std=c++17
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
-CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP
+CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 
 # LDFLAGS are the flags for linking
 # The options used in linking as well as in any direct use of ld.
@@ -27,10 +27,10 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP
 
 # LDLIBS is the libraries to link
 # define any directories containing header files other than /usr/include /usr/lib
-INCLUDES = -I./include -I./lib/slog/src
+INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
 
 # define any libraries to link into executable
-LIBS = -lstdc++ -lm -lwiringPi -lslog -lpthread -lrt
+LIBS = -lstdc++ -lm -lwiringPi -lslog -lpthread -lrt -llcdgfx
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp)

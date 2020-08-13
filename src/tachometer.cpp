@@ -1,5 +1,12 @@
-// gcc -Wall -o tachometer tachometer.cpp.c -lwiringPi -O3
+/**
+ * @file tachometer.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
+// gcc -Wall -o tachometer tachometer.cpp.c -lwiringPi -O3
 
 #include <stdint.h>
 #include <errno.h>

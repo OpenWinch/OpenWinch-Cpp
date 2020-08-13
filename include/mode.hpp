@@ -1,14 +1,17 @@
-/*
-  mode.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file mode.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef MODE_HPP_
 #define MODE_HPP_
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 class Board;
 class Winch;
@@ -29,6 +32,14 @@ class ModeType {
   constexpr bool operator==(const ValueModeType v) const { return value == v; }
   constexpr bool operator!=(const ValueModeType v) const { return value != v; }
 
+  operator std::string() const {
+    switch (value) {
+      case OneWay:   return "OneWay";
+      case TwoWay:   return "TwoWay";
+      case Infinity: return "Infinity";
+    };
+  }
+
   std::vector<ModeType> list();
 
  private:
@@ -42,23 +53,23 @@ class ModeEngine {
   explicit ModeEngine(Board*, Winch*);
   void applyThrottleValue();
   float getDistance();
-  unsigned int getSpeedCurrent();
+  uint8_t getSpeedCurrent();
   void runControlLoop();
 
  protected:
   Logger *logger = nullptr;
   Board *board = nullptr;
   Winch *winch = nullptr;
-  unsigned int speed_current = 0;
+  uint8_t speed_current = 0;
 
   virtual void extraMode() = 0;
   bool isBeginSecurity();
 
  private:
-  unsigned int security_begin = 20;
-  unsigned int speed_ratio = 1;
-  unsigned int velocity_start = 1;
-  unsigned int velocity_stop = 3;
+  uint8_t security_begin = 20;
+  uint8_t speed_ratio = 1;
+  uint8_t velocity_start = 1;
+  uint8_t velocity_stop = 3;
 
   void initialize();
   void starting();
@@ -69,7 +80,7 @@ class ModeEngine {
 class OneWayMode: public ModeEngine {
  public:
   explicit OneWayMode(Board*, Winch*);
-  
+
  protected:
   void extraMode() override;
 };
@@ -79,9 +90,9 @@ class TwoWayMode: public ModeEngine {
   explicit TwoWayMode(Board*, Winch*);
 
  private:
-  int security_end = 20;
-  int standby_duration = 5;
-  int current_duration = 0;
+  uint8_t security_end = 20;
+  uint8_t standby_duration = 5;
+  uint8_t current_duration = 0;
 
  protected:
   bool isEndSecurity();

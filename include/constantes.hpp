@@ -1,8 +1,10 @@
-/*
-  constantes.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file constantes.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef CONSTANTES_HPP_
 #define CONSTANTES_HPP_
@@ -21,9 +23,8 @@
 #define SPEED_MIN 1
 #define SPEED_UNIT 'Km/h'
 
-/* Loop delay */
+/* Loop delay in nanosecond*/
 #define LOOP_DELAY 1
-// 0.01
-// #define LOOP_DELAY 0.1
+// #define LOOP_DELAY 10
 
 #endif  // CONSTANTES_HPP_

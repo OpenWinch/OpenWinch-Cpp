@@ -1,3 +1,11 @@
+/**
+ * @file hardware.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
+
 #include "hardware.hpp"
 
 #include "controller.hpp"
@@ -14,7 +22,7 @@ void Board::initialize() {
 
 void Board::setReverse(bool enable) {
   this->reverse = enable;
-  this->logger->debug("IO : Change Reverse mode to %s", this->isReverse());
+  this->logger->debug("IO : Change Reverse mode to %s", this->isReverse() ? "true" : "false");
 }
 
 bool Board::isReverse() {
@@ -23,7 +31,7 @@ bool Board::isReverse() {
 
 void Board::setSpeedMode(SpeedMode speed_mode) {
   this->speed_mode = speed_mode;
-  this->logger->debug("IO : Change Speed mode to %s", this->getSpeedMode());
+  this->logger->debug("IO : Change Speed mode to %s", std::string(this->getSpeedMode()).c_str());
 }
 
 SpeedMode Board::getSpeedMode() {
@@ -71,7 +79,6 @@ void Emulator::setThrottleValue(int value) {
 }
 
 int Emulator::getThrottleValue() {
-  this->logger->debug("IO : Throttle to %d", this->value);
   return this->value;
 }
 

@@ -11,4 +11,7 @@ sudo make install
 # LCDGFX
 cd $DIR/lib
 git clone https://github.com/lexus2k/lcdgfx.git
-cd 
+cd lcdgfx
+make
+sudo cp bld/liblcdgfx.a /usr/local/lib/
+

@@ -1,13 +1,16 @@
-/*
-  hardware.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file hardware.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef HARDWARE_HPP_
 #define HARDWARE_HPP_
 
 #include <cstdint>
+#include <string>
 
 class Winch;
 class Logger;
@@ -26,6 +29,14 @@ class SpeedMode {
   constexpr SpeedMode& operator=(ValueSpeedMode v) { value = v; return *this;}
   constexpr bool operator==(const ValueSpeedMode v) const { return value == v; }
   constexpr bool operator!=(const ValueSpeedMode v) const { return value != v; }
+
+  operator std::string() const {
+    switch (value) {
+      case LOW:     return "LOW";
+      case MEDIUM:  return "MEDIUM";
+      case HIGH:    return "HIGH";
+    };
+  }
 
  private:
   ValueSpeedMode value;

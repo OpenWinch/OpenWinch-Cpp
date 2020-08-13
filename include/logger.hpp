@@ -1,8 +1,10 @@
-/*
-  logger.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file logger.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef LOGGER_HPP_
 #define LOGGER_HPP_
@@ -10,6 +12,8 @@
 #ifdef __cplusplus
 
 #include <cstdarg>
+
+#define MAXMSG 1024
 
 class Logger {
 
@@ -22,8 +26,9 @@ class Logger {
     return logger;
   }
 
-  void info(const char*, ...);
+  void live(const char*, ...);
   void debug(const char* ...);
+  void info(const char*, ...);
   void warning(const char*, ...);
   void error(const char*, ...);
   void fatal(const char*, ...);

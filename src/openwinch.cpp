@@ -1,3 +1,11 @@
+/**
+ * @file mode.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
+
 #include <iostream>
 
 // #include <stdio.h>
@@ -22,9 +30,6 @@ int main(int argc, char *argv[])  {
   Winch *winch = new Winch();
   winch->start();
 
-  Emulator *emu = new Emulator(winch);
-  emu->initialize();
-  emu->setThrottleValue(5);
 
   
 

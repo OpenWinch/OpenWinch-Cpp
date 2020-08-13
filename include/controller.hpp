@@ -1,21 +1,27 @@
-/*
-  controller.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file controller.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef CONTROLLER_HPP_
 #define CONTROLLER_HPP_
 
 #include "constantes.hpp"
-#include "display.hpp"
-#include "input.hpp"
-#include "mode.hpp"
 #include "state.hpp"
-#include "logger.hpp"
-#include "hardware.hpp"
 
 #include <thread>
+
+class Logger;
+class Board;
+class Gui;
+class InputType;
+class ModeEngine;
+class ModeType;
+
+
 class Winch {
  public:
   Winch();
@@ -28,14 +34,14 @@ class Winch {
   void emergency();
   void display();
   ModeType getMode();
-  int getSpeedTarget();
+  uint8_t getSpeedTarget();
   State getState();
-  int getBattery();
-  int getRemote();
+  uint8_t getBattery();
+  uint8_t getRemote();
   float getDistance();
-  void speedUp(int);
-  void speedDown(int);
-  void speedValue(int);
+  void speedUp(uint8_t);
+  void speedDown(uint8_t);
+  void speedValue(uint8_t);
   void enterGui(InputType);
 
  private:
@@ -47,7 +53,7 @@ class Winch {
   std::thread *controlLoop;
 
   State state = State::UNKNOWN;
-  int speed_target = SPEED_INIT;
+  uint8_t speed_target = SPEED_INIT;
 
   void banner();
   void loadConfig();
