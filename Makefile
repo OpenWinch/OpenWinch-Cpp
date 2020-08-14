@@ -30,7 +30,10 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
 
 # define any libraries to link into executable
-LIBS = -lstdc++ -lm -lwiringPi -lslog -lpthread -lrt -llcdgfx
+LIBS = -lstdc++ -lm -lrt
+LIBS += -lslog -lpthread
+LIBS += -lwiringPi
+LIBS += -llcdgfx
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
