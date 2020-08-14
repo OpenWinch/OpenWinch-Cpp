@@ -9,6 +9,9 @@
 // -@-@---@@--@------@@--@@@-@--@@@--@@--@@@-
 // -------------------------------@----------
 // -------------------------------@----------
+
+#include <cstdint>
+
 extern const uint8_t free_FreePixel8x11[] PROGMEM;
 const uint8_t free_FreePixel8x11[] PROGMEM =
 {

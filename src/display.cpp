@@ -31,7 +31,11 @@ Gui::Gui(Winch *_winch) : winch(_winch) {
     this->device->begin();
     this->device->clear();
     this->device->setColor(RGB_COLOR16(255,255,0));
-    this->device->drawLine(10,30,56,96);
+    //this->device->drawLine(10,30,56,96);
+    //this->device->setFixedFont(free_SLANT12x10);
+    this->device->setFixedFont(ssd1306xled_font6x8);
+    this->device->clear();
+    this->device->printFixed(1, 1, "OpenWinch", STYLE_NORMAL);
   } else if (GuiType::VGA == config) {
     // from luma.emulator.device import pygame
 

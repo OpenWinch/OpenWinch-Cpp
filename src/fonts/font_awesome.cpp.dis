@@ -7,8 +7,9 @@
 // @--@-@--@-@--@-@--@-@--@-@--@-@--@-@--@-@--@-
 // @--@-@--@-@--@-@--@-@--@-@--@-@--@-@--@-@--@-
 // @@@@-@@@@-@@@@-@@@@-@@@@-@@@@-@@@@-@@@@-@@@@-
-extern const uint8_t free_fontawesome-webfont4x9[] PROGMEM;
-const uint8_t free_fontawesome-webfont4x9[] PROGMEM =
+#include <cstdint>
+extern const uint8_t free_fontawesome_webfont4x9[] PROGMEM;
+const uint8_t free_fontawesome_webfont4x9[] PROGMEM =
 {
 //  type|width|height|first char
     0x02, 0x04, 0x09, 0x00,

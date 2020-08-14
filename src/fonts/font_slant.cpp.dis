@@ -8,8 +8,13 @@
 // ------------@@@@--@-----@@@@-@@@@--@@--@@@@----@@@@---@@-
 // ---------------------------------------------------------
 // ---------------------------------------------------------
-extern const uint8_t free_SLANT12x10[] PROGMEM;
-const uint8_t free_SLANT12x10[] PROGMEM =
+
+#include <cstdint>
+
+//
+
+
+const uint8_t free_SLANT12x10[] =
 {
 //  type|width|height|first char
     0x02, 0x0C, 0x0A, 0x00,

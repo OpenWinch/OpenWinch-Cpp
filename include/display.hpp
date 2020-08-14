@@ -20,6 +20,8 @@ class Winch;
 class InputType;
 class DisplaySH1106_128x64_I2C;
 
+extern const uint8_t free_SLANT12x10[] ;
+
 class GuiType {
  public:
   enum ValueGuiType : uint8_t {

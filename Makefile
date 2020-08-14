@@ -33,7 +33,8 @@ INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
 LIBS = -lstdc++ -lm -lwiringPi -lslog -lpthread -lrt -llcdgfx
 
 SRCS := $(wildcard src/*.c) \
-		$(wildcard src/*.cpp)
+		$(wildcard src/*.cpp) \
+		$(wildcard src/fonts/*.cpp)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)TARGET_ARCH
 
