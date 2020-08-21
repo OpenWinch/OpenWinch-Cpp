@@ -38,7 +38,7 @@ class ModeType {
       case TwoWay:   return "TwoWay";
       case Infinity: return "Infinity";
     };
-  }
+  };
 
   std::vector<ModeType> list();
 

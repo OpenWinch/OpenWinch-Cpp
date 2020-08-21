@@ -2,21 +2,26 @@ TARGET_EXEC ?= openwinch
 BUILD_DIR ?= ./build
 
 # C and C++ program compilers. Un-comment and specify for cross-compiling if needed. 
-CC 						?= gcc
+#CC 					?= gcc
+#CC 						= clang-9
 # CXX is the C++ compiler
 #CXX    				?= g++
+#CXX    					= clang++-9
 # Un-comment the following line to compile C programs as C++ ones.
 #CC						?= $(CXX)
 
 
-CFLAGS 					+= -Og -g
+CFLAGS 					+= -Og
 
 #CXXFLAGS is the flags for the C++ compiler
-CXXFLAGS				+= -std=c++17
+CXXFLAGS				+= -std=c++17 -ffreestanding -Og
+#CXXFLAGS += -g
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
 CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
+# clang 
+#CPPFLAGS				+= -Wno-reserved-user-defined-literal
 
 # LDFLAGS are the flags for linking
 # The options used in linking as well as in any direct use of ld.
@@ -30,7 +35,11 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
 
 # define any libraries to link into executable
-LIBS = -lstdc++ -lm -lwiringPi -lslog -lpthread -lrt -llcdgfx
+LIBS = -lstdc++ -lm -lpthread -lrt
+LIBS += -lslog
+LIBS += -llcdgfx
+LIBS += -lpigpio
+LIBS += -lwiringPi
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \

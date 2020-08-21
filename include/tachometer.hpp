@@ -10,7 +10,12 @@
 #define TACHOMETER_HPP_
 
 #include <string>
-#include "logger.hpp"
+
+class Logger;
+class InputDevice;
+class OutputDevice;
+class PWMOutputDevice;
+
 
 typedef enum rotation {
   Clock = 1,
@@ -41,9 +46,9 @@ class Tachometer {
 
   uint32_t get_rpm(uint32_t pulseTime);
 
-  void int_hall_W();
-  void int_hall_V();
-  void int_hall_U();
+  void int_hall_W(int, int, uint32_t);
+  void int_hall_V(int, int, uint32_t);
+  void int_hall_U(int, int, uint32_t);
 
   tacho_hallSensor_t get_hall_sensorU();
   tacho_hallSensor_t get_hall_sensorW();
@@ -51,6 +56,10 @@ class Tachometer {
 
  private:
   Logger *logger = nullptr;
+  InputDevice *input_hal_u;
+  InputDevice *input_hal_w;
+  InputDevice *input_hal_v;
+
   rotation_t tacho_direct = rotation::Clock;
 
   tacho_hallSensor_t tacho_hsu;

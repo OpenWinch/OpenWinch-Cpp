@@ -24,7 +24,11 @@ class ModeType;
 
 class Winch {
  public:
-  Winch();
+  static Winch& get() {
+    static Winch instance;
+    return instance;
+  }
+
   void initialize();
   void initialized();
   void start();
@@ -33,14 +37,15 @@ class Winch {
   void stopped();
   void emergency();
   void display();
+  void exit();
   ModeType getMode();
   uint8_t getSpeedTarget();
   State getState();
   uint8_t getBattery();
   uint8_t getRemote();
   float getDistance();
-  void speedUp(uint8_t);
-  void speedDown(uint8_t);
+  void speedUp(uint8_t value=1);
+  void speedDown(uint8_t value=1);
   void speedValue(uint8_t);
   void enterGui(InputType);
 
@@ -55,6 +60,8 @@ class Winch {
   State state = State::UNKNOWN;
   uint8_t speed_target = SPEED_INIT;
 
+  Winch();
+  ~Winch()= default;
   void banner();
   void loadConfig();
   void initControlLoop();

@@ -62,7 +62,7 @@ class State {
       case RUNNING: return "RUNNING";
       case STOP:    return "STOP";
     };
-  }
+  };
 
  private:
   ValueState value;

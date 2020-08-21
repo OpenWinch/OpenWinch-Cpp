@@ -13,7 +13,7 @@
 
 Board::Board(Winch *_winch) : winch{_winch}  {
   this->logger = &Logger::get();
-  this->logger->debug("IO : Initialize board...");
+  this->logger->debug("IO : Initialize board stack...");
 }
 
 void Board::initialize() {
@@ -38,7 +38,7 @@ SpeedMode Board::getSpeedMode() {
   return this->speed_mode;
 }
 
-int Board::getBattery() {
+uint8_t Board::getBattery() {
   return 100;
 }
 
@@ -65,7 +65,7 @@ void Emulator::emergency() {
   this->logger->info("IO : Emulator Emergency mode !");
 }
 
-void Emulator::setThrottleValue(int value) {
+void Emulator::setThrottleValue(uint8_t value) {
   if (this->value > 0) {
     this->rotation_from_init -= 1;
   } else if (this->init) {
@@ -78,7 +78,7 @@ void Emulator::setThrottleValue(int value) {
   }
 }
 
-int Emulator::getThrottleValue() {
+uint8_t Emulator::getThrottleValue() {
   return this->value;
 }
 
@@ -90,7 +90,7 @@ void Emulator::setSpeedMode(SpeedMode mode) {
   Board::setSpeedMode(mode);
 }
 
-int Emulator::getBattery() {
+uint8_t Emulator::getBattery() {
 // power_now = open("/sys/class/power_supply/BAT0/energy_now", "r").readline();
 // power_full = open("/sys/class/power_supply/BAT0/energy_full", "r").readline();
 // return int(float(power_now) / float(power_full) * 100);

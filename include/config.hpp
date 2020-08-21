@@ -20,4 +20,13 @@
 #define OW_GUI "SH1106_I2C"
 // #define OW_GUI EMULATOR
 
+// Define Framework of GPIO
+//#define OW_BG_DEBUG
+
+// PiGpio Framework
+#define OW_BG_PIGPIO
+
+// WiringPI Framework
+// #define OW_BG_WIRINGPI
+
 #endif  // CONFIG_HPP_

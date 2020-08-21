@@ -13,13 +13,22 @@
 #include "mode.hpp"
 #include "logger.hpp"
 #include "hardware.hpp"
+#include "hardware_pi.hpp"
 #include "version.hpp"
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include <thread>
+#include <typeinfo>  
 
+void terminate_gpio();
+
+void terminate() {
+  terminate_gpio();
+  Winch::get().exit();
+  std::cout << "Stop !!" << std::endl;
+}
 
 /**
  * @brief Construct a new Winch:: Winch object
@@ -27,11 +36,11 @@
 Winch::Winch() {
   this->logger = &Logger::get();
 
-//   const int result_1 = std::atexit(this->emergency);
-//   if (result_1 != 0) {
-//     std::cerr << "Registration failed\n";
-//     //return EXIT_FAILURE;
-//   }
+  const int result_1 = std::atexit(terminate);
+  if (result_1 != 0) {
+    std::cerr << "Registration failed\n";
+    //return EXIT_FAILURE;
+  }
 
   this->banner();
   this->loadConfig();
@@ -123,6 +132,10 @@ void Winch::display() {
           std::string(this->state).c_str(),
           std::to_string(this->speed_target).c_str(),
           std::to_string(this->mode->getSpeedCurrent()).c_str());
+}
+
+void Winch::exit() {
+  this->gui->exit();
 }
 
 /**
@@ -239,18 +252,21 @@ void Winch::banner() {
  * @brief Load configuration.
  */
 void Winch::loadConfig() {
-  this->logger->debug("Gui config : %s", OW_GUI);
+  this->logger->info("Gui config : %s", OW_GUI);
   this->gui = new Gui(this);
   this->gui->boot();
   //this->input = Keyboard(this);
 
-  this->logger->debug("Board config : %s", OW_BOARD);
-  this->board = new Emulator(this);  // loadClass( OW_BOARD, this);
-  //this->logger->info("Board : %s", type(this->board).__name__);
+  this->logger->info("Board config : %s", OW_BOARD);
+  if (std::string(OW_BOARD) == std::string("openwinch.hardware.Emulator")) {
+    this->board = new Emulator(this);
+  } else
+  if (std::string(OW_BOARD) == std::string("openwinch.hardwarePi.RaspberryPi")) {
+    this->board = new Raspberrypi(this);
+  }
 
-  this->logger->debug("Mode config : %s", OW_MODE);
+  this->logger->info("Mode config : %s", OW_MODE);
   this->mode = new OneWayMode(this->board, this);  // ModeFactory.modeFactory(this, this->board, OW_MODE);
-  this->logger->info("Mode : %s", std::string(this->getMode()).c_str());
 }
 
 /**

@@ -18,76 +18,64 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <functional>
 
-#include <wiringPi.h>
 
 #include "tachometer.hpp"
-#include "logger.hpp"
+#include "bridge_io.hpp"
 
-#define IN_HS_W 1
-#define IN_HS_V 2
-#define IN_HS_U 3
+#include "hardware_config.hpp"
+#include "logger.hpp"
 
 #define MOTOR_PPR 45      // pulse by turn
 #define WINCH_DIAM 0.20   // In meter
 
 
-void __challSensorW() {
-  Tachometer::get().int_hall_W();
-}
-
-void __challSensorV() {
-  Tachometer::get().int_hall_V();
-}
-
-void __challSensorU() {
-  Tachometer::get().int_hall_U();
-}
-
 Tachometer::Tachometer() {
   this->logger = &Logger::get();
-  this->logger->debug("Init GPIO...");
+  this->logger->debug("IO-T : Init Tachometer...");
 
   this->hall_init(&this->tacho_hsu);
   this->hall_init(&this->tacho_hsw);
   this->hall_init(&this->tacho_hsv);
 
-  if (wiringPiSetup() < 0) {
-    error_exit("Unable to setup wiringPi: ");
-  }
-
   // Sensor U
-  pinMode(IN_HS_U, INPUT);
-  // pullUpDnControl(IN_HS_U, PUD_UP);
-  if (wiringPiISR(IN_HS_U, INT_EDGE_FALLING, &__challSensorU) < 0) {
-    error_exit("Unable to setup ISR U: ");
-  }
+  this->input_hal_u = new InputDevice(IN_HS_U);
+  this->input_hal_u->when_pressed(std::bind(
+                                  &Tachometer::int_hall_U,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
 
   // Sensor W
-  pinMode(IN_HS_W, INPUT);
-  // pullUpDnControl(IN_HS_W, PUD_UP);
-  if (wiringPiISR(IN_HS_W, INT_EDGE_FALLING, &__challSensorW) < 0) {
-    error_exit("Unable to setup ISR W: ");
-  }
+  this->input_hal_w = new InputDevice(IN_HS_W);
+  this->input_hal_w->when_pressed(std::bind(
+                                  &Tachometer::int_hall_W,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
 
   // Sensor V
-  pinMode(IN_HS_V, INPUT);
-  // pullUpDnControl(IN_HS_V, PUD_UP);
-  if (wiringPiISR(IN_HS_V, INT_EDGE_FALLING, &__challSensorV) < 0) {
-    error_exit("Unable to setup ISR V: ");
-  }
-
+  this->input_hal_v = new InputDevice(IN_HS_V);
+  this->input_hal_v->when_pressed(std::bind(
+                                  &Tachometer::int_hall_V,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
 }
 
-void Tachometer::int_hall_W() {
-    this->logger->debug("Pulse W");
+void Tachometer::int_hall_W(int gpio, int level, uint32_t tick) {
+    this->logger->debug("IO-T : Pulse W");
     // Set startTime to current microcontroller elapsed time value
-    this->tacho_hsw.startTime = millis();
+    this->tacho_hsw.startTime = tick;
 
     // Read the current W hall sensor value
-    int HSW_Val = digitalRead(IN_HS_W);
+    int HSW_Val = this->input_hal_w->digitalRead();
     // Read the current V (or U) hall sensor value
-    int HSV_Val = digitalRead(IN_HS_V);
+    int HSV_Val = this->input_hal_v->digitalRead();
     // Determine rotation __direction (ternary if statement)
     this->tacho_direct = HSW_Val == HSV_Val ? Clock : CounterClock;
 
@@ -101,12 +89,12 @@ void Tachometer::int_hall_W() {
     this->tacho_hsw.pulseCount = this->tacho_hsw.pulseCount + (1 * this->tacho_direct);
 }
 
-void Tachometer::int_hall_V() {
-    this->logger->debug("Pulse V");
-    this->tacho_hsv.startTime = millis();
+void Tachometer::int_hall_V(int gpio, int level, uint32_t tick) {
+    this->logger->debug("IO-T : Pulse V");
+    this->tacho_hsv.startTime = tick;
 
-    int HSV_Val = digitalRead(IN_HS_V);
-    int HSU_Val = digitalRead(IN_HS_U);
+    int HSV_Val = this->input_hal_v->digitalRead();
+    int HSU_Val = this->input_hal_u->digitalRead();
     this->tacho_direct = HSV_Val == HSU_Val ? Clock : CounterClock;
 
     this->tacho_hsv.pulseTime = this->tacho_hsv.startTime - this->tacho_hsv.prevTime;
@@ -116,12 +104,12 @@ void Tachometer::int_hall_V() {
     this->tacho_hsv.pulseCount = this->tacho_hsv.pulseCount + (1 * this->tacho_direct);
 }
 
-void Tachometer::int_hall_U() {
-    this->logger->debug("Pulse U");
-    this->tacho_hsu.startTime = millis();
+void Tachometer::int_hall_U(int gpio, int level, uint32_t tick) {
+    this->logger->debug("IO-T : Pulse U");
+    this->tacho_hsu.startTime = tick;
 
-    int HSU_Val = digitalRead(IN_HS_U);
-    int HSW_Val = digitalRead(IN_HS_W);
+    int HSU_Val = this->input_hal_u->digitalRead();
+    int HSW_Val = this->input_hal_w->digitalRead();
     this->tacho_direct = HSU_Val == HSW_Val ? Clock : CounterClock;
 
     this->tacho_hsu.pulseTime = this->tacho_hsu.startTime - this->tacho_hsu.prevTime;
@@ -146,7 +134,7 @@ uint32_t tacho_get_rpm(uint32_t pulseTime) {
 }
 
 void Tachometer::hall_init(tacho_hallSensor_t *sensor) {
-  this->logger->debug("Init Sensor...");
+  this->logger->debug("IO-T : Init Sensor...");
 
   sensor->pulseTime = 0;
   sensor->pulseCount = 0;

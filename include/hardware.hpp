@@ -36,7 +36,7 @@ class SpeedMode {
       case MEDIUM:  return "MEDIUM";
       case HIGH:    return "HIGH";
     };
-  }
+  };
 
  private:
   ValueSpeedMode value;
@@ -49,13 +49,13 @@ class Board {
   Board(Winch*);
   virtual void initialize() = 0;
   virtual void emergency() = 0;
-  virtual void setThrottleValue(int) = 0;
-  virtual int getThrottleValue() = 0;
+  virtual void setThrottleValue(uint8_t) = 0;
+  virtual uint8_t getThrottleValue() = 0;
   virtual void setReverse(bool) = 0;
   bool isReverse();
   virtual void setSpeedMode(SpeedMode) = 0;
   SpeedMode getSpeedMode();
-  virtual int getBattery() = 0;
+  virtual uint8_t getBattery() = 0;
   int getRotationFromBegin();
   int getRotationFromEnd();
 
@@ -73,14 +73,14 @@ class Emulator: virtual public Board {
   Emulator(Winch*);
   void initialize() override;
   void emergency() override;
-  void setThrottleValue(int) override;
-  int getThrottleValue() override;
+  void setThrottleValue(uint8_t) override;
+  uint8_t getThrottleValue() override;
   void setReverse(bool) override;
   void setSpeedMode(SpeedMode) override;
-  int getBattery() override;
+  uint8_t getBattery() override;
 
  private:
-  int value = 0;
+  uint8_t value = 0;
   bool init = false;
 
 };

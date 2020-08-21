@@ -8,33 +8,66 @@
 
 #include <iostream>
 
-// #include <stdio.h>
-// #include <string.h>
-// #include <stdint.h>
-// #include <errno.h>
-// #include <stdlib.h>
-// #include <time.h>
-
 #include "tachometer.hpp"
 #include "logger.hpp"
-#include "hardware.hpp"
 #include "controller.hpp"
+#include "webserver.hpp"
 
 int main(int argc, char *argv[])  {
   int i = 0;
   int j = 0;
 
-  Logger &logger = Logger::get();
-  Tachometer &tacho = Tachometer::get();
-
-  Winch *winch = new Winch();
-  winch->start();
-
-
-  
+  Winch *winch = &Winch::get();
+  Logger *logger = &Logger::get();
+  // Debug
+  Tachometer *Tachometer = &Tachometer::get();
 
   // clock_t tic = clock();
   std::cout << "Start.." << std::endl;
+
+  WebServer srv;
+  srv.run();
+
+  // httplib::Server svr;
+
+  // if (!svr.is_valid()) {
+  //   printf("server has an error...\n");
+  //   return -1;
+  // }
+
+  // svr.Get("/", [=](const httplib::Request & /*req*/, httplib::Response &res) {
+  //   res.set_redirect("/hi");
+  // });
+
+  // svr.Get("/hi", [](const httplib::Request & /*req*/, httplib::Response &res) {
+  //   res.set_content("Hello World!\n", "text/plain");
+  // });
+
+  // svr.Get("/slow", [](const httplib::Request & /*req*/, httplib::Response &res) {
+  //   std::this_thread::sleep_for(std::chrono::seconds(2));
+  //   res.set_content("Slow...\n", "text/plain");
+  // });
+
+  // // svr.Get("/dump", [](const httplib::Request &req, httplib::Response &res) {
+  // //   res.set_content(dump_headers(req.headers), "text/plain");
+  // // });
+
+  // svr.Get("/stop",
+  //         [&](const httplib::Request & /*req*/, httplib::Response & /*res*/) { svr.stop(); });
+
+  // // svr.set_error_handler([](const httplib::Request & /*req*/, httplib::Response &res) {
+  // //   const char *fmt = "<p>Error Status: <span style='color:red;'>%d</span></p>";
+  // //   char buf[BUFSIZ];
+  // //   snprintf(buf, sizeof(buf), fmt, res.status);
+  // //   res.set_content(buf, "text/html");
+  // // });
+
+  // // svr.set_logger([](const httplib::Request &req, const httplib::Response &res) {
+  // //   printf("%s", log(req, res).c_str());
+  // // });
+
+  // svr.listen("0.0.0.0", 80);
+
   while (1) {
     ++j;
 
@@ -53,7 +86,7 @@ int main(int argc, char *argv[])  {
     //   i = 0;
     //   j = 0;
     // }
-
+    std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 
   return 0;

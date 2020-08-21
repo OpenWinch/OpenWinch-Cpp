@@ -15,3 +15,8 @@ cd lcdgfx
 make
 sudo cp bld/liblcdgfx.a /usr/local/lib/
 
+cd $DIR/lib
+git clone https://github.com/yhirose/cpp-httplib.git
+cd cpp-httplib
+
+

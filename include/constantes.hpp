@@ -21,10 +21,10 @@
 #define SPEED_MAX 38
 #define SPEED_INIT 30
 #define SPEED_MIN 1
-#define SPEED_UNIT 'Km/h'
+#define SPEED_UNIT "Km/h"
 
-/* Loop delay in nanosecond*/
-#define LOOP_DELAY 1
+/* Loop delay in milisecond*/
+#define LOOP_DELAY 100
 // #define LOOP_DELAY 10
 
 #endif  // CONSTANTES_HPP_
