@@ -9,12 +9,15 @@
 
 #include <string>
 
+extern const std::string index_html;
+extern const std::string extra_html;
+
 namespace httplib {
-  class SSLServer;
-  class Server;
-//  class Headers;
-  class Request;
-  class Response;
+class SSLServer;
+class Server;
+// class Headers;
+class Request;
+class Response;
 }
 
 class Logger;
@@ -33,14 +36,16 @@ class WebServer {
 #else
   httplib::Server* srv = nullptr;
 #endif
+  void setErrorHandler();
+  void setLogger();
+  void setStaticFile();
   static std::string log(const httplib::Request&, const httplib::Response&);
-  //static std::string dump_headers(const httplib::Headers &headers);
-
+  // static std::string dump_headers(const httplib::Headers &headers);
 };
 
 class WebMain {
  public:
-  WebMain(WebServer*);
+  explicit WebMain(WebServer*);
 
  private:
   WebServer* server = nullptr;
@@ -49,12 +54,11 @@ class WebMain {
 
 class WebExtra {
  public:
-  WebExtra(WebServer*);
+  explicit WebExtra(WebServer*);
 
  private:
   WebServer* server = nullptr;
   httplib::Server* srv = nullptr;
-
 };
 
 #endif  // WEBSERVER_HPP_

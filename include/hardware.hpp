@@ -35,18 +35,17 @@ class SpeedMode {
       case LOW:     return "LOW";
       case MEDIUM:  return "MEDIUM";
       case HIGH:    return "HIGH";
-    };
-  };
+    }
+  }
 
  private:
   ValueSpeedMode value;
   SpeedMode() = default;
-
 };
 
 class Board {
  public:
-  Board(Winch*);
+  explicit Board(Winch*);
   virtual void initialize() = 0;
   virtual void emergency() = 0;
   virtual void setThrottleValue(uint8_t) = 0;
@@ -65,12 +64,11 @@ class Board {
   SpeedMode speed_mode = SpeedMode::LOW;
   bool reverse = false;
   int rotation_from_init = 0;
-
 };
 
 class Emulator: virtual public Board {
  public:
-  Emulator(Winch*);
+  explicit Emulator(Winch*);
   void initialize() override;
   void emergency() override;
   void setThrottleValue(uint8_t) override;

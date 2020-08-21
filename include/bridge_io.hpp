@@ -6,8 +6,8 @@
  * @copyright Copyright © 2020
  */
 
-#ifndef BRIDGE_PIGPIO_HPP_
-#define BRIDGE_PIGPIO_HPP_
+#ifndef BRIDGE_IO_HPP_
+#define BRIDGE_IO_HPP_
 
 #include <functional>
 #include <cinttypes>
@@ -22,13 +22,16 @@ typedef std::function<void(int, int, uint32_t)> cb_t;
 
 class InputDevice {
  public:
-  explicit InputDevice(uint8_t _pin, uint8_t pull = PI_PUD_UP, bool inverse = false);
-  ~InputDevice();
+  explicit InputDevice(uint8_t _pin, uint8_t _pull = PI_PUD_UP, bool _inverse = false);
+  // InputDevice(const InputDevice&) = 0;
+  virtual ~InputDevice();
   uint8_t digitalRead();
   void when_pressed(const cb_t &);
   void when_released(const cb_t &);
  protected:
   uint8_t pin;
+  uint8_t pull;
+  bool inverse;
   cb_t pressedEvent;
   cb_t releasedEvent;
   static void interruptEdge(int, int, uint32_t, void *);
@@ -36,23 +39,31 @@ class InputDevice {
 
 class OutputDevice {
  public:
-  explicit OutputDevice(uint8_t);
+  explicit OutputDevice(uint8_t _pin, uint8_t _pull = PI_PUD_UP, bool _inverse = false);
+  // OutputDevice(const OutputDevice&) = 0;
+  virtual ~OutputDevice() = default;
   void on();
   void off();
  protected:
   uint8_t pin;
+  uint8_t pull;
+  bool inverse;
 };
 
 class PWMOutputDevice {
  public:
-  explicit PWMOutputDevice(uint8_t);
+  explicit PWMOutputDevice(uint8_t _pin, uint8_t _pull = PI_PUD_UP, bool _inverse = false);
+  // PWMOutputDevice(const PWMOutputDevice&) = 0;
+  virtual ~PWMOutputDevice() = default;
   void on();
   void off();
   void setValue(float);
   float getValue();
  protected:
   uint8_t pin;
+  uint8_t pull;
+  bool inverse;
   float value;
 };
 
-#endif  // BRIDGE_PIGPIO_HPP_
+#endif  // BRIDGE_IO_HPP_

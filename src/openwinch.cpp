@@ -8,26 +8,33 @@
 
 #include <iostream>
 
-#include "tachometer.hpp"
-#include "logger.hpp"
 #include "controller.hpp"
 #include "webserver.hpp"
 
+#ifdef DEBUG
+#include "tachometer.hpp"
+#include "logger.hpp"
+#endif
+
 int main(int argc, char *argv[])  {
-  int i = 0;
   int j = 0;
 
+  // Start Winch engine.
   Winch *winch = &Winch::get();
-  Logger *logger = &Logger::get();
+
   // Debug
+#ifdef DEBUG
+  Logger *logger = &Logger::get();
   Tachometer *Tachometer = &Tachometer::get();
+#endif
 
-  // clock_t tic = clock();
-  std::cout << "Start.." << std::endl;
-
+  // Start Web stack.
   WebServer srv;
   srv.run();
 
+
+  // clock_t tic = clock();
+  std::cout << "Start.." << std::endl;
   // httplib::Server svr;
 
   // if (!svr.is_valid()) {

@@ -21,13 +21,19 @@
 
 std::once_flag init_flag;
 
-void init_pigpio()
-{
+void init_pigpio() {
     std::call_once(init_flag, [](){
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO ver " << std::to_string(gpioVersion()) << std::endl;
       std::cout << "IO: Hardware ver " << std::to_string(gpioHardwareRevision()) << std::endl;
 #endif
+      // gpioCfgBufferSize (PI_DEFAULT_BUFFER_MILLIS);
+      // gpioCfgClock (PI_DEFAULT_CLK_MICROS, PI_DEFAULT_CLK_PERIPHERAL, 0);
+      // gpioCfgInterfaces (PI_DEFAULT_IF_FLAGS);
+      // gpioCfgDMAchannels (PI_DEFAULT_DMA_PRIMARY_CHANNEL, PI_DEFAULT_DMA_SECONDARY_CHANNEL);
+      // gpioCfgSocketPort (PI_DEFAULT_SOCKET_PORT);
+      // gpioCfgMemAlloc (PI_DEFAULT_MEM_ALLOC_MODE);
+      // gpioCfgSetInternals (PI_DEFAULT_CFG_INTERNALS);
       int ret = gpioInitialise();
       if (ret < 0) { throw ret; }
     });
@@ -40,21 +46,42 @@ void terminate_gpio() {
   gpioTerminate();
 }
 
-OutputDevice::OutputDevice(uint8_t _pin): pin(_pin) {
+/**
+ * @brief Construct a new Output Device:: Output Device object
+ * 
+ * @param _pin GPIO pin.
+ * @param _pull Pull resistor up or down.
+ * @param _inverse Inverse state.
+ */
+OutputDevice::OutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
+    pin(_pin),
+    pull(_pull),
+    inverse(_inverse) {
   init_pigpio();
 
-  int ret = gpioSetMode(this->pin, PI_OUTPUT);
-  if (ret < 0) { throw ret; }
+  // Set mode (if not good)
+  int ret = gpioGetMode(this->pin);
+  if (ret != PI_OUTPUT) {
+    ret = gpioSetMode(this->pin, PI_OUTPUT);
+    if (ret < 0) { throw ret; }
+  }
 
-  // ret = gpioSetPullUpDown(this->pin, PI_PUD_UP);
-  // if (ret < 0) { throw ret; }
+  // Set Pull resistor
+  ret = gpioSetPullUpDown(this->pin, this->pull);
+  if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Change state of GPIO to ON/HIGH
+ */
 void OutputDevice::on() {
   int ret = gpioWrite(this->pin, PI_ON);
   if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Change state of GPIO to OFF/LOW
+ */
 void OutputDevice::off() {
   int ret = gpioWrite(this->pin, PI_OFF);
   if (ret < 0) { throw ret; }
@@ -62,8 +89,17 @@ void OutputDevice::off() {
 
 
 
-
-PWMOutputDevice::PWMOutputDevice(uint8_t _pin): pin(_pin) {
+/**
+ * @brief Construct a new PWMOutputDevice::PWMOutputDevice object
+ * 
+ * @param _pin GPIO pin.
+ * @param _pull Pull resistor up or down.
+ * @param _inverse Inverse state.
+ */
+PWMOutputDevice::PWMOutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
+    pin(_pin),
+    pull(_pull),
+    inverse(_inverse) {
   init_pigpio();
 
 //   if (this->pin == PWM_HARDWARE_PIN) {
@@ -74,6 +110,9 @@ PWMOutputDevice::PWMOutputDevice(uint8_t _pin): pin(_pin) {
   // pullUpDnControl(this->pin, PUD_UP);
 }
 
+/**
+ * @brief Change state of GPIO to ON/HIGH
+ */
 void PWMOutputDevice::on() {
   this->value = 1;
 
@@ -86,6 +125,9 @@ void PWMOutputDevice::on() {
   if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Change state of GPIO to OFF/LOW
+ */
 void PWMOutputDevice::off() {
   this->value = 0;
 
@@ -98,6 +140,11 @@ void PWMOutputDevice::off() {
   if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Change value of GPIO 
+ * 
+ * @param _value 
+ */
 void PWMOutputDevice::setValue(float _value) {
   // Assertion
   if (_value > 1) { _value = 1; }
@@ -122,8 +169,18 @@ float PWMOutputDevice::getValue() {
 
 
 
+/**
+ * @brief Construct a new Input Device object
+ * 
+ * @param _pin GPIO pin.
+ * @param _pull Pull resistor up or down.
+ * @param _inverse Inverse state.
+ */
+InputDevice::InputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
+    pin(_pin),
+    pull(_pull),
+    inverse(_inverse) {
 
-InputDevice::InputDevice(uint8_t _pin, uint8_t pull, bool inverse): pin(_pin) {
   init_pigpio();
 
   // Set mode (if not good)
@@ -134,7 +191,7 @@ InputDevice::InputDevice(uint8_t _pin, uint8_t pull, bool inverse): pin(_pin) {
   }
 
   // Set Pull resistor
-  ret = gpioSetPullUpDown(this->pin, pull);
+  ret = gpioSetPullUpDown(this->pin, this->pull);
   if (ret < 0) { throw ret; }
 
   // Set Interupt
@@ -142,15 +199,23 @@ InputDevice::InputDevice(uint8_t _pin, uint8_t pull, bool inverse): pin(_pin) {
   if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Destroy the Input Device object
+ */
 InputDevice::~InputDevice() {
   int ret = gpioSetAlertFuncEx(this->pin, 0, this);
   if (ret < 0) { throw ret; }
 }
 
+/**
+ * @brief Read state of GPIO
+ * 
+ * @return uint8_t State PI_ON or PI_OFF
+ */
 uint8_t InputDevice::digitalRead() {
   int result = gpioRead(this->pin);
   if (result < 0) { throw result; }
-  return result;
+  return (uint8_t)result;
 }
 
 void InputDevice::interruptEdge(int gpio, int level, uint32_t tick, void *data)

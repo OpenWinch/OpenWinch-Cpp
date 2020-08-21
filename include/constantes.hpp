@@ -15,7 +15,7 @@
 /* Diameter in meter. */
 #define WINCH_DIAM 0.2
 /* Distance in meter. */
-#define WINCH_DISTANCE 200
+#define WINCH_DISTANCE 300
 
 /* Speed */
 #define SPEED_MAX 38

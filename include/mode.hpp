@@ -37,15 +37,14 @@ class ModeType {
       case OneWay:   return "OneWay";
       case TwoWay:   return "TwoWay";
       case Infinity: return "Infinity";
-    };
-  };
+    }
+  }
 
   std::vector<ModeType> list();
 
  private:
   ValueModeType value;
   ModeType() = default;
-  
 };
 
 class ModeEngine {

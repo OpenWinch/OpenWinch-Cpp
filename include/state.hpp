@@ -61,13 +61,12 @@ class State {
       case START:   return "START";
       case RUNNING: return "RUNNING";
       case STOP:    return "STOP";
-    };
-  };
+    }
+  }
 
  private:
   ValueState value;
   State() = default;
-
 };
 #endif
 

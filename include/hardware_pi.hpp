@@ -46,7 +46,6 @@ class Raspberrypi : virtual public Board {
   void pressedEnter(int, int, uint32_t);
   void pressedLeft(int, int, uint32_t);
   void pressedRight(int, int, uint32_t);
-
 };
 
 #endif  // HARDWARE_PI_HPP_

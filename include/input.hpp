@@ -33,7 +33,6 @@ class InputType {
  private:
   ValueInputType value;
   InputType() = default;
-
 };
 
 #endif  // INPUT_HPP_

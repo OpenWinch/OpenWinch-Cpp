@@ -15,7 +15,7 @@ CFLAGS 					+= -Og
 
 #CXXFLAGS is the flags for the C++ compiler
 CXXFLAGS				+= -std=c++17 -ffreestanding -Og
-#CXXFLAGS += -g
+CXXFLAGS 				+= -g
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
@@ -43,11 +43,13 @@ LIBS += -lwiringPi
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
-		$(wildcard src/fonts/*.cpp)
+		$(wildcard src/fonts/*.cpp) \
+		$(wildcard src/pages/*.cpp)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)TARGET_ARCH
 
 all:    $(BUILD_DIR)/$(TARGET_EXEC)
+		#@cp -r public $(BUILD_DIR)/public
 		@cp src/slog.cfg $(BUILD_DIR)/slog.cfg
 		@echo  OpenWinch is compiled
 

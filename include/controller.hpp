@@ -44,8 +44,8 @@ class Winch {
   uint8_t getBattery();
   uint8_t getRemote();
   float getDistance();
-  void speedUp(uint8_t value=1);
-  void speedDown(uint8_t value=1);
+  void speedUp(uint8_t value = 1);
+  void speedDown(uint8_t value = 1);
   void speedValue(uint8_t);
   void enterGui(InputType);
 
@@ -66,7 +66,6 @@ class Winch {
   void loadConfig();
   void initControlLoop();
   void changeState(State);
-
 };
 
 #endif  // CONTROLLER_HPP_

@@ -30,7 +30,7 @@ template<class C, class D> class NanoEngine;
 template <uint8_t BPP> class NanoCanvasOps;
 
 template <class D>
-using NanoEngine1 = NanoEngine<NanoCanvas<16,16,1>, D>;
+using NanoEngine1 = NanoEngine<NanoCanvas<16, 16, 1>, D>;
 
 extern const uint8_t free_SLANT12x10[];
 
@@ -104,12 +104,11 @@ class Gui {
 
   void drawBoot();
   void draw_loop();
-
 };
 
 class ScreenBase {
  public:
-  ScreenBase(Gui *);
+  explicit ScreenBase(Gui*);
   virtual uint8_t countItems() = 0;
   virtual void display(NanoCanvasOps<1>*) = 0;
   virtual void enter(uint8_t) = 0;
@@ -122,7 +121,7 @@ class ScreenBase {
 
 class MainScreen: public ScreenBase {
  public:
-  MainScreen(Gui *);
+  explicit MainScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -136,7 +135,7 @@ class MainScreen: public ScreenBase {
 
 class MenuScreen: public ScreenBase {
  public:
-  MenuScreen(Gui *);
+  explicit MenuScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -153,7 +152,7 @@ class MenuScreen: public ScreenBase {
 
 class ManualPositionScreen: public ScreenBase {
  public:
-  ManualPositionScreen(Gui *);
+  explicit ManualPositionScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -163,7 +162,7 @@ class ManualPositionScreen: public ScreenBase {
 
 class SecurityDistanceScreen: public ScreenBase {
  public:
-  SecurityDistanceScreen(Gui *);
+  explicit SecurityDistanceScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -173,7 +172,7 @@ class SecurityDistanceScreen: public ScreenBase {
 
 class ModeSelectorScreen: public ScreenBase {
  public:
-  ModeSelectorScreen(Gui *);
+  explicit ModeSelectorScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -183,7 +182,7 @@ class ModeSelectorScreen: public ScreenBase {
 
 class VelocityStartScreen: public ScreenBase {
  public:
-  VelocityStartScreen(Gui *);
+  explicit VelocityStartScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
@@ -193,7 +192,7 @@ class VelocityStartScreen: public ScreenBase {
 
 class VelocityStopScreen: public ScreenBase {
  public:
-  VelocityStopScreen(Gui *);
+  explicit VelocityStopScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
   void enter(uint8_t) override;
