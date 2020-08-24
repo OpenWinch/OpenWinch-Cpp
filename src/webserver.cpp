@@ -168,6 +168,7 @@ WebMain::WebMain(WebServer* _server) : server(_server) {
   this->srv->Get(HTTP_ROUTE_INDEX, [this](const httplib::Request &req, httplib::Response &res) {
     std::string content(index_html);
     Winch* winch = &Winch::get();
+    const auto host = res.headers.find("HOST");
 
     auto enable = "white";
     if (winch->getState().isRun()) {
@@ -178,7 +179,7 @@ WebMain::WebMain(WebServer* _server) : server(_server) {
       enable = "orange";
     }
 
-    findAndReplaceAll(content, TPL_URL, "http://192.168.0.81/index");
+    findAndReplaceAll(content, TPL_URL,  "http://" + host->second + HTTP_ROUTE_EXTRA);
     findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
     findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
     findAndReplaceAll(content, TPL_ENABLE, enable);
@@ -221,7 +222,6 @@ WebExtra::WebExtra(WebServer* _server) : server(_server) {
   this->srv->Get(HTTP_ROUTE_EXTRA, [this](const httplib::Request &req, httplib::Response &res) {
     std::string content(extra_html);
     Winch* winch = &Winch::get();
-
     const auto host = res.headers.find("HOST");
 
     findAndReplaceAll(content, TPL_URL, "http://" + host->second + HTTP_ROUTE_EXTRA);
