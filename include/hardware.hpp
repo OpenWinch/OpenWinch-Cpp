@@ -39,7 +39,7 @@ class SpeedMode {
   }
 
  private:
-  ValueSpeedMode value;
+  ValueSpeedMode value = ValueSpeedMode::LOW;
   SpeedMode() = default;
 };
 

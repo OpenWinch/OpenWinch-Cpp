@@ -10,7 +10,6 @@ BUILD_DIR ?= ./build
 # Un-comment the following line to compile C programs as C++ ones.
 #CC						?= $(CXX)
 
-
 CFLAGS 					+= -Og
 
 #CXXFLAGS is the flags for the C++ compiler
@@ -38,8 +37,9 @@ INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
 LIBS = -lstdc++ -lm -lpthread -lrt
 LIBS += -lslog
 LIBS += -llcdgfx
+
 LIBS += -lpigpio
-LIBS += -lwiringPi
+#LIBS += -lwiringPi
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
@@ -49,7 +49,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)TARGET_ARCH
 
 all:    $(BUILD_DIR)/$(TARGET_EXEC)
-		#@cp -r public $(BUILD_DIR)/public
+		@cp -r public $(BUILD_DIR)/public
 		@cp src/slog.cfg $(BUILD_DIR)/slog.cfg
 		@echo  OpenWinch is compiled
 

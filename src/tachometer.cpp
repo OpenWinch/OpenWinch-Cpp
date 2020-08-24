@@ -23,21 +23,17 @@
 
 #include "tachometer.hpp"
 #include "bridge_io.hpp"
+#include "constantes.hpp"
 
 #include "hardware_config.hpp"
 #include "logger.hpp"
-
-#define MOTOR_PPR 45      // pulse by turn
-#define WINCH_DIAM 0.20   // In meter
 
 
 Tachometer::Tachometer() {
   this->logger = &Logger::get();
   this->logger->debug("IO-T : Init Tachometer...");
 
-  this->hall_init(&this->tacho_hsu);
-  this->hall_init(&this->tacho_hsw);
-  this->hall_init(&this->tacho_hsv);
+  this->initialize();
 
   // Sensor U
   this->input_hal_u = new InputDevice(IN_HS_U);
@@ -67,15 +63,25 @@ Tachometer::Tachometer() {
                                   std::placeholders::_3));
 }
 
+void Tachometer::initialize() {
+  this->logger->debug("IO-T : Reset Tachometer !");
+
+  this->hall_init(&this->tacho_hsu);
+  this->hall_init(&this->tacho_hsw);
+  this->hall_init(&this->tacho_hsv);
+}
+
 void Tachometer::int_hall_W(int gpio, int level, uint32_t tick) {
-    this->logger->debug("IO-T : Pulse W");
+#ifdef OW_TA_DEBUG
+    std::cout << "IO-T : Pulse W" << std::endl;
+#endif
     // Set startTime to current microcontroller elapsed time value
     this->tacho_hsw.startTime = tick;
 
     // Read the current W hall sensor value
-    int HSW_Val = this->input_hal_w->digitalRead();
+    uint8_t HSW_Val = this->input_hal_w->digitalRead();
     // Read the current V (or U) hall sensor value
-    int HSV_Val = this->input_hal_v->digitalRead();
+    uint8_t HSV_Val = this->input_hal_v->digitalRead();
     // Determine rotation __direction (ternary if statement)
     this->tacho_direct = HSW_Val == HSV_Val ? Clock : CounterClock;
 
@@ -90,7 +96,9 @@ void Tachometer::int_hall_W(int gpio, int level, uint32_t tick) {
 }
 
 void Tachometer::int_hall_V(int gpio, int level, uint32_t tick) {
-    this->logger->debug("IO-T : Pulse V");
+#ifdef OW_TA_DEBUG
+    std::cout << "IO-T : Pulse V" << std::endl;
+#endif
     this->tacho_hsv.startTime = tick;
 
     int HSV_Val = this->input_hal_v->digitalRead();
@@ -105,7 +113,9 @@ void Tachometer::int_hall_V(int gpio, int level, uint32_t tick) {
 }
 
 void Tachometer::int_hall_U(int gpio, int level, uint32_t tick) {
-    this->logger->debug("IO-T : Pulse U");
+#ifdef OW_TA_DEBUG
+    std::cout << "IO-T : Pulse U" << std::endl;
+#endif
     this->tacho_hsu.startTime = tick;
 
     int HSU_Val = this->input_hal_u->digitalRead();
@@ -119,7 +129,7 @@ void Tachometer::int_hall_U(int gpio, int level, uint32_t tick) {
     this->tacho_hsu.pulseCount = this->tacho_hsu.pulseCount + (1 * this->tacho_direct);
 }
 
-uint32_t tacho_get_rpm(uint32_t pulseTime) {
+uint32_t Tachometer::get_rpm(uint32_t pulseTime) {
   uint32_t RPM = 0;
 
   if (pulseTime != 0) {
@@ -145,8 +155,9 @@ void Tachometer::hall_init(tacho_hallSensor_t *sensor) {
   sensor->rpm = 0;
 }
 
-void Tachometer::hall_debug(tacho_hallSensor_t sensor) {
-  this->logger->debug("{ time=%d, count=%d, rpm=%d }",
+void Tachometer::hall_debug(tacho_hallSensor_t sensor, std::string name) {
+  this->logger->debug("{ name=%s time=%d, count=%d, rpm=%d }",
+                      name.c_str(),
                       sensor.pulseTime,
                       sensor.pulseCount,
                       sensor.rpm);

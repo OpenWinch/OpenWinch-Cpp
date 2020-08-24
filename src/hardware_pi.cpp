@@ -96,13 +96,17 @@ if (this->debounced(tick)) {
 void Raspberrypi::initialize() {
   Board::initialize();
 
+  this->tacho->initialize();
+
   this->setReverse(false);
   this->setSpeedMode(SpeedMode::LOW);
+
   this->throttle_cmd->setValue(0);
   this->throttle_cmd->on();
 
   this->power_cmd->on();
-  this->logger->info("IO : Hardware Initialized !");
+  
+  this->logger->debug("IO : Hardware Initialized !");
 }
 
 void Raspberrypi::emergency() {

@@ -11,9 +11,16 @@
 
 /* Hardware */
 #define MOTOR_MAX 38
+#define MOTOR_PPR 45      // pulse by turn
+
+/* LCD */
+#define LCD_FPS 10
+#define LCD_WIDTH 128
+#define LCD_HEIGHT 64
 
 /* Diameter in meter. */
 #define WINCH_DIAM 0.2
+
 /* Distance in meter. */
 #define WINCH_DISTANCE 300
 

@@ -38,10 +38,7 @@
 #define IN_HS_U 24
 
 // LCD
-#define LCD_WIDTH 128
-#define LCD_HEIGHT 64
 #define LCD_ADDR 0x3c
 
-#define LCD_FPS 10
 
 #endif  // HARDWARE_CONFIG_HPP_

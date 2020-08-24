@@ -11,10 +11,29 @@
 #include "controller.hpp"
 #include "webserver.hpp"
 
+#define DEBUG
+
 #ifdef DEBUG
+#include <thread>
 #include "tachometer.hpp"
 #include "logger.hpp"
+
+void debug() {
+  Logger *logger = &Logger::get();
+  Tachometer *tacho = &Tachometer::get();
+
+  while (1) {
+    tacho->hall_debug(tacho->get_hall_sensorU(), "U");
+    tacho->hall_debug(tacho->get_hall_sensorW(), "W");
+    tacho->hall_debug(tacho->get_hall_sensorV(), "V");
+    logger->debug("RPM %d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+}
 #endif
+
+
 
 int main(int argc, char *argv[])  {
   int j = 0;
@@ -25,58 +44,29 @@ int main(int argc, char *argv[])  {
   // Debug
 #ifdef DEBUG
   Logger *logger = &Logger::get();
-  Tachometer *Tachometer = &Tachometer::get();
+  Tachometer *tacho = &Tachometer::get();
 #endif
+
+  // clock_t tic = clock();
+  std::cout << "Start.." << std::endl;
+
+   std::thread t(debug); 
 
   // Start Web stack.
   WebServer srv;
   srv.run();
 
 
-  // clock_t tic = clock();
-  std::cout << "Start.." << std::endl;
-  // httplib::Server svr;
+//   while (1) {
 
-  // if (!svr.is_valid()) {
-  //   printf("server has an error...\n");
-  //   return -1;
-  // }
+// #ifdef DEBUG
+//     tacho->hall_debug(tacho->get_hall_sensorU(), "U");
+//     tacho->hall_debug(tacho->get_hall_sensorW(), "W");
+//     tacho->hall_debug(tacho->get_hall_sensorV(), "V");
+//     logger->debug("%d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+// #endif
 
-  // svr.Get("/", [=](const httplib::Request & /*req*/, httplib::Response &res) {
-  //   res.set_redirect("/hi");
-  // });
-
-  // svr.Get("/hi", [](const httplib::Request & /*req*/, httplib::Response &res) {
-  //   res.set_content("Hello World!\n", "text/plain");
-  // });
-
-  // svr.Get("/slow", [](const httplib::Request & /*req*/, httplib::Response &res) {
-  //   std::this_thread::sleep_for(std::chrono::seconds(2));
-  //   res.set_content("Slow...\n", "text/plain");
-  // });
-
-  // // svr.Get("/dump", [](const httplib::Request &req, httplib::Response &res) {
-  // //   res.set_content(dump_headers(req.headers), "text/plain");
-  // // });
-
-  // svr.Get("/stop",
-  //         [&](const httplib::Request & /*req*/, httplib::Response & /*res*/) { svr.stop(); });
-
-  // // svr.set_error_handler([](const httplib::Request & /*req*/, httplib::Response &res) {
-  // //   const char *fmt = "<p>Error Status: <span style='color:red;'>%d</span></p>";
-  // //   char buf[BUFSIZ];
-  // //   snprintf(buf, sizeof(buf), fmt, res.status);
-  // //   res.set_content(buf, "text/html");
-  // // });
-
-  // // svr.set_logger([](const httplib::Request &req, const httplib::Response &res) {
-  // //   printf("%s", log(req, res).c_str());
-  // // });
-
-  // svr.listen("0.0.0.0", 80);
-
-  while (1) {
-    ++j;
+    // ++j;
 
     // clock_t toc = clock();
     // double delta = (int)(toc - tic);
@@ -84,17 +74,17 @@ int main(int argc, char *argv[])  {
     // if ( (delta / CLOCKS_PER_SEC) >= 1.0 ) {
     //   tic = clock();
       // tacho_hallSensor_t hallU = tacho_get_hall_sensorU();
-      // printf("CPU: %dkHz  GPIO : %dHz \n", j/1000, i);
-      // printf("U: %d  W: %d  V: %d \n",
-      //           tacho_get_rpm(hallU.pulseTime),
-      //           tacho_get_rpm(tacho_get_hall_sensorW().pulseTime),
-      //           tacho_get_rpm(tacho_get_hall_sensorV().pulseTime));
+    // printf("CPU: %dkHz  GPIO : %dHz \n", j/1000, i);
+    // printf("U: %d  W: %d  V: %d \n",
+    //           tacho_get_rpm(hallU.pulseTime),
+    //           tacho_get_rpm(tacho_get_hall_sensorW().pulseTime),
+    //           tacho_get_rpm(tacho_get_hall_sensorV().pulseTime));
       // tacho_hall_debug(hallU);
     //   i = 0;
     //   j = 0;
     // }
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-  }
+  //   std::this_thread::sleep_for(std::chrono::seconds(1));
+  // }
 
   return 0;
 }

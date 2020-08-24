@@ -82,9 +82,9 @@ class Gui {
   uint8_t view_pos = 0;
 
   explicit Gui(Winch*);
+  ~Gui();
   Winch* getWinch();
   void boot();
-  void exit();
   void display();
   uint8_t getPos();
   void enter(InputType);
@@ -97,6 +97,7 @@ class Gui {
  private:
   Logger *logger = nullptr;
   Winch* winch = nullptr;
+  
   DisplaySH1106_128x64_I2C* device = nullptr;
   NanoEngine1<DisplaySH1106_128x64_I2C>* engine = nullptr;
   NanoCanvas<128, 64, 1>* draw = nullptr;

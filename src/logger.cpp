@@ -16,7 +16,8 @@
 #include "logger.hpp"
 
 Logger::Logger() {
-    slog_init("openwinch.log", "slog.cfg", 3, 1);
+    slog_init("openwinch.log", "slog.cfg", 100, 1);
+
     printf("slog Version: %s\n", slog_version(0));
     this->debug("Initialize Logger...");
 }
@@ -30,7 +31,7 @@ void Logger::live(const char *msg, ...) {
     vsprintf(sInput, msg, args);
     va_end(args);
 
-    slog(0, SLOG_LIVE, sInput);
+    slog(99, SLOG_LIVE, sInput);
 }
 
 void Logger::info(const char *msg, ...) {
@@ -42,7 +43,7 @@ void Logger::info(const char *msg, ...) {
     vsprintf(sInput, msg, args);
     va_end(args);
 
-    slog(0, SLOG_INFO, sInput);
+    slog(2, SLOG_INFO, sInput);
 }
 
 void Logger::debug(const char * msg, ...) {
@@ -54,7 +55,7 @@ void Logger::debug(const char * msg, ...) {
     vsprintf(sInput, msg, args);
     va_end(args);
 
-    slog(0, SLOG_DEBUG, sInput);
+    slog(3, SLOG_DEBUG, sInput);
 }
 
 void Logger::warning(const char *msg, ...) {
@@ -66,7 +67,7 @@ void Logger::warning(const char *msg, ...) {
     vsprintf(sInput, msg, args);
     va_end(args);
 
-    slog(0, SLOG_WARN, sInput);
+    slog(1, SLOG_WARN, sInput);
 }
 
 void Logger::error(const char *msg, ...) {

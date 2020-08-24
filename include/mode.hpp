@@ -33,11 +33,16 @@ class ModeType {
   constexpr bool operator!=(const ValueModeType v) const { return value != v; }
 
   operator std::string() const {
+    std::string result;
+
     switch (value) {
-      case OneWay:   return "OneWay";
-      case TwoWay:   return "TwoWay";
-      case Infinity: return "Infinity";
+      case OneWay:   result = "OneWay"; break;
+      case TwoWay:   result = "TwoWay"; break;
+      case Infinity: result = "Infinity"; break;
+      default: result = "Unknow";
     }
+
+    return result;
   }
 
   std::vector<ModeType> list();

@@ -29,6 +29,7 @@ extern const uint8_t free_fontawesome_webfont22x14[];
 #define FONT_COLOR_BLACK() draw->setColor(RGB_COLOR16(0, 0, 0))
 
 #define FONT_TYPE_LOGO() draw->setFreeFont(free_SLANT24x17, nullptr)
+#define FONT_TYPE_SPEED() draw->setFixedFont(comic_sans_font24x32_123)
 #define FONT_TYPE_ICON() draw->setFreeFont(free_fontawesome_webfont22x14, nullptr)
 #define FONT_TYPE_DEFAULT() draw->setFixedFont(ssd1306xled_font6x8)
 
@@ -79,6 +80,17 @@ Gui::Gui(Winch *_winch) : winch(_winch) {
 //   this->regulator = framerate_regulator(fps=LCD_FPS)
 
   this->screen = new MainScreen(this);
+}
+
+Gui::~Gui() {
+  if (this->device != nullptr) {
+    this->draw->clear();
+    this->device->clear();
+    
+    delete this->draw;
+    delete this->engine;
+    delete this->device;
+  }
 }
 
 Winch* Gui::getWinch() {
@@ -358,20 +370,13 @@ void Gui::drawBoot() {
   }
 }
 
-void Gui::exit() {
-  if (this->device != nullptr) {
-    this->draw->clear();
-    this->device->clear();
-  }
-}
-
 void Gui::draw_loop() {
   // auto t = std::this_thread;
   GuiType config = GuiType::valueof(OW_GUI);
 
   if (GuiType::DISABLE != config && GuiType::CAPTURE != config) {
     while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(33));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
           // with this->regulator:
         if (this->winch->getState().isBoot()) {
           this->display();
@@ -411,14 +416,17 @@ void MainScreen::display(NanoCanvasOps<1>* draw) {
   auto speed_x = 54;
   char buffer2[256];
   sprintf(buffer2, "%d", this->winch->getSpeedTarget());
+  FONT_TYPE_SPEED();
   draw->printFixed(speed_x, 14, buffer2, STYLE_NORMAL); //FONT_SIZE_2X
     // draw.text((speed_x, 14), "%s" % self._winch.getSpeedTarget(), fill="white", font=ImageFont.truetype(FONT_TEXT, 35))
+  FONT_TYPE_DEFAULT();
+  FONT_COLOR_WHITE();
   draw->printFixed(speed_x + 40, 28, SPEED_UNIT, STYLE_NORMAL);
     // draw.text((speed_x + 40, 28), SPEED_UNIT, fill="white", font=ImageFont.truetype(FONT_TEXT, 15))  # Very good
 
   // Distance
   auto marg = 4;
-  auto percent = 1 / WINCH_DISTANCE * this->winch->getDistance();
+  auto percent = 0; //TODO 1 / WINCH_DISTANCE * this->winch->getDistance();
   FONT_COLOR_WHITE();
   draw->fillRect(0 + marg, 11, ((LCD_WIDTH - marg) * percent), 14);
   draw->drawRect(0 + marg, 11, ((LCD_WIDTH - marg) * percent), 14);

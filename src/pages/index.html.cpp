@@ -45,9 +45,10 @@ extern const std::string index_html=R"html(
       <div id="cmd">
         <table style="width: 100%;">
           <tbody >
-            <tr><th><a href="/start"><button class="btn-cmd" style="background-color: green;">Start</button></a>
-            </th><th><a href="/stop"><button class="btn-cmd" style="background-color: crimson;">Stop</button></a>
-            </th></tr>
+            <tr>
+              <th><a href="/start"><button class="btn-cmd" style="background-color: green;">Start</button></a></th>
+              <th><a href="/stop"><button class="btn-cmd" style="background-color: crimson;">Stop</button></a></th>
+            </tr>
           </tbody>
         </table>
         <a href="/halt"><button class="btn-cmd" style="background-color: red;">!! EMERGENCY !!</button></a>

@@ -32,6 +32,7 @@
 
 // Debug Bridge
 // #define OW_BG_DEBUG
+#define OW_TA_DEBUG
 
 // Define Framework to use
 #define OW_BG_PIGPIO    /* PiGpio Framework */

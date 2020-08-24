@@ -25,12 +25,12 @@ typedef enum rotation {
 
 typedef struct tacho_hallSensor {
     uint32_t pulseTime;
-    int pulseCount;
+    uint32_t pulseCount;
 
     uint32_t startTime;
     uint32_t prevTime;
 
-    int rpm;
+    uint32_t rpm;
 } tacho_hallSensor_t;
 
 
@@ -42,17 +42,18 @@ class Tachometer {
     return tacho;
   }
 
-  void hall_debug(tacho_hallSensor_t sensor);
-
+  void initialize();
+  void hall_debug(tacho_hallSensor_t sensor, std::string name);
   uint32_t get_rpm(uint32_t pulseTime);
-
-  void int_hall_W(int, int, uint32_t);
-  void int_hall_V(int, int, uint32_t);
-  void int_hall_U(int, int, uint32_t);
 
   tacho_hallSensor_t get_hall_sensorU();
   tacho_hallSensor_t get_hall_sensorW();
   tacho_hallSensor_t get_hall_sensorV();
+
+ protected:
+  void int_hall_W(int, int, uint32_t);
+  void int_hall_V(int, int, uint32_t);
+  void int_hall_U(int, int, uint32_t);
 
  private:
   Logger *logger = nullptr;

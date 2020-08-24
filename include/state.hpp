@@ -18,6 +18,7 @@ class State {
  public:
   enum ValueState : int16_t {
     UNKNOWN = -999,
+    HALT = -3,
     BOOTED = -2,
     ERROR = -1,
     INIT = 0,
@@ -52,16 +53,23 @@ class State {
   constexpr bool operator!=(const ValueState v) const { return value != v; }
 
   operator std::string() const {
+    std::string result("No available");
+
     switch (value) {
-      case UNKNOWN: return "UNKNOWN";
-      case BOOTED:  return "BOOTED";
-      case ERROR:   return "ERROR";
-      case INIT:    return "INIT";
-      case IDLE:    return "IDLE";
-      case START:   return "START";
-      case RUNNING: return "RUNNING";
-      case STOP:    return "STOP";
+      case HALT:    result = "HALT"; break;
+      case BOOTED:  result = "BOOTED"; break;
+      case ERROR:   result = "ERROR"; break;
+      case INIT:    result = "INIT"; break;
+      case IDLE:    result = "IDLE"; break;
+      case START:   result = "START"; break;
+      case RUNNING: result = "RUNNING"; break;
+      case STOP:    result = "STOP"; break;
+      case UNKNOWN:
+      default :
+        result = "UNKNOWN";
     }
+
+    return result;
   }
 
  private:

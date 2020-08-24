@@ -20,18 +20,18 @@ ModeEngine::ModeEngine(Board *_board, Winch *_winch) : board(_board), winch(_win
 }
 
 void ModeEngine::applyThrottleValue() {
-  this->logger->live("Calculate throttle value.");
+  this->logger->live("MOD : Calculate throttle value.");
   uint32_t value = this->speed_ratio * this->speed_current;
 
   if (this->board->getThrottleValue() != value) {
-    this->logger->debug("Apply throttle value.");
+    this->logger->debug("MOD : Apply throttle value.");
     this->board->setThrottleValue(value);
   }
 }
 
 // Move to Board or Winch
 float ModeEngine::getDistance() {
-  this->logger->debug("Calculate distance.");
+  this->logger->live("MOD : Calculate distance.");
   return -999; //rotate2distance(this->board->getRotationFromBegin());
 }
 
@@ -41,10 +41,10 @@ uint8_t ModeEngine::getSpeedCurrent() {
 
 void ModeEngine::runControlLoop() {
   //auto t = std::this_thread;
-  this->logger->debug("Starting Control Loop.");
+  this->logger->debug("MOD : Starting Control Loop.");
 
   while (true) {
-      this->logger->live("Current state : %s - speed : %s - limit : %s",
+      this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
                           std::string(this->winch->getState()).c_str(),
                           std::to_string(this->speed_current).c_str(),
                           std::to_string(this->board->getRotationFromBegin()).c_str());
@@ -78,7 +78,7 @@ void ModeEngine::runControlLoop() {
       std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
   }
 
-  this->logger->debug("Stopping Control Loop.");
+  this->logger->debug("MOD : Stopping Control Loop.");
 }
 
 bool ModeEngine::isBeginSecurity() {
@@ -86,13 +86,15 @@ bool ModeEngine::isBeginSecurity() {
 }
 
 void ModeEngine::initialize() {
-  this->logger->debug("Initialize mode.");
+  this->logger->debug("MOD : Initialize mode stack...");
   this->speed_current = 0;
   this->board->initialize();
   this->winch->initialized();
 }
 
 void ModeEngine::starting() {
+  this->logger->live("MOD : Apply starting...");
+
   // Increment speed
   if (this->speed_current < this->winch->getSpeedTarget()) {
     this->speed_current += this->velocity_start;
@@ -120,6 +122,8 @@ void ModeEngine::starting() {
 }
 
 void ModeEngine::stopping() {
+  this->logger->live("MOD : Apply stopping...");
+
   if (this->speed_current > 0) {
     uint16_t vel_stop = this->velocity_stop;
     uint16_t diff_stop = this->speed_current - 0;
@@ -143,6 +147,7 @@ void ModeEngine::stopping() {
 }
 
 void ModeEngine::fault() {
+  this->logger->live("MOD : Apply emergency...");
   this->board->emergency();
   this->speed_current = 0;
 }
@@ -151,7 +156,7 @@ void ModeEngine::fault() {
 // OneWayMode
 
 OneWayMode::OneWayMode(Board *_board, Winch *_winch) : ModeEngine{_board, _winch} {
-
+  this->logger->debug("MOD : Enable One way mode.");
 }
 
 void OneWayMode::extraMode() {
@@ -164,7 +169,7 @@ void OneWayMode::extraMode() {
 // TwoWayMode
 
 TwoWayMode::TwoWayMode(Board *_board, Winch *_winch) : ModeEngine{_board, _winch} {
-
+  this->logger->debug("MOD : Enable Two way mode.");
 }
 
 void TwoWayMode::extraMode() {
@@ -179,7 +184,7 @@ bool TwoWayMode::isEndSecurity() {
 // InfinityMode
 
 InfinityMode::InfinityMode(Board *_board, Winch *_winch) : ModeEngine{_board, _winch} {
-
+  this->logger->debug("MOD : Enable Infinity way mode.");
 }
 
 void InfinityMode::extraMode() {

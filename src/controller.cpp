@@ -25,8 +25,8 @@
 void terminate_gpio();
 
 void terminate() {
-  terminate_gpio();
   Winch::get().exit();
+  terminate_gpio();
   std::cout << "Stop !!" << std::endl;
 }
 
@@ -55,7 +55,7 @@ Winch::Winch() {
  *  - Position at origin
  */
 void Winch::initialize() {
-  this->logger->debug("Initialize Winch hardware...");
+  this->logger->info("Initialize Winch hardware... Reset counter !");
   this->changeState(State::INIT);
 }
 
@@ -72,7 +72,7 @@ void Winch::initialized() {
  * @brief Command Start winch. 
  */
 void Winch::start() {
-  this->logger->info("Press Start");
+  this->logger->info("Start");
 
   if (this->state.isStop()) {
     this->changeState(State::START);
@@ -96,7 +96,7 @@ void Winch::started() {
  * @brief Command Stop winch.
  */
 void Winch::stop() {
-  this->logger->info("Press Stop");
+  this->logger->info("Stop");
 
   if (this->state.isRun()) {
     this->changeState(State::STOP);
@@ -135,7 +135,11 @@ void Winch::display() {
 }
 
 void Winch::exit() {
-  this->gui->exit();
+  this->logger->info("Shutdown...");
+  this->emergency() ;
+
+  this->changeState(State::HALT);
+  delete this->gui;
 }
 
 /**
@@ -238,13 +242,14 @@ void Winch::enterGui(InputType value) {
  * @brief Display Banner of OpenWinch
  */
 void Winch::banner() {
-  this->logger->info("\n"
-    "   ____                 _       ___            __\n"
-    "  / __ \\____  ___  ____| |     / (_)___  _____/ /_\n"
-    " / / / / __ \\/ _ \\/ __ \\ | /| / / / __ \\/ ___/ __ \\\n"
-    "/ /_/ / /_/ /  __/ / / / |/ |/ / / / / / /__/ / / /\n"
-    "\\____/ .___/\\___/_/ /_/|__/|__/_/_/ /_/\\___/_/ /_/\n"
-    "    /_/                                            Ver. %s",
+  this->logger->info(R"(
+   ____                 _       ___            __
+  / __ \____  ___  ____| |     / (_)___  _____/ /_
+ / / / / __ \/ _ \/ __ \ | /| / / / __ \/ ___/ __ \
+/ /_/ / /_/ /  __/ / / / |/ |/ / / / / / /__/ / / /
+\____/ .___/\___/_/ /_/|__/|__/_/_/ /_/\___/_/ /_/
+    /_/                                            Ver. %s
+)",
     VERSION);
 }
 
@@ -252,6 +257,8 @@ void Winch::banner() {
  * @brief Load configuration.
  */
 void Winch::loadConfig() {
+  this->logger->debug("Config stack...");
+
   this->logger->info("Gui config : %s", OW_GUI);
   this->gui = new Gui(this);
   this->gui->boot();
