@@ -174,7 +174,7 @@ WebMain::WebMain(WebServer* _server) : server(_server) {
   this->srv->Get(HTTP_ROUTE_INDEX, [this](const httplib::Request &req, httplib::Response &res) {
     std::string content(index_html);
     Winch* winch = &Winch::get();
-    const auto host = res.headers.find("HOST");
+    const auto host = req.headers.find("HOST");
 
     auto enable = "white";
     if (winch->getState().isRun()) {
@@ -228,7 +228,7 @@ WebExtra::WebExtra(WebServer* _server) : server(_server) {
   this->srv->Get(HTTP_ROUTE_EXTRA, [this](const httplib::Request &req, httplib::Response &res) {
     std::string content(extra_html);
     Winch* winch = &Winch::get();
-    const auto host = res.headers.find("HOST");
+    const auto host = req.headers.find("HOST");
 
     findAndReplaceAll(content, TPL_URL, "http://" + host->second + HTTP_ROUTE_EXTRA);
     findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());

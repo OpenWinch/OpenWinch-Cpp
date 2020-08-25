@@ -51,7 +51,7 @@ DEPS := $(OBJS:.o=.d)TARGET_ARCH
 
 all:    $(BUILD_DIR)/$(TARGET_EXEC)
 		@cp -r public $(BUILD_DIR)/public
-		@cp src/slog.cfg $(BUILD_DIR)/slog.cfg
+		@cp src/raspberry/slog.cfg $(BUILD_DIR)/slog.cfg
 		@echo  OpenWinch is compiled
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS) 

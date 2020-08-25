@@ -51,19 +51,27 @@ class GuiType {
   constexpr bool operator!=(const ValueGuiType v) const { return value != v; }
 
   operator std::string() const {
+    std::string result("No available");
+
     switch (value) {
-      case DISABLE:     return "DISABLE";
-      case SH1106_I2C:  return "SH1106_I2C";
-      case VGA:         return "VGA";
-      case CAPTURE:     return "CAPTURE";
+      case SH1106_I2C:  result = "SH1106_I2C"; break;
+      case VGA:         result = "VGA"; break;
+      case CAPTURE:     result = "CAPTURE"; break;
+      case DISABLE:
+      default:
+          result = "DISABLE";
     }
+
+    return result;
   }
 
   static GuiType valueof(const std::string& str) {
-      if (str == "DISABLE")         return DISABLE;
-      else if (str == "SH1106_I2C") return SH1106_I2C;
-      else if (str == "VGA")        return VGA;
-      else if (str == "CAPTURE")    return CAPTURE;
+      if (str == "SH1106_I2C")  return SH1106_I2C;
+      if (str == "VGA")         return VGA;
+      if (str == "CAPTURE")     return CAPTURE;
+      if (str == "DISABLE")     return DISABLE;
+
+      return DISABLE;
   }
 
 
@@ -110,6 +118,7 @@ class Gui {
 class ScreenBase {
  public:
   explicit ScreenBase(Gui*);
+  ~ScreenBase() = default;
   virtual uint8_t countItems() = 0;
   virtual void display(NanoCanvasOps<1>*) = 0;
   virtual void enter(uint8_t) = 0;

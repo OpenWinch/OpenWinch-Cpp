@@ -552,7 +552,7 @@ VelocityStopScreen::VelocityStopScreen(Gui *_gui) : ScreenBase{_gui} {
 
 uint8_t VelocityStopScreen::countItems() {
   return 255;
-};
+}
 
 void VelocityStopScreen::display(NanoCanvasOps<1>* draw) {
   this->gui->createValue(draw, this->TITLE.c_str(), std::to_string(this->gui->getPos()).c_str());
