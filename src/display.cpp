@@ -369,19 +369,21 @@ void Gui::draw_loop() {
   // auto t = std::this_thread;
   GuiType config = GuiType::valueof(OW_GUI);
 
-  if (GuiType::DISABLE != config && GuiType::CAPTURE != config) {
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
-          // with this->regulator:
-        if (this->winch->getState().isBoot()) {
-          this->display();
-        } else {
-          this->drawBoot();
-          std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+  if (GuiType::DISABLE != config) {
+    if (GuiType::CAPTURE != config) {
+      while (true) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
+            // with this->regulator:
+          if (this->winch->getState().isBoot()) {
+            this->display();
+          } else {
+            this->drawBoot();
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+          }
+      }
+    } else {
+      this->extractScreen();
     }
-  } else {
-    this->extractScreen();
   }
 }
 
