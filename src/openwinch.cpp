@@ -1,15 +1,15 @@
 /**
- * @file mode.cpp
+ * @file openwinch.cpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
  * @copyright Copyright © 2020
  */
 
-#include <iostream>
-
-#include "controller.hpp"
+#include "openwinch.hpp"
 #include "webserver.hpp"
+
+#include <iostream>
 
 #define DEBUG
 

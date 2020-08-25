@@ -6,9 +6,10 @@
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "bridge_io.hpp"
-#include "config.hpp"
 
+#ifdef OW_BD_PI
 #ifdef OW_BG_PIGPIO
 
 #include <mutex>
@@ -17,7 +18,7 @@
 #ifdef OW_BG_DEBUG
 #include <string>
 #include <iostream>
-#endif
+#endif  // OW_BG_DEBUG
 
 std::once_flag init_flag;
 
@@ -26,7 +27,7 @@ void init_pigpio() {
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO ver " << std::to_string(gpioVersion()) << std::endl;
       std::cout << "IO: Hardware ver " << std::to_string(gpioHardwareRevision()) << std::endl;
-#endif
+#endif  // OW_BG_DEBUG
       // gpioCfgBufferSize (PI_DEFAULT_BUFFER_MILLIS);
       // gpioCfgClock (PI_DEFAULT_CLK_MICROS, PI_DEFAULT_CLK_PERIPHERAL, 0);
       // gpioCfgInterfaces (PI_DEFAULT_IF_FLAGS);
@@ -42,7 +43,7 @@ void init_pigpio() {
 void terminate_gpio() {
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO free. " << std::endl;
-#endif
+#endif  // OW_BG_DEBUG
   gpioTerminate();
 }
 
@@ -222,7 +223,7 @@ void InputDevice::interruptEdge(int gpio, int level, uint32_t tick, void *data)
 {
 #ifdef OW_BG_DEBUG
   std::cout << "IO : interrupt GPIO :" << std::to_string(gpio) << " Level :" << std::to_string(level) << std::endl;
-#endif
+#endif  // OW_BG_DEBUG
   const InputDevice *instance = reinterpret_cast<InputDevice *>(data);
 
   if (instance != nullptr) {
@@ -239,7 +240,7 @@ void InputDevice::interruptEdge(int gpio, int level, uint32_t tick, void *data)
 void InputDevice::when_pressed(const cb_t &callback) {
 #ifdef OW_BG_DEBUG
   std::cout << "IO: Set pressed callback : " << std::endl;  // reinterpret_cast<unsigned char *>(callback) << std::endl;
-#endif
+#endif  // OW_BG_DEBUG
 
   this->pressedEvent = callback;
 }
@@ -247,9 +248,10 @@ void InputDevice::when_pressed(const cb_t &callback) {
 void InputDevice::when_released(const cb_t &callback) {
 #ifdef OW_BG_DEBUG
   std::cout << "IO: Set released callback : " << std::endl;  // reinterpret_cast<unsigned char *>(callback) << std::endl;
-#endif
+#endif  // OW_BG_DEBUG
 
   this->releasedEvent = callback;
 }
 
-#endif
+#endif  // OW_BG_PIGPIO
+#endif  // OW_BD_PI

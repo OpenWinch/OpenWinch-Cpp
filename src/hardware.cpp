@@ -6,10 +6,8 @@
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "hardware.hpp"
-
-#include "controller.hpp"
-#include "logger.hpp"
 
 Board::Board(Winch *_winch) : winch{_winch}  {
   this->logger = &Logger::get();

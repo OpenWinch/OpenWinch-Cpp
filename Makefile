@@ -10,10 +10,10 @@ BUILD_DIR ?= ./build
 # Un-comment the following line to compile C programs as C++ ones.
 #CC						?= $(CXX)
 
-CFLAGS 					+= -Og
+CFLAGS 					+= -Og -ffunction-sections -fdata-sections
 
 #CXXFLAGS is the flags for the C++ compiler
-CXXFLAGS				+= -std=c++17 -ffreestanding -Og
+CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections
 CXXFLAGS 				+= -g
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
@@ -43,6 +43,7 @@ LIBS += -lpigpio
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
+		$(wildcard src/raspberry/*.cpp) \
 		$(wildcard src/fonts/*.cpp) \
 		$(wildcard src/pages/*.cpp)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

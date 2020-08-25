@@ -6,15 +6,10 @@
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "display.hpp"
-#include "display_config.hpp"
-#include "constantes.hpp"
-#include "controller.hpp"
-#include "config.hpp"
-#include "hardware_config.hpp"
+
 #include "input.hpp"
-#include "version.hpp"
-#include "logger.hpp"
 
 #include <string>
 #include <vector>

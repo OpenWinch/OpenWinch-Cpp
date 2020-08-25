@@ -1,8 +1,10 @@
-/*
-  webserver.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file webserver.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef WEBSERVER_HPP_
 #define WEBSERVER_HPP_

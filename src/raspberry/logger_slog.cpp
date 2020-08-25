@@ -1,19 +1,23 @@
 /**
- * @file logger.cpp
+ * @file logger_slog.cpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
  * @copyright Copyright © 2020
  */
 
-#include <slog.h>
+#include "openwinch.hpp"
+#include "logger.hpp"
+
+#ifdef OW_BD_PI
+#ifdef OW_LOG_SLOG
 
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
 #include <string>
 
-#include "logger.hpp"
+#include <slog.h>
 
 Logger::Logger() {
     slog_init("openwinch.log", "slog.cfg", 100, 1);
@@ -135,3 +139,6 @@ void Logger::fatal(const char *msg, ...) {
 //     va_end(args);
 //     return logger;
 // }
+
+#endif  // OW_LOG_SLOG
+#endif  // OW_BD_PI

@@ -1,9 +1,14 @@
+/**
+ * @file webserver.cpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
+
+#include "openwinch.hpp"
 #include "webserver.hpp"
-#include "webserver_config.hpp"
-#include "version.hpp"
-#include "constantes.hpp"
-#include "logger.hpp"
-#include "controller.hpp"
+
 #include "mode.hpp"
 
 #include <string>
@@ -19,6 +24,7 @@
 #else
 #define PORT 80
 #endif
+
 
 WebServer::WebServer() {
   this->logger = &Logger::get();

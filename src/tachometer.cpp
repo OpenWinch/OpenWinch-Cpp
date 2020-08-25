@@ -6,7 +6,10 @@
  * @copyright Copyright © 2020
  */
 
-// gcc -Wall -o tachometer tachometer.cpp.c -lwiringPi -O3
+#include "openwinch.hpp"
+#include "tachometer.hpp"
+
+#include "bridge_io.hpp"
 
 #include <stdint.h>
 #include <errno.h>
@@ -19,14 +22,6 @@
 #include <string>
 #include <iostream>
 #include <functional>
-
-
-#include "tachometer.hpp"
-#include "bridge_io.hpp"
-#include "constantes.hpp"
-
-#include "hardware_config.hpp"
-#include "logger.hpp"
 
 
 Tachometer::Tachometer() {
@@ -71,7 +66,7 @@ void Tachometer::initialize() {
   this->hall_init(&this->tacho_hsv);
 }
 
-void Tachometer::int_hall_W(int gpio, int level, uint32_t tick) {
+void Tachometer::int_hall_W(int /*gpio*/, int level, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse W" << std::endl;
 #endif
@@ -95,7 +90,7 @@ void Tachometer::int_hall_W(int gpio, int level, uint32_t tick) {
     this->tacho_hsw.pulseCount = this->tacho_hsw.pulseCount + (1 * this->tacho_direct);
 }
 
-void Tachometer::int_hall_V(int gpio, int level, uint32_t tick) {
+void Tachometer::int_hall_V(int /*gpio*/, int level, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse V" << std::endl;
 #endif
@@ -112,7 +107,7 @@ void Tachometer::int_hall_V(int gpio, int level, uint32_t tick) {
     this->tacho_hsv.pulseCount = this->tacho_hsv.pulseCount + (1 * this->tacho_direct);
 }
 
-void Tachometer::int_hall_U(int gpio, int level, uint32_t tick) {
+void Tachometer::int_hall_U(int /*gpio*/, int level, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse U" << std::endl;
 #endif

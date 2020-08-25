@@ -6,16 +6,15 @@
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "hardware_pi.hpp"
-#include "hardware_config.hpp"
+
+#ifdef OW_BD_PI
 
 #include "bridge_io.hpp"
 #include "tachometer.hpp"
-
-#include "controller.hpp"
 #include "input.hpp"
 
-#include "logger.hpp"
 #include <functional>
 
 Raspberrypi::Raspberrypi(Winch *winch) : Board(winch) {
@@ -72,21 +71,21 @@ bool Raspberrypi::debounced(uint32_t tick) {
   return result;
 }
 
-void Raspberrypi::pressedEnter(int gpio, int level, uint32_t tick) {
+void Raspberrypi::pressedEnter(int /*gpio*/, int /*level*/, uint32_t tick) {
   if (this->debounced(tick)) {
     this->logger->debug("IO : Enter pressed !");
     this->winch->enterGui(InputType::ENTER);
   }
 }
 
-void Raspberrypi::pressedLeft(int gpio, int level, uint32_t tick) {
+void Raspberrypi::pressedLeft(int /*gpio*/, int /*level*/, uint32_t tick) {
   if (this->debounced(tick)) {
     this->logger->debug("IO : Move Left pressed !");
     this->winch->enterGui(InputType::LEFT);
   }
 }
 
-void Raspberrypi::pressedRight(int gpio, int level, uint32_t tick) {
+void Raspberrypi::pressedRight(int /*gpio*/, int /*level*/, uint32_t tick) {
 if (this->debounced(tick)) {
     this->logger->debug("IO : Move Right pressed !");
     this->winch->enterGui(InputType::RIGHT);
@@ -150,3 +149,5 @@ void Raspberrypi::setReverse(bool enable) {
 uint8_t Raspberrypi::getBattery() {
   return 100;
 }
+
+#endif  // OW_BD_PI

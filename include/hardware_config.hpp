@@ -1,8 +1,10 @@
-/*
-  hardware_config.h - OpenWinch Project
-
-  Copyright (C) 2020  Mickael Gaillard
-*/
+/**
+ * @file hardware_config.hpp
+ * @author Mickael GAILLARD (mick.gaillard@gmail.com)
+ * @brief OpenWinch Project
+ * 
+ * @copyright Copyright © 2020
+ */
 
 #ifndef HARDWARE_CONFIG_HPP_
 #define HARDWARE_CONFIG_HPP_

@@ -6,6 +6,7 @@
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "state.hpp"
 
 bool State::checkRun(State current) {

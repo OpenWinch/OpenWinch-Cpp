@@ -1,14 +1,15 @@
 /**
- * @file bridge_pigpio.cpp
+ * @file bridge_.cpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
  * @copyright Copyright © 2020
  */
 
+#include "openwinch.hpp"
 #include "bridge_io.hpp"
-#include "config.hpp"
 
+#ifdef OW_BD_PI
 #ifdef OW_BG_WIRINGPI
 
 #include <wiringPi.h>
@@ -92,4 +93,5 @@ void InputDevice::when_pressed(void*) {
 
 }
 
-#endif
+#endif  // OW_BG_WIRINGPI
+#endif  // OW_BD_PI

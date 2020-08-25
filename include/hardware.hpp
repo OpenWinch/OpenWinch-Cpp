@@ -31,11 +31,17 @@ class SpeedMode {
   constexpr bool operator!=(const ValueSpeedMode v) const { return value != v; }
 
   operator std::string() const {
+    std::string result("No available");
+
     switch (value) {
       case LOW:     return "LOW";
       case MEDIUM:  return "MEDIUM";
       case HIGH:    return "HIGH";
+      default :
+        result = "UNKNOWN";
     }
+
+    return result;
   }
 
  private:
