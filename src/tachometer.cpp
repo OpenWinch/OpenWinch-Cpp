@@ -11,13 +11,7 @@
 
 #include "bridge_io.hpp"
 
-#include <stdint.h>
-#include <errno.h>
-#include <stdlib.h>
-
-#include <cstdio>
 #include <cstring>
-#include <ctime>
 #include <sstream>
 #include <string>
 #include <iostream>

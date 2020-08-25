@@ -9,15 +9,21 @@
 #include "openwinch.hpp"
 #include "logger.hpp"
 
-#ifdef OW_BD_PI
+//#ifdef OW_BD_PI
 #ifdef OW_LOG_SLOG
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <slog.h>
+#ifdef __cplusplus
+}
+#endif
 
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
 #include <string>
-
-#include <slog.h>
 
 Logger::Logger() {
     slog_init("openwinch.log", "slog.cfg", 100, 1);
@@ -141,4 +147,4 @@ void Logger::fatal(const char *msg, ...) {
 // }
 
 #endif  // OW_LOG_SLOG
-#endif  // OW_BD_PI
+//#endif  // OW_BD_PI

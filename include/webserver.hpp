@@ -26,9 +26,9 @@ extern const std::string extra_html;
 
 namespace httplib {
 
-  namespace detail {
-  struct ci;
-  }
+namespace detail {
+struct ci;
+}
 
 class SSLServer;
 class Server;

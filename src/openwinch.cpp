@@ -47,10 +47,7 @@ int main(int argc, char *argv[])  {
   Tachometer *tacho = &Tachometer::get();
 #endif
 
-  // clock_t tic = clock();
-  std::cout << "Start.." << std::endl;
-
-   std::thread t(debug); 
+  std::thread t(debug); 
 
   // Start Web stack.
   WebServer srv;

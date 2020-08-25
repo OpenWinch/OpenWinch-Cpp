@@ -13,7 +13,7 @@ BUILD_DIR ?= ./build
 CFLAGS 					+= -Og -ffunction-sections -fdata-sections
 
 #CXXFLAGS is the flags for the C++ compiler
-CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections
+CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections -fpic 
 CXXFLAGS 				+= -g
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
@@ -31,14 +31,14 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 
 # LDLIBS is the libraries to link
 # define any directories containing header files other than /usr/include /usr/lib
-INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src
+INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib
 
 # define any libraries to link into executable
 LIBS = -lstdc++ -lm -lpthread -lrt
-LIBS += -lslog
-LIBS += -llcdgfx
+LIBS += -lslog -L lib/slog/src
+LIBS += -llcdgfx -L lib/lcdgfx/bld
 
-LIBS += -lpigpio
+#LIBS += -lpigpio
 #LIBS += -lwiringPi
 
 SRCS := $(wildcard src/*.c) \

@@ -13,8 +13,11 @@
 #include "input.hpp"
 #include "mode.hpp"
 #include "hardware.hpp"
+#include "bridge_io.hpp"
 
+#ifdef OW_BD_PI
 #include "hardware_pi.hpp"
+#endif  // OW_BD_PI
 
 #include <iostream>
 #include <cstdlib>
@@ -22,11 +25,9 @@
 #include <thread>
 #include <typeinfo>  
 
-void terminate_gpio();
-
 void terminate() {
   Winch::get().exit();
-  terminate_gpio();
+  Device::terminate_gpio();
   std::cout << "Stop !!" << std::endl;
 }
 
@@ -136,7 +137,7 @@ void Winch::display() {
 
 void Winch::exit() {
   this->logger->info("Shutdown...");
-  this->emergency() ;
+  this->emergency();
 
   this->changeState(State::HALT);
   delete this->gui;
@@ -265,12 +266,17 @@ void Winch::loadConfig() {
   //this->input = Keyboard(this);
 
   this->logger->info("Board config : %s", OW_BOARD);
+#ifdef OW_BD_EMU
   if (std::string(OW_BOARD) == std::string("openwinch.hardware.Emulator")) {
     this->board = new Emulator(this);
-  } else
+  }
+#endif  // OW_BD_EMU
+
+#ifdef OW_BD_PI
   if (std::string(OW_BOARD) == std::string("openwinch.hardwarePi.RaspberryPi")) {
     this->board = new Raspberrypi(this);
   }
+#endif  // OW_BD_PI
 
   this->logger->info("Mode config : %s", OW_MODE);
   this->mode = new OneWayMode(this->board, this);  // ModeFactory.modeFactory(this, this->board, OW_MODE);

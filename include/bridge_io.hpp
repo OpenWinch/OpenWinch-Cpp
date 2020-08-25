@@ -20,6 +20,17 @@
 
 typedef std::function<void(int, int, uint32_t)> cb_t;
 
+class Device {
+ public:
+  static void init_pigpio() {}
+  static void terminate_gpio() {}
+ private:
+  Device();
+  ~Device()= default;
+  Device(const Device&)= delete;
+  Device& operator=(const Device&)= delete;
+};
+
 class InputDevice {
  public:
   explicit InputDevice(uint8_t _pin, uint8_t _pull = PI_PUD_UP, bool _inverse = false);

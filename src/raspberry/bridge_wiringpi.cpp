@@ -12,11 +12,35 @@
 #ifdef OW_BD_PI
 #ifdef OW_BG_WIRINGPI
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <wiringPi.h>
 #include <softPwm.h>
+#ifdef __cplusplus
+}
+#endif
+
+std::once_flag init_flag;
+
+void Device::init_pigpio() {
+    std::call_once(init_flag, [](){
+#ifdef OW_BG_DEBUG
+
+#endif  // OW_BG_DEBUG
+    });
+}
+
+void Device::terminate_gpio() {
+#ifdef OW_BG_DEBUG
+
+#endif  // OW_BG_DEBUG
+}
 
 
 OutputDevice::OutputDevice(uint8_t _pin): pin(_pin) {
+  Device::init_pigpio();
+
   pinMode(this->pin, OUTPUT);
   // pullUpDnControl(this->pin, PUD_UP);
 }
@@ -32,6 +56,8 @@ void OutputDevice::off() {
 
 
 PWMOutputDevice::PWMOutputDevice(uint8_t _pin): pin(_pin) {
+  Device::init_pigpio();
+
   if (this->pin == PWM_HARDWARE_PIN) {
     pinMode(this->pin, PWM_OUTPUT);
   } else {
@@ -77,6 +103,8 @@ float PWMOutputDevice::getValue() {
 
 
 InputDevice::InputDevice(uint8_t _pin): pin(_pin) {
+  Device::init_pigpio();
+
   pinMode(this->pin, INPUT);
   pullUpDnControl(this->pin, PUD_UP);
 

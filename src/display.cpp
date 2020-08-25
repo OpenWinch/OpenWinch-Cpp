@@ -52,11 +52,11 @@ Gui::Gui(Winch *_winch) : winch(_winch) {
   } else if (GuiType::VGA == config) {
     // from luma.emulator.device import pygame
 
-    this->device ; // = pygame(width=LCD_WIDTH, height=LCD_HEIGHT, rotate=0, mode='1', transform='scale2x', scale=2, frame_rate=60)
+    //his->device ; // = pygame(width=LCD_WIDTH, height=LCD_HEIGHT, rotate=0, mode='1', transform='scale2x', scale=2, frame_rate=60)
   } else if (GuiType::CAPTURE == config) {
     // from luma.emulator.device import capture
 
-    this->device ; // = capture(width=LCD_WIDTH, height=LCD_HEIGHT, rotate=0, mode='1', transform='scale2x', scale=2, file_template="docs/images/screens/OpenWinch_{0:06}.png")
+    //this->device ; // = capture(width=LCD_WIDTH, height=LCD_HEIGHT, rotate=0, mode='1', transform='scale2x', scale=2, file_template="docs/images/screens/OpenWinch_{0:06}.png")
   }
 
   if (this->device != nullptr) {

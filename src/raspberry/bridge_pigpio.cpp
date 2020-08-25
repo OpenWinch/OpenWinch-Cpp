@@ -12,8 +12,15 @@
 #ifdef OW_BD_PI
 #ifdef OW_BG_PIGPIO
 
-#include <mutex>
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <pigpio.h>
+#ifdef __cplusplus
+}
+#endif
+
+#include <mutex>
 
 #ifdef OW_BG_DEBUG
 #include <string>
@@ -22,7 +29,7 @@
 
 std::once_flag init_flag;
 
-void init_pigpio() {
+void Device::init_pigpio() {
     std::call_once(init_flag, [](){
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO ver " << std::to_string(gpioVersion()) << std::endl;
@@ -40,7 +47,7 @@ void init_pigpio() {
     });
 }
 
-void terminate_gpio() {
+void Device::terminate_gpio() {
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO free. " << std::endl;
 #endif  // OW_BG_DEBUG
@@ -58,7 +65,7 @@ OutputDevice::OutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pin(_pin),
     pull(_pull),
     inverse(_inverse) {
-  init_pigpio();
+  Device::init_pigpio();
 
   // Set mode (if not good)
   int ret = gpioGetMode(this->pin);
@@ -101,7 +108,7 @@ PWMOutputDevice::PWMOutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pin(_pin),
     pull(_pull),
     inverse(_inverse) {
-  init_pigpio();
+  Device::init_pigpio();
 
 //   if (this->pin == PWM_HARDWARE_PIN) {
 //     gpioHardwarePWM(this->pin, PWM_OUTPUT);
@@ -182,7 +189,7 @@ InputDevice::InputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pull(_pull),
     inverse(_inverse) {
 
-  init_pigpio();
+  Device::init_pigpio();
 
   // Set mode (if not good)
   int ret = gpioGetMode(this->pin);
