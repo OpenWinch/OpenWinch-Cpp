@@ -185,7 +185,7 @@ WebMain::WebMain(WebServer* _server) : server(_server) {
       enable = "orange";
     }
 
-    findAndReplaceAll(content, TPL_URL,  "http://" + host->second + HTTP_ROUTE_EXTRA);
+    findAndReplaceAll(content, TPL_URL,  "http://" + host->second + HTTP_ROUTE_INDEX);
     findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
     findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
     findAndReplaceAll(content, TPL_ENABLE, enable);
