@@ -23,9 +23,9 @@ extern const uint8_t free_fontawesome_webfont22x14[];
 #define FONT_COLOR_WHITE() draw->setColor(RGB_COLOR16(255, 255, 255))
 #define FONT_COLOR_BLACK() draw->setColor(RGB_COLOR16(0, 0, 0))
 
-#define FONT_TYPE_LOGO() draw->setFreeFont(free_SLANT24x17, nullptr)
+#define FONT_TYPE_LOGO() draw->setFreeFont(free_SLANT24x17, free_SLANT24x17)
 #define FONT_TYPE_SPEED() draw->setFixedFont(comic_sans_font24x32_123)
-#define FONT_TYPE_ICON() draw->setFreeFont(free_fontawesome_webfont22x14, nullptr)
+#define FONT_TYPE_ICON() draw->setFreeFont(free_fontawesome_webfont22x14, free_fontawesome_webfont22x14)
 #define FONT_TYPE_DEFAULT() draw->setFixedFont(ssd1306xled_font6x8)
 
 Gui::Gui(Winch *_winch) : winch(_winch) {
@@ -44,11 +44,12 @@ Gui::Gui(Winch *_winch) : winch(_winch) {
     const SPlatformI2cConfig &config = {(-1), (60), (-1), (-1), (0)};
     this->device = new DisplaySH1106_128x64_I2C(-1, config);
 
-    this->logger->debug("GUI : Initialize Engine... (not use)");
-    this->engine = new NanoEngine1<DisplaySH1106_128x64_I2C>(*this->device);
+//    this->logger->debug("GUI : Initialize Engine... (not use)");
+//    this->engine = new NanoEngine1<DisplaySH1106_128x64_I2C>(*this->device);
 
     this->logger->debug("GUI : Initialize Canvas...");
     this->draw = new NanoCanvas<128, 64, 1>();
+    this->draw->setMode(CANVAS_MODE_TRANSPARENT);
   } else if (GuiType::VGA == config) {
     // from luma.emulator.device import pygame
 
@@ -83,7 +84,7 @@ Gui::~Gui() {
     this->device->clear();
     
     delete this->draw;
-    delete this->engine;
+//    delete this->engine;
     delete this->device;
   }
 }
@@ -157,7 +158,7 @@ void Gui::statusBar(NanoCanvasOps<1>* draw) {
   uint8_t battery_x = 2;
   FONT_TYPE_ICON();
   FONT_COLOR_WHITE();
-  draw->printFixed(battery_x, 0, battery_symbol.c_str(), STYLE_NORMAL);
+  //draw->printFixed(battery_x, 0, battery_symbol.c_str(), STYLE_NORMAL);
 
   char buffer1[256];
   snprintf(buffer1, 255, "%d", battery_value);
@@ -170,7 +171,7 @@ void Gui::statusBar(NanoCanvasOps<1>* draw) {
   uint8_t wifi_x = 105;
   FONT_COLOR_WHITE();
   FONT_TYPE_ICON();
-  draw->printFixed(wifi_x, 0, "", STYLE_NORMAL);  // U+F09E - 61598
+  //draw->printFixed(wifi_x, 0, "", STYLE_NORMAL);  // U+F09E - 61598
 
   char buffer2[256];
   FONT_COLOR_WHITE();
@@ -212,7 +213,7 @@ void Gui::createMenuScroll(NanoCanvasOps<1>* draw,
                            std::string selected_item = nullptr) {
 
   uint8_t font_size = 12;
-  uint8_t draw_cursor_pos = 0;
+  uint8_t cur_pos = 0;
   uint8_t draw_view_pos = 0;
 
   uint8_t cursor_limit_screen = (LCD_HEIGHT / font_size) - 1;
@@ -221,9 +222,9 @@ void Gui::createMenuScroll(NanoCanvasOps<1>* draw,
   }
 
   for (auto &item : items) {
-    uint8_t y = draw_cursor_pos * font_size;
+    uint8_t y = cur_pos * font_size;
 
-    if (this->cursor_pos == draw_cursor_pos) {
+    if (this->cursor_pos == cur_pos) {
       FONT_COLOR_WHITE();
       draw->fillRect(0, draw_view_pos + y, LCD_WIDTH, draw_view_pos + y + font_size);
       draw->drawRect(0, draw_view_pos + y, LCD_WIDTH, draw_view_pos + y + font_size);
@@ -242,36 +243,30 @@ void Gui::createMenuScroll(NanoCanvasOps<1>* draw,
     FONT_TYPE_DEFAULT();
     draw->printFixed(1, draw_view_pos + y, item.c_str(), STYLE_NORMAL);
       // draw.text((1, draw_view_pos + y), item, fill=text_color, font=ImageFont.truetype(FONT_TEXT, font_size))
-    draw_cursor_pos += 1;
+    cur_pos += 1;
   }
 }
 
-void Gui::createMenuIcon(NanoCanvasOps<1>* draw, const char* items) {
-  uint8_t font_size = 12;
+void Gui::createMenuIcon(NanoCanvasOps<1>* draw, std::vector<std::string> items) {
+  uint8_t font_size = 8;
   uint8_t btn_width = LCD_WIDTH / 3;
   uint8_t btn_start = ((btn_width - font_size) / 2) + 1;
   uint8_t btn_height = 0.78 * LCD_HEIGHT;
-  uint8_t draw_cursor_pos = 0;
+  uint8_t txt_height = 0.84 * LCD_HEIGHT;
 
-  for (int i=0; i < sizeof(items); i++) {
-      std::string bgd = "white";
-      std::string fnt = "black";
+  for (auto cur_pos=0; cur_pos < items.size(); cur_pos++) {
+    bool is_select = (cur_pos == this->cursor_pos);
 
-      if (i == this->cursor_pos) {
-        bgd = "black";
-        fnt = "white";
-      }
+    if (is_select) FONT_COLOR_WHITE(); else FONT_COLOR_BLACK();
+    draw->fillRect(cur_pos * btn_width, btn_height, (cur_pos + 1) * btn_width, LCD_HEIGHT);
 
-      FONT_COLOR_WHITE();
-      draw->fillRect(draw_cursor_pos * btn_width, btn_height, (draw_cursor_pos + 1) * btn_width, LCD_HEIGHT);
-      FONT_COLOR_BLACK();
-      draw->drawRect(draw_cursor_pos * btn_width, btn_height, (draw_cursor_pos + 1) * btn_width, LCD_HEIGHT);
-      // draw.rectangle([draw_cursor_pos * btn_width, btn_height, (draw_cursor_pos + 1) * btn_width, LCD_HEIGHT], fill=bgd, outline=fnt)
+    if (is_select) FONT_COLOR_BLACK(); else FONT_COLOR_WHITE();
+    draw->drawRect(cur_pos * btn_width, btn_height, (cur_pos + 1) * btn_width, LCD_HEIGHT);
 
-      std::string sym(1, items[i]);
-      FONT_TYPE_ICON();
-      draw->printFixed(btn_start + draw_cursor_pos * btn_width, 0.79 * LCD_HEIGHT, sym.c_str(), STYLE_NORMAL);
-        // draw.text((btn_start + draw_cursor_pos * btn_width, 0.79 * LCD_HEIGHT), items[draw_cursor_pos], fill=fnt, font=ImageFont.truetype(FONT_ICON, font_size))
+    //FONT_TYPE_ICON();
+    //FONT_TYPE_DEFAULT();
+    if (is_select) FONT_COLOR_BLACK(); else FONT_COLOR_WHITE();
+    draw->printFixed(btn_start + cur_pos * btn_width, txt_height, items[cur_pos].c_str(), STYLE_NORMAL);
   }
 }
 
@@ -367,15 +362,14 @@ void Gui::drawBoot() {
 
 void Gui::draw_loop() {
   // auto t = std::this_thread;
-  GuiType config = GuiType::valueof(OW_GUI);
+  const GuiType config = GuiType::valueof(OW_GUI);
 
   if (GuiType::DISABLE != config) {
     if (GuiType::CAPTURE != config) {
       while (true) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
-            // with this->regulator:
           if (this->winch->getState().isBoot()) {
             this->display();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
           } else {
             this->drawBoot();
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -387,6 +381,7 @@ void Gui::draw_loop() {
   }
 }
 
+//////////////////////////////////////////////////////////
 
 ScreenBase::ScreenBase(Gui *_gui) : gui(_gui) {
   this->winch = this->gui->getWinch();
@@ -410,20 +405,20 @@ void MainScreen::display(NanoCanvasOps<1>* draw) {
   this->gui->statusBar(draw);
 
   // Speed
-  auto speed_x = 54;
+  auto speed_x = 44;
   char buffer2[256];
   sprintf(buffer2, "%d", this->winch->getSpeedTarget());
   FONT_TYPE_SPEED();
+  FONT_COLOR_WHITE();
   draw->printFixed(speed_x, 14, buffer2, STYLE_NORMAL); //FONT_SIZE_2X
-    // draw.text((speed_x, 14), "%s" % self._winch.getSpeedTarget(), fill="white", font=ImageFont.truetype(FONT_TEXT, 35))
+
   FONT_TYPE_DEFAULT();
   FONT_COLOR_WHITE();
-  draw->printFixed(speed_x + 40, 28, SPEED_UNIT, STYLE_NORMAL);
-    // draw.text((speed_x + 40, 28), SPEED_UNIT, fill="white", font=ImageFont.truetype(FONT_TEXT, 15))  # Very good
+  draw->printFixed(speed_x + 50, 28, SPEED_UNIT, STYLE_NORMAL);
 
   // Distance
   auto marg = 4;
-  auto percent = 0; //TODO 1 / WINCH_DISTANCE * this->winch->getDistance();
+  auto percent = 1 / WINCH_DISTANCE * this->winch->getDistance();
   FONT_COLOR_WHITE();
   draw->fillRect(0 + marg, 11, ((LCD_WIDTH - marg) * percent), 14);
   draw->drawRect(0 + marg, 11, ((LCD_WIDTH - marg) * percent), 14);
