@@ -29,7 +29,7 @@ extern "C" {
 
 std::once_flag init_flag;
 
-void Device::init_pigpio() {
+void Device::init_gpio() {
     std::call_once(init_flag, [](){
 #ifdef OW_BG_DEBUG
       std::cout << "IO: PiGPIO ver " << std::to_string(gpioVersion()) << std::endl;
