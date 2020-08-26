@@ -31,7 +31,7 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 
 # LDLIBS is the libraries to link
 # define any directories containing header files other than /usr/include /usr/lib
-INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib
+INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib 
 
 # define any libraries to link into executable
 LIBS = -lstdc++ -lm -lpthread -lrt
@@ -40,6 +40,12 @@ LIBS += -L lib/lcdgfx/bld -llcdgfx
 
 #LIBS += -lpigpio
 #LIBS += -lwiringPi
+
+ifeq ($(SDL_EMULATION), y)
+  
+	INCLUDES += -I./lib/lcdgfx/tools/sdl -DSDL_EMULATION
+	LIBS += -L/mingw/lib -lssd1306_sdl $(shell sdl2-config --libs)
+endif
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
