@@ -22,8 +22,8 @@ typedef std::function<void(int, int, uint32_t)> cb_t;
 
 class Device {
  public:
-  static void init_pigpio() {}
-  static void terminate_gpio() {}
+  static void init_gpio();
+  static void terminate_gpio();
  private:
   Device();
   ~Device()= default;

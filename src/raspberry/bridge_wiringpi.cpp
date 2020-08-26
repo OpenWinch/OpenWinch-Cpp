@@ -23,7 +23,7 @@ extern "C" {
 
 std::once_flag init_flag;
 
-void Device::init_pigpio() {
+void Device::init_gpio() {
     std::call_once(init_flag, [](){
 #ifdef OW_BG_DEBUG
 
@@ -39,7 +39,7 @@ void Device::terminate_gpio() {
 
 
 OutputDevice::OutputDevice(uint8_t _pin): pin(_pin) {
-  Device::init_pigpio();
+  Device::init_gpio();
 
   pinMode(this->pin, OUTPUT);
   // pullUpDnControl(this->pin, PUD_UP);
@@ -56,7 +56,7 @@ void OutputDevice::off() {
 
 
 PWMOutputDevice::PWMOutputDevice(uint8_t _pin): pin(_pin) {
-  Device::init_pigpio();
+  Device::init_gpio();
 
   if (this->pin == PWM_HARDWARE_PIN) {
     pinMode(this->pin, PWM_OUTPUT);
@@ -103,7 +103,7 @@ float PWMOutputDevice::getValue() {
 
 
 InputDevice::InputDevice(uint8_t _pin): pin(_pin) {
-  Device::init_pigpio();
+  Device::init_gpio();
 
   pinMode(this->pin, INPUT);
   pullUpDnControl(this->pin, PUD_UP);

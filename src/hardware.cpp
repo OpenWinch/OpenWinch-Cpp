@@ -9,6 +9,8 @@
 #include "openwinch.hpp"
 #include "hardware.hpp"
 
+#include "bridge_io.hpp"
+
 Board::Board(Winch *_winch) : winch{_winch}  {
   this->logger = &Logger::get();
   this->logger->debug("IO : Initialize board stack...");
@@ -49,6 +51,11 @@ int Board::getRotationFromEnd() {
 }
 
 
+
+#ifndef OW_BG_PIGPIO
+void Device::init_gpio() { }
+void Device::terminate_gpio() { }
+#endif
 
 Emulator::Emulator(Winch *_winch) : Board{_winch} { }
 

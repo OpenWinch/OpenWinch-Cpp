@@ -49,7 +49,7 @@ void Device::init_pigpio() {
 
 void Device::terminate_gpio() {
 #ifdef OW_BG_DEBUG
-      std::cout << "IO: PiGPIO free. " << std::endl;
+  std::cout << "IO: PiGPIO free. " << std::endl;
 #endif  // OW_BG_DEBUG
   gpioTerminate();
 }
@@ -65,7 +65,7 @@ OutputDevice::OutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pin(_pin),
     pull(_pull),
     inverse(_inverse) {
-  Device::init_pigpio();
+  Device::init_gpio();
 
   // Set mode (if not good)
   int ret = gpioGetMode(this->pin);
@@ -108,7 +108,7 @@ PWMOutputDevice::PWMOutputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pin(_pin),
     pull(_pull),
     inverse(_inverse) {
-  Device::init_pigpio();
+  Device::init_gpio();
 
 //   if (this->pin == PWM_HARDWARE_PIN) {
 //     gpioHardwarePWM(this->pin, PWM_OUTPUT);
@@ -189,7 +189,7 @@ InputDevice::InputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) :
     pull(_pull),
     inverse(_inverse) {
 
-  Device::init_pigpio();
+  Device::init_gpio();
 
   // Set mode (if not good)
   int ret = gpioGetMode(this->pin);
