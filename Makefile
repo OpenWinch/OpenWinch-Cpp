@@ -35,8 +35,8 @@ INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib
 
 # define any libraries to link into executable
 LIBS = -lstdc++ -lm -lpthread -lrt
-LIBS += -lslog -L lib/slog/src
-LIBS += -llcdgfx -L lib/lcdgfx/bld
+LIBS += -L lib/slog/src -lslog
+LIBS += -L lib/lcdgfx/bld -llcdgfx
 
 #LIBS += -lpigpio
 #LIBS += -lwiringPi
