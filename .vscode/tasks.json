@@ -5,7 +5,7 @@
       "type": "shell",
       "label": "Make build",
       "command": "/usr/bin/make",
-      "args": ["SDL_EMULATION=y"],
+      "args": ["BOARD=emulator"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -19,7 +19,7 @@
       "type": "shell",
       "label": "Clean & Make build",
       "command": "/usr/bin/make",
-      "args": ["clean", "all", "SDL_EMULATION=y"],
+      "args": ["clean", "all", "BOARD=emulator"],
       "options": {
         "cwd": "${workspaceFolder}"
       },

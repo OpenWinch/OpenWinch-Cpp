@@ -265,17 +265,14 @@ void Winch::loadConfig() {
   this->gui->boot();
   //this->input = Keyboard(this);
 
-  this->logger->info("Board config : %s", OW_BOARD);
 #ifdef OW_BD_EMU
-  if (std::string(OW_BOARD) == std::string("openwinch.hardware.Emulator")) {
-    this->board = new Emulator(this);
-  }
+  this->logger->info("Board config : Emulator");
+  this->board = new Emulator(this);
 #endif  // OW_BD_EMU
 
 #ifdef OW_BD_PI
-  if (std::string(OW_BOARD) == std::string("openwinch.hardwarePi.RaspberryPi")) {
-    this->board = new Raspberrypi(this);
-  }
+  this->logger->info("Board config : RaspberryPi");
+  this->board = new Raspberrypi(this);
 #endif  // OW_BD_PI
 
   this->logger->info("Mode config : %s", OW_MODE);

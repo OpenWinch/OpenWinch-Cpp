@@ -1,24 +1,34 @@
 TARGET_EXEC ?= openwinch
 BUILD_DIR ?= ./build
 
+## Board
+# Can be emulator, raspberry, esp32
+BOARD ?= raspberry
+GPIO  ?= pigpio
+GUI   ?= SH1106_I2C
+
+
+## Compilator & Linker
 # C and C++ program compilers. Un-comment and specify for cross-compiling if needed. 
 #CC 					?= gcc
 #CC 						= clang-9
+
 # CXX is the C++ compiler
 #CXX    				?= g++
 #CXX    					= clang++-9
+
 # Un-comment the following line to compile C programs as C++ ones.
 #CC						?= $(CXX)
 
-CFLAGS 					+= -Og -ffunction-sections -fdata-sections
+CFLAGS 					+= --std=c99 -Og -ffunction-sections -fdata-sections
 
 #CXXFLAGS is the flags for the C++ compiler
-CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections -fpic 
-CXXFLAGS 				+= -g
+CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections -fpic
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
 CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
+CPPFLAGS				+= -g
 # clang 
 #CPPFLAGS				+= -Wno-reserved-user-defined-literal
 
@@ -31,29 +41,48 @@ CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
 
 # LDLIBS is the libraries to link
 # define any directories containing header files other than /usr/include /usr/lib
-INCLUDES = -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib 
+LDLIBS = -lstdc++ -lm -lpthread -lrt
+LDLIBS += -L lib/slog/src -lslog
+LDLIBS += -L lib/lcdgfx/bld -llcdgfx
 
-# define any libraries to link into executable
-LIBS = -lstdc++ -lm -lpthread -lrt
-LIBS += -L lib/slog/src -lslog
-LIBS += -L lib/lcdgfx/bld -llcdgfx
-
-#LIBS += -lpigpio
-#LIBS += -lwiringPi
-
-ifeq ($(SDL_EMULATION), y)
-  
-	INCLUDES += -I./lib/lcdgfx/tools/sdl -DSDL_EMULATION
-	LIBS += -L/mingw/lib -lssd1306_sdl $(shell sdl2-config --libs)
-endif
+INCLUDES += -I./include -I./lib/slog/src -I./lib/lcdgfx/src -I./lib/cpp-httplib
 
 SRCS := $(wildcard src/*.c) \
 		$(wildcard src/*.cpp) \
-		$(wildcard src/raspberry/*.cpp) \
 		$(wildcard src/fonts/*.cpp) \
-		$(wildcard src/pages/*.cpp)
+		$(wildcard src/pages/*.cpp) \
+		$(wildcard src/emulator/*.cpp) \
+		$(wildcard src/raspberry/*.cpp) \
+		$(wildcard src/arduino/*.cpp)
+
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)TARGET_ARCH
+
+ifeq ($(BOARD), raspberry)
+	#SRCS := $(wildcard src/raspberry/*.cpp)
+	INCLUDES += -DOW_BD_PI
+
+	ifeq ($(GPIO), pigpio)
+		INCLUDES += -DOW_BG_PIGPIO
+		LDLIBS += -lpigpio
+	else
+		INCLUDES += -DOW_BG_WIRINGPI
+		LDLIBS += -lwiringPi
+	endif
+endif
+
+ifeq ($(BOARD), emulator)
+	#SRCS := $(wildcard src/emulator/*.cpp)
+	INCLUDES += -I./lib/lcdgfx/tools/sdl -DSDL_EMULATION -DOW_BD_EMU
+	LDLIBS += -L/mingw/lib -lssd1306_sdl $(shell sdl2-config --libs)
+endif
+
+ifeq ($(BOARD), esp32)
+	#SRCS := $(wildcard src/arduino/*.cpp)
+	INCLUDES += -DOW_BD_ESP32 -DOW_BG_ARDUINO
+	LDLIBS += -lpigpio
+endif
+
 
 all:    $(BUILD_DIR)/$(TARGET_EXEC)
 		@cp -r public $(BUILD_DIR)/public
@@ -61,7 +90,7 @@ all:    $(BUILD_DIR)/$(TARGET_EXEC)
 		@echo  OpenWinch is compiled
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS) 
-		$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(LIBS)
+		$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(LDLIBS)
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s
