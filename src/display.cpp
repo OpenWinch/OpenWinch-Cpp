@@ -17,15 +17,15 @@
 
 #include "lcdgfx.h"
 
-extern const uint8_t free_SLANT24x17[];
-extern const uint8_t free_fontawesome_webfont22x14[];
+extern const uint8_t free_SLANT23x20[];
+extern const uint8_t free_fontawesomewebfont15x9[];
 
 #define FONT_COLOR_WHITE() draw->setColor(RGB_COLOR16(255, 255, 255))
 #define FONT_COLOR_BLACK() draw->setColor(RGB_COLOR16(0, 0, 0))
 
-#define FONT_TYPE_LOGO() draw->setFreeFont(free_SLANT24x17, free_SLANT24x17)
+#define FONT_TYPE_LOGO() draw->setFreeFont(free_SLANT23x20, nullptr)
 #define FONT_TYPE_SPEED() draw->setFixedFont(comic_sans_font24x32_123)
-#define FONT_TYPE_ICON() draw->setFreeFont(free_fontawesome_webfont22x14, free_fontawesome_webfont22x14)
+#define FONT_TYPE_ICON() draw->setFreeFont(free_fontawesomewebfont15x9, nullptr)
 #define FONT_TYPE_DEFAULT() draw->setFixedFont(ssd1306xled_font6x8)
 
 Gui::Gui(Winch *_winch) : winch(_winch) {
@@ -144,15 +144,15 @@ void Gui::statusBar(NanoCanvasOps<1>* draw) {
   // Battery
   uint8_t battery_value = this->winch->getBattery();
 
-  std::string battery_symbol = ""; // U+F244 - 62020
+  std::string battery_symbol = u8""; // U+F244 - 62020
   if (battery_value > 87.5) {
-      battery_symbol = "";         // U+F240 - 62016
+      battery_symbol = u8"";         // U+F240 - 62016
   } else if (battery_value > 62.5) {
-      battery_symbol = "";         // U+F241 - 62017
+      battery_symbol = u8"";         // U+F241 - 62017
   } else if (battery_value > 37.5) {
-      battery_symbol = "";         // U+F242 - 62018
+      battery_symbol = u8"";         // U+F242 - 62018
   } else if (battery_value > 12.5) {
-      battery_symbol = "";         // U+F243 - 62019
+      battery_symbol = u8"";         // U+F243 - 62019
   }
 
   uint8_t battery_x = 2;
@@ -341,7 +341,7 @@ void Gui::drawBoot() {
     draw->clear();
 
     uint8_t font_size = 24;
-    std::string name = "OpenWinch";
+    std::string name = u8"OpenWinch";
 
     auto x = (LCD_WIDTH / 2) - (name.size() / 2 * font_size / 2);
     auto xver = (LCD_WIDTH / 2) + (((name.size() / 2) - 2) * font_size / 2);
