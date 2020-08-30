@@ -33,7 +33,7 @@ class ModeType {
   constexpr bool operator!=(const ValueModeType v) const { return value != v; }
 
   operator std::string() const {
-    std::string result;
+    std::string result("No available");
 
     switch (value) {
       case OneWay:   result = "OneWay"; break;

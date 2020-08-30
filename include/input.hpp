@@ -10,6 +10,9 @@
 #define INPUT_HPP_
 
 #include <cstdint>
+#include <thread>
+#include <termios.h>
+#include <unistd.h>
 
 class InputType {
  public:
@@ -19,6 +22,7 @@ class InputType {
     DOWN = 3,
     LEFT = 4,
     ENTER = InputType::DOWN,
+    NONE = 255,
   };
 
   explicit operator bool() = delete;        // Prevent usage: if(value)
@@ -33,6 +37,48 @@ class InputType {
  private:
   ValueInputType value;
   InputType() = default;
+};
+
+class Winch;
+class Keyboard {
+ public:
+  Keyboard(Winch *);
+ private:
+  Winch* winch = nullptr;
+  std::thread* controlLoop = nullptr;
+  void runControlLoop();
+  InputType get();
+};
+
+class BufferToggle
+{
+    private:
+        struct termios t;
+
+    public:
+
+        /*
+         * Disables buffered input
+         */
+
+        void off(void)
+        {
+            tcgetattr(STDIN_FILENO, &t); //get the current terminal I/O structure
+            t.c_lflag &= ~ICANON; //Manipulate the flag bits to do what you want it to do
+            tcsetattr(STDIN_FILENO, TCSANOW, &t); //Apply the new settings TSCANOW
+        }
+
+
+        /*
+         * Enables buffered input
+         */
+
+        void on(void)
+        {
+            tcgetattr(STDIN_FILENO, &t); //get the current terminal I/O structure
+            t.c_lflag |= ICANON; //Manipulate the flag bits to do what you want it to do
+            tcsetattr(STDIN_FILENO, TCSANOW, &t); //Apply the new settings
+        }
 };
 
 #endif  // INPUT_HPP_

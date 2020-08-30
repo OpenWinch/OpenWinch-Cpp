@@ -10,6 +10,7 @@
 #include "display.hpp"
 
 #include "input.hpp"
+#include "mode.hpp"
 
 #include <string>
 #include <vector>
@@ -19,6 +20,8 @@
 
 extern const uint8_t free_SLANT23x20[];
 extern const uint8_t free_fontawesomewebfont15x9[];
+
+#define ITEM_BACK "Back"
 
 #define FONT_COLOR_WHITE() draw->setColor(RGB_COLOR16(255, 255, 255))
 #define FONT_COLOR_BLACK() draw->setColor(RGB_COLOR16(0, 0, 0))
@@ -121,7 +124,6 @@ void Gui::enter(InputType key) {
     this->cursor_pos -= 1;
   } else if (InputType::ENTER == key) {
     this->logger->debug("GUI : Enter");
-    this->screen->enter(this->cursor_pos);
   }
 
   // out bound fix
@@ -138,6 +140,7 @@ void Gui::enter(InputType key) {
   }
 
   this->logger->debug("GUI : Cursor postion : %d", this->cursor_pos);
+  this->screen->enter(key, this->cursor_pos);
 }
 
 void Gui::statusBar(NanoCanvasOps<1>* draw) {
@@ -156,15 +159,16 @@ void Gui::statusBar(NanoCanvasOps<1>* draw) {
   }
 
   uint8_t battery_x = 2;
-  FONT_TYPE_ICON();
   FONT_COLOR_WHITE();
-  //draw->printFixed(battery_x, 0, battery_symbol.c_str(), STYLE_NORMAL);
+  //FONT_TYPE_ICON();
+  FONT_TYPE_LOGO();
+  //draw->printFixed(battery_x, 1, battery_symbol.c_str(), STYLE_NORMAL);
 
   char buffer1[256];
   snprintf(buffer1, 255, "%d", battery_value);
   FONT_COLOR_WHITE();
   FONT_TYPE_DEFAULT();
-  draw->printFixed(battery_x + 15, 1, buffer1, STYLE_NORMAL);
+  //draw->printFixed(battery_x + 15, 1, buffer1, STYLE_NORMAL);
   // this->logger->debug("GUI : Display battery : %s", buffer1);
 
   // Wifi
@@ -182,11 +186,11 @@ void Gui::statusBar(NanoCanvasOps<1>* draw) {
 }
 
 void Gui::createValue(NanoCanvasOps<1>* draw,
-                      const char* title,
-                      const char* value) {
+                      std::string title,
+                      std::string value) {
 
   FONT_COLOR_WHITE();
-  draw->printFixed(0, 0, title, STYLE_NORMAL);
+  draw->printFixed(0, 0, title.c_str(), STYLE_NORMAL);
     // draw.text((0, 0), title, fill=COLOR_PRIM_FONT, font=ImageFont.truetype(FONT_TEXT, 12))
 
   FONT_COLOR_WHITE();
@@ -194,7 +198,7 @@ void Gui::createValue(NanoCanvasOps<1>* draw,
   draw->drawRect(0, 12, LCD_WIDTH, 12);
 
   FONT_COLOR_WHITE();
-  draw->printFixed(2, 18, value, STYLE_NORMAL);
+  draw->printFixed(2, 18, value.c_str(), STYLE_NORMAL);
     // draw.text((2, 18), "%s" % value, fill=COLOR_PRIM_FONT, font=ImageFont.truetype(FONT_TEXT, 14))
 
   auto y = 0.78 * LCD_HEIGHT;
@@ -210,7 +214,7 @@ void Gui::createValue(NanoCanvasOps<1>* draw,
 
 void Gui::createMenuScroll(NanoCanvasOps<1>* draw,
                            std::vector<std::string> items,
-                           std::string selected_item = nullptr) {
+                           std::string selected_item = "") {
 
   uint8_t font_size = 12;
   uint8_t cur_pos = 0;
@@ -234,14 +238,14 @@ void Gui::createMenuScroll(NanoCanvasOps<1>* draw,
       FONT_COLOR_WHITE();
     }
 
-    if (selected_item.empty() && selected_item == item) {
-      FONT_TYPE_ICON();
-      draw->printFixed(LCD_WIDTH - font_size, draw_view_pos + y, "", STYLE_NORMAL);  // U+F00C - 61452
+    if (!selected_item.empty() && selected_item == item) {
+      //FONT_TYPE_ICON();
+      draw->printFixed(LCD_WIDTH - font_size, draw_view_pos + y + 3, "*", STYLE_NORMAL);  // "" U+F00C - 61452
         // draw.text((LCD_WIDTH - font_size, draw_view_pos + y), "", fill=text_color, font=ImageFont.truetype(FONT_ICON, font_size - 2))
     }
 
     FONT_TYPE_DEFAULT();
-    draw->printFixed(1, draw_view_pos + y, item.c_str(), STYLE_NORMAL);
+    draw->printFixed(1, draw_view_pos + y + 3, item.c_str(), STYLE_NORMAL);
       // draw.text((1, draw_view_pos + y), item, fill=text_color, font=ImageFont.truetype(FONT_TEXT, font_size))
     cur_pos += 1;
   }
@@ -383,10 +387,22 @@ void Gui::draw_loop() {
 
 //////////////////////////////////////////////////////////
 
-ScreenBase::ScreenBase(Gui *_gui) : gui(_gui) {
+ScreenBase::ScreenBase(Gui *_gui) : ScreenBase(_gui, "") { }
+
+ScreenBase::ScreenBase(Gui* _gui, std::string _title) : gui(_gui), title(_title) {
   this->winch = this->gui->getWinch();
   this->gui->cursor_pos = 0;
   this->gui->view_pos = 0;
+}
+
+void ScreenBase::selector_value(NanoCanvasOps<1>* draw) {
+  this->gui->createValue(draw, this->title, std::to_string(this->gui->getPos()));
+}
+
+void ScreenBase::go_back() {
+  ScreenBase* old = this->gui->screen;
+  this->gui->screen = new MenuScreen(this->gui);
+  delete old;
 }
 
 //////////////////////////////////////////////////////////
@@ -433,21 +449,23 @@ void MainScreen::display(NanoCanvasOps<1>* draw) {
   }
 }
 
-void MainScreen::enter(uint8_t cursor_pos) {
-  if (0 == cursor_pos) {
-    if (this->winch->getState().isStop()) {
-      this->winch->start();
-    } else {
-      this->winch->stop();
+void MainScreen::enter(InputType key, uint8_t cursor_pos) {
+  if (InputType::ENTER == key) {
+    if (0 == cursor_pos) {
+      if (this->winch->getState().isStop()) {
+        this->winch->start();
+      } else {
+        this->winch->stop();
+      }
     }
-  }
-  if (1 == cursor_pos) {
-      ScreenBase* old = this->gui->screen;
-      this->gui->screen = new MenuScreen(this->gui);
-      delete old;
-  }
-  if (2 == cursor_pos) {
-    this->winch->initialize();
+    if (1 == cursor_pos) {
+        ScreenBase* old = this->gui->screen;
+        this->gui->screen = new MenuScreen(this->gui);
+        delete old;
+    }
+    if (2 == cursor_pos) {
+      this->winch->initialize();
+    }
   }
 }
 
@@ -463,18 +481,21 @@ void MenuScreen::display(NanoCanvasOps<1>* draw) {
   this->gui->createMenuScroll(draw, this->ITEMS_MENU);
 }
 
-void MenuScreen::enter(uint8_t cursor_pos) {
-  ScreenBase* old = this->gui->screen;
+void MenuScreen::enter(InputType key, uint8_t cursor_pos) {
+  if (InputType::ENTER == key) {
+    ScreenBase* old = this->gui->screen;
 
-  switch (cursor_pos) {
-    case 0: this->gui->screen = new MainScreen(this->gui); break;
-    case 1: this->gui->screen = new ManualPositionScreen(this->gui); break;
-    case 2: this->gui->screen = new SecurityDistanceScreen(this->gui); break;
-    case 3: this->gui->screen = new ModeSelectorScreen(this->gui); break;
-    case 4: this->gui->screen = new VelocityStartScreen(this->gui); break;
-    case 5: this->gui->screen = new VelocityStopScreen(this->gui); break;
+    switch (cursor_pos) {
+      case 0: this->gui->screen = new MainScreen(this->gui); break;
+      case 1: this->gui->screen = new ManualPositionScreen(this->gui); break;
+      case 2: this->gui->screen = new SecurityDistanceScreen(this->gui); break;
+      case 3: this->gui->screen = new ModeSelectorScreen(this->gui); break;
+      case 4: this->gui->screen = new VelocityStartScreen(this->gui); break;
+      case 5: this->gui->screen = new VelocityStopScreen(this->gui); break;
+    }
+
+    delete old;
   }
-  delete old;
 }
 
 //////////////////////////////////////////////////////////
@@ -482,69 +503,103 @@ void MenuScreen::enter(uint8_t cursor_pos) {
 ManualPositionScreen::ManualPositionScreen(Gui *_gui) : ScreenBase{_gui} { }
 
 uint8_t ManualPositionScreen::countItems() {
-  return 0;
+  return 255;
 }
 
 void ManualPositionScreen::display(NanoCanvasOps<1>* draw) {
+  FONT_TYPE_DEFAULT();
+  FONT_COLOR_WHITE();
+  draw->printFixed(1, 1, "Move with Right/Left button.");
 
+  auto y = 0.78 * LCD_HEIGHT;
+  FONT_COLOR_WHITE();
+  draw->fillRect(0, y, LCD_WIDTH, LCD_HEIGHT);
+  draw->drawRect(0, y, LCD_WIDTH, LCD_HEIGHT);
+  FONT_TYPE_DEFAULT();
+  FONT_COLOR_BLACK();
+  draw->printFixed(0, 0.80 * LCD_HEIGHT, "enter to exit.");
 }
 
-void ManualPositionScreen::enter(uint8_t cursor_pos) {
+void ManualPositionScreen::enter(InputType key, uint8_t cursor_pos) {
+  if (this->cursor_pos > cursor_pos) {
+    this->winch->manualForward();
+  } else if (this->cursor_pos < cursor_pos) {
+    this->winch->manualReverse();
+  }
+  this->cursor_pos = cursor_pos;
 
+  if (InputType::ENTER == key) {
+    this->go_back();
+  }
 }
 
 //////////////////////////////////////////////////////////
 
-SecurityDistanceScreen::SecurityDistanceScreen(Gui *_gui) : ScreenBase{_gui} { }
+SecurityDistanceScreen::SecurityDistanceScreen(Gui *_gui) :
+    ScreenBase{_gui, "Secuirty distance"} {
+  this->gui->cursor_pos = 128;  // TODO
+}
 
 uint8_t SecurityDistanceScreen::countItems() {
-  return 0;
+  return 255;
 }
 
 void SecurityDistanceScreen::display(NanoCanvasOps<1>* draw) {
-
+  this->selector_value(draw);
 }
 
-void SecurityDistanceScreen::enter(uint8_t cursor_pos) {
-
+void SecurityDistanceScreen::enter(InputType key, uint8_t /* cursor_pos */) {
+  if (InputType::ENTER == key) {
+    this->go_back();
+  }
 }
 
 //////////////////////////////////////////////////////////
 
-ModeSelectorScreen::ModeSelectorScreen(Gui *_gui) : ScreenBase{_gui} { }
+ModeSelectorScreen::ModeSelectorScreen(Gui *_gui) :
+    ScreenBase{_gui} { }
 
 uint8_t ModeSelectorScreen::countItems() {
-  return 0;
+  return this->ITEMS_MENU.size();
 }
 
 void ModeSelectorScreen::display(NanoCanvasOps<1>* draw) {
-
+  ModeType mode = ModeType::OneWay;
+  this->gui->createMenuScroll(draw, this->ITEMS_MENU, std::string(mode));
 }
 
-void ModeSelectorScreen::enter(uint8_t cursor_pos) {
-
+void ModeSelectorScreen::enter(InputType key, uint8_t /* cursor_pos */) {
+  if (InputType::ENTER == key) {
+    this->go_back();
+  }
 }
 
 //////////////////////////////////////////////////////////
 
-VelocityStartScreen::VelocityStartScreen(Gui *_gui) : ScreenBase{_gui} { }
+VelocityStartScreen::VelocityStartScreen(Gui *_gui) :
+    ScreenBase{_gui, "Velocity Start"} {
+  this->gui->cursor_pos = 128;  // TODO
+}
 
 uint8_t VelocityStartScreen::countItems() {
-  return 0;
+  return 255;
 }
 
 void VelocityStartScreen::display(NanoCanvasOps<1>* draw) {
-
+  this->selector_value(draw);
 }
 
-void VelocityStartScreen::enter(uint8_t cursor_pos) {
-
+void VelocityStartScreen::enter(InputType key, uint8_t /* cursor_pos */) {
+  if (InputType::ENTER == key) {
+    this->go_back();
+  }
 }
 
 //////////////////////////////////////////////////////////
 
-VelocityStopScreen::VelocityStopScreen(Gui *_gui) : ScreenBase{_gui} {
-  this->gui->cursor_pos = this->value;
+VelocityStopScreen::VelocityStopScreen(Gui *_gui) : 
+    ScreenBase{_gui, "Velocity Stop"} {
+  this->gui->cursor_pos = 128;  // TODO
 }
 
 uint8_t VelocityStopScreen::countItems() {
@@ -552,10 +607,11 @@ uint8_t VelocityStopScreen::countItems() {
 }
 
 void VelocityStopScreen::display(NanoCanvasOps<1>* draw) {
-  this->gui->createValue(draw, this->TITLE.c_str(), std::to_string(this->gui->getPos()).c_str());
+  this->selector_value(draw);
 }
 
-void VelocityStopScreen::enter(uint8_t cursor_pos) {
-  free(this->gui->screen);
-  this->gui->screen = new MenuScreen(this->gui);
+void VelocityStopScreen::enter(InputType key, uint8_t /* cursor_pos */) {
+  if (InputType::ENTER == key) {
+    this->go_back();
+  }
 }

@@ -19,6 +19,10 @@
 #include "hardware_pi.hpp"
 #endif  // OW_BD_PI
 
+#if defined(OW_BD_EMU) || defined(OW_BD_PI)
+
+#endif  // OW_BD_EMU || OW_BD_PI
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -239,6 +243,14 @@ void Winch::enterGui(InputType value) {
   this->gui->enter(value);
 }
 
+void Winch::manualForward() {
+  this->logger->debug(">>> Forward >>>");
+}
+
+void Winch::manualReverse() {
+  this->logger->debug("<<< Reverse <<<");
+}
+
 /**
  * @brief Display Banner of OpenWinch
  */
@@ -263,7 +275,6 @@ void Winch::loadConfig() {
   this->logger->info("Gui config : %s", OW_GUI);
   this->gui = new Gui(this);
   this->gui->boot();
-  //this->input = Keyboard(this);
 
 #ifdef OW_BD_EMU
   this->logger->info("Board config : Emulator");
@@ -274,6 +285,10 @@ void Winch::loadConfig() {
   this->logger->info("Board config : RaspberryPi");
   this->board = new Raspberrypi(this);
 #endif  // OW_BD_PI
+
+#if defined(OW_BD_EMU) || defined(OW_BD_PI)
+  this->input = new Keyboard(this);
+#endif  // OW_BD_EMU || OW_BD_PI
 
   this->logger->info("Mode config : %s", OW_MODE);
   this->mode = new OneWayMode(this->board, this);  // ModeFactory.modeFactory(this, this->board, OW_MODE);

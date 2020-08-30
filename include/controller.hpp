@@ -18,6 +18,7 @@ class Logger;
 class Board;
 class Gui;
 class InputType;
+class Keyboard;
 class ModeEngine;
 class ModeType;
 
@@ -48,14 +49,16 @@ class Winch {
   void speedDown(uint8_t value = 1);
   void speedValue(uint8_t);
   void enterGui(InputType);
+  void manualForward();
+  void manualReverse();
 
  private:
-  Logger *logger = nullptr;
-  Board *board = nullptr;
-  Gui *gui = nullptr;
-  InputType *input = nullptr;
-  ModeEngine *mode = nullptr;
-  std::thread *controlLoop;
+  Logger* logger = nullptr;
+  Board* board = nullptr;
+  Gui* gui = nullptr;
+  Keyboard* input = nullptr;
+  ModeEngine* mode = nullptr;
+  std::thread* controlLoop;
 
   State state = State::UNKNOWN;
   uint8_t speed_target = SPEED_INIT;

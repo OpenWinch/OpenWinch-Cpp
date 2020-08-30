@@ -74,7 +74,6 @@ class GuiType {
       return DISABLE;
   }
 
-
  private:
   ValueGuiType value;
   GuiType() = default;
@@ -86,7 +85,7 @@ class Logger;
 class Gui {
  public:
   ScreenBase* screen = nullptr;
-  uint8_t cursor_pos = 1;
+  int16_t cursor_pos = 1;
   uint8_t view_pos = 0;
 
   explicit Gui(Winch*);
@@ -97,7 +96,7 @@ class Gui {
   uint8_t getPos();
   void enter(InputType);
   void statusBar(NanoCanvasOps<1>*);
-  void createValue(NanoCanvasOps<1>*, const char*, const char*);
+  void createValue(NanoCanvasOps<1>*, std::string, std::string);
   void createMenuScroll(NanoCanvasOps<1>*, std::vector<std::string>, std::string);
   void createMenuIcon(NanoCanvasOps<1>*, std::vector<std::string>);
   void extractScreen();
@@ -121,12 +120,16 @@ class ScreenBase {
   ~ScreenBase() = default;
   virtual uint8_t countItems() = 0;
   virtual void display(NanoCanvasOps<1>*) = 0;
-  virtual void enter(uint8_t) = 0;
+  virtual void enter(InputType, uint8_t) = 0;
 
  protected:
   Gui *gui = nullptr;
   Winch *winch = nullptr;
+  std::string title;
   bool inver = false;
+  explicit ScreenBase(Gui*, std::string);
+  void selector_value(NanoCanvasOps<1>*);
+  void go_back();
 };
 
 class MainScreen: public ScreenBase {
@@ -134,7 +137,7 @@ class MainScreen: public ScreenBase {
   explicit MainScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
   std::vector<std::string> ITEMS_IDLE = { u8"1", u8"2", "3" }; // { u8"", u8"", " " };
@@ -148,11 +151,11 @@ class MenuScreen: public ScreenBase {
   explicit MenuScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
   std::vector<std::string> ITEMS_MENU = {
-        "Back",  // ITEM_BACK,
+        ITEM_BACK,
         "Manual position",
         "Security distance",
         "Mode selector",
@@ -165,9 +168,10 @@ class ManualPositionScreen: public ScreenBase {
   explicit ManualPositionScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
+  int16_t cursor_pos = 0;
 };
 
 class SecurityDistanceScreen: public ScreenBase {
@@ -175,9 +179,10 @@ class SecurityDistanceScreen: public ScreenBase {
   explicit SecurityDistanceScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
+ protected:
 };
 
 class ModeSelectorScreen: public ScreenBase {
@@ -185,9 +190,15 @@ class ModeSelectorScreen: public ScreenBase {
   explicit ModeSelectorScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
+  std::vector<std::string> ITEMS_MENU = {
+        ITEM_BACK,
+        "OneWay",
+        "TwoWay"
+  };
+ protected:
 };
 
 class VelocityStartScreen: public ScreenBase {
@@ -195,9 +206,10 @@ class VelocityStartScreen: public ScreenBase {
   explicit VelocityStartScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
+ protected:
 };
 
 class VelocityStopScreen: public ScreenBase {
@@ -205,11 +217,10 @@ class VelocityStopScreen: public ScreenBase {
   explicit VelocityStopScreen(Gui*);
   uint8_t countItems() override;
   void display(NanoCanvasOps<1>*) override;
-  void enter(uint8_t) override;
+  void enter(InputType, uint8_t) override;
 
  private:
-  std::string TITLE = "Velocity Stop";
-  uint8_t value = 10;
+ protected:
 };
 
 #endif  // DISPLAY_HPP_

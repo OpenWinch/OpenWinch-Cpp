@@ -16,24 +16,26 @@
 // Debug Tachometer
 #ifndef OW_TA_DEBUG
 #define OW_TA_DEBUG
-#endif
+#endif  // OW_TA_DEBUG
 
 // Debug Bridge
 #ifndef OW_BG_DEBUG
 // #define OW_BG_DEBUG
-#endif
+#endif  // OW_BG_DEBUG
 
 // Debug Logger
 #ifndef OW_LOG_DEBUG
 // #define OW_LOG_DEBUG
-#endif
+#endif  // OW_LOG_DEBUG
 
 /***************/
 /* CONFIG      */
 /***************/
 
 // Default mode
+#ifndef OW_MODE
 #define OW_MODE "ModeType.OneWay"
+#endif  // OW_MODE
 
 // Build Display type
 // #define OW_GUI "DISABLE"           /* Disable GUI */
