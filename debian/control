@@ -1,0 +1,28 @@
+Source: openwinch
+Section: misc
+Priority: optional
+Build-Depends: debhelper (>=11~), devscripts, gawk
+Standards-Version: 4.4.1
+Homepage: https://openwinch.github.io/
+Vcs-Git: git@github.com:OpenWinch/OpenWinch-Cpp.git
+Vcs-Browser: https://github.com/OpenWinch/OpenWinch-Cpp
+
+Package: openwinch
+Version: 1.0
+Maintainer: Mickael Gaillard <mick.gaillard@gmail.com>
+# Pre-Depends: <comma-separated list of packages>
+Depends: ${misc:Depends}, ${shlibs:Depends}
+# Recommends: <comma-separated list of packages>
+# Suggests: <comma-separated list of packages>
+# Provides: <comma-separated list of packages>
+# Replaces: <comma-separated list of packages
+Architecture: any
+Multi-Arch: foreign
+# Copyright: <copyright file; defaults to GPL2>
+# Changelog: <changelog file; defaults to a generic changelog>
+# Readme: <README.Debian file; defaults to a generic one>
+# Extra-Files: <comma-separated list of additional files for the doc directory>
+# Links: <pair of space-separated paths; First is path symlink points at, second is filename of link>
+# Files: <pair of space-separated paths; First is file to include, second is destination>
+#  <more pairs, if there's more than one file to include. Notice the starting space>
+Description: OpenWinch binary package.

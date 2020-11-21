@@ -1,16 +1,24 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+
+apt update
+apt install libsdl2-dev
+
+
+
 # Slog
 echo -e "\nInstall slog"
 cd $DIR/lib
 if [ ! -d "slog" ]
 then
-  git clone https://github.com/kala13x/slog.git
+#  #git clone https://github.com/kala13x/slog.git
+  git clone git@github.com:OpenWinch/slog.git
 fi
-cd slog/src
-make
-# sudo make install
+# cd slog/src
+# make
+# #sudo make install
+
 
 # LCDGFX
 echo -e "\nInstall LCDGFX"
@@ -23,6 +31,7 @@ cd lcdgfx
 make
 #sudo cp bld/liblcdgfx.a /usr/local/lib/
 
+
 # CPP-HTTPlib
 echo -e "\nInstall cpp-httplib"
 cd $DIR/lib
@@ -30,10 +39,10 @@ if [ ! -d "cpp-httplib" ]
 then
   git clone https://github.com/yhirose/cpp-httplib.git
 fi
-cd cpp-httplib
-mkdir -p build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+# #cd cpp-httplib
+# #mkdir -p build
+# #cd build
+# #cmake -DCMAKE_BUILD_TYPE=Release ..
 
 
 # SpdLog
@@ -43,3 +52,11 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 #cd spdlog && mkdir build && cd build
 #cmake .. && make -j
 
+
+# CPP-HTTPlib
+echo -e "\nInstall PiGPIO"
+cd $DIR/lib
+if [ ! -d "cpp-httplib" ]
+then
+  git https://github.com/joan2937/pigpio.git
+fi

@@ -1,9 +1,9 @@
 TARGET_EXEC ?= openwinch
-BUILD_DIR ?= ./build
+BUILD_DIR ?= ./build/makefile
 
 ## Board
 # Can be emulator, raspberry, esp32
-BOARD ?= raspberry
+BOARD ?= emulator
 GPIO  ?= pigpio
 GUI   ?= SH1106_I2C
 
@@ -20,15 +20,17 @@ GUI   ?= SH1106_I2C
 # Un-comment the following line to compile C programs as C++ ones.
 #CC						?= $(CXX)
 
-CFLAGS 					+= --std=c99 -Og -ffunction-sections -fdata-sections
+CFLAGS 					+= --std=c99 -ffunction-sections -fdata-sections
 
 #CXXFLAGS is the flags for the C++ compiler
-CXXFLAGS				+= -std=c++17 -ffreestanding -Og -ffunction-sections -fdata-sections -fpic
+CXXFLAGS				+= -std=c++17 -ffreestanding -ffunction-sections -fdata-sections -fpic
+CXXFLAGS				+= -O0
+#CXXFLAGS				+= -Og
 
 # CPPFLAGS is the flags for the preprocessor (they are common between C and C++ in gnu make)
 # The C Preprocessor options (notice here "CPP" does not mean "C++"; man cpp for more info.). Actually $(INCLUDE) is included. 
 CPPFLAGS				+= -Wall -Wextra -Wpedantic -Wconversion -MMD -MP -Wno-multichar
-CPPFLAGS				+= -g
+CPPFLAGS				+= -g -O0
 # clang 
 #CPPFLAGS				+= -Wno-reserved-user-defined-literal
 
