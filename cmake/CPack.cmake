@@ -102,14 +102,12 @@ endif()
 install(FILES ${CPACK_PACKAGE_DIRECTORY}/deb/changelog.Debian.gz
               ${CPACK_PACKAGE_DIRECTORY}/deb/NEWS.Debian.gz
               ${CMAKE_SOURCE_DIR}/cmake/deb/copyright
-        DESTINATION share/doc/${file}
+        DESTINATION share/doc/openwinch-bin/${file}
         COMPONENT bin)
 
 # set packaging by components
 set(CPACK_DEB_COMPONENT_INSTALL ON)
 set(CPACK_COMPONENTS_ALL bin dev)
-
-
 
 include(CPack)
 cpack_add_component(bin)
