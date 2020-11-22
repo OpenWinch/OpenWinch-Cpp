@@ -106,11 +106,18 @@ target_compile_definitions( ${OW_TARGET} PRIVATE ${_OW_COMPILE_DEF} )
 
 install(TARGETS ${OW_TARGET}
     COMPONENT bin
-    RUNTIME DESTINATION "/opt/openwinch/bin"
-    LIBRARY DESTINATION "/opt/openwinch/lib"
-    DESTINATION "/home/"
+    RUNTIME DESTINATION /opt/openwinch/bin
+    LIBRARY DESTINATION /opt/openwinch/lib
+    DESTINATION /opt/openwinch
 )
 
+install(DIRECTORY public 
+        DESTINATION /opt/openwinch/bin
+        COMPONENT bin)
+
+install(FILES src/raspberry/slog.cfg
+        DESTINATION /opt/openwinch/bin
+        COMPONENT bin)
 
 ### Pack ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/CPack.cmake")
