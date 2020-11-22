@@ -1,0 +1,17 @@
+repositories:
+  cpp-httplib:
+    type: git
+    url: https://github.com/yhirose/cpp-httplib.git
+    version: master
+  lcdgfx:
+    type: git
+    url: https://github.com/lexus2k/lcdgfx.git
+    version: master
+  pigpio:
+    type: git
+    url: https://github.com/joan2937/pigpio.git
+    version: master
+  slog:
+    type: git
+    url: https://github.com/kala13x/slog.git
+    version: master
