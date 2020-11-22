@@ -32,7 +32,17 @@ jobs:
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: ctest
+    - name: Make Package
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cpack
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
+
 
   openwinch-armhf:
     name: OpenWinch - RaspberryPI (armhf)
@@ -63,4 +73,12 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: ctest -C $BUILD_TYPE
-
+    - name: Make Package
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cpack
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
