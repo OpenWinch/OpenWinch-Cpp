@@ -5,11 +5,11 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-set(CMAKE_C_COMPILER   /usr/bin/arm-linux-gnueabi-gcc)
-set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabi-g++)
+set(CMAKE_C_COMPILER   /usr/bin/arm-linux-gnueabihf-gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++)
 
 # where is the target environment 
-set(CMAKE_FIND_ROOT_PATH  /usr/arm-linux-gnueabi)
+set(CMAKE_FIND_ROOT_PATH  /usr/arm-linux-gnueabihf)
 
 # search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -19,5 +19,5 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 
 set(OW_BOARD "raspberry")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armel")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "armhf")
 
