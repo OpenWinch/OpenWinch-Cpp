@@ -1,0 +1,24 @@
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+
+arduino:
+- any: ['src/arduino/**/*']
+
+emulator:
+- any: ['src/emulator/**/*']
+
+emulator:
+- any: ['src/raspberry/**/*']
+
+web:
+- any: ['src/pages/**/*', 'src/web*', 'public/**/*']
+
+display:
+- any: ['src/fonts/**/*', 'src/display']
+
+cmake:
+- any: ['cmake/**/*', 'CMakeLists.txt']
+
+make:
+- any: ['Makefile']
