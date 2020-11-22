@@ -28,7 +28,7 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build .
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -69,15 +69,15 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabi.toolchain.cmake
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabihf.toolchain.cmake
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build .
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: ctest
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -91,4 +91,48 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Packages-armhf (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
+
+  openwinch-arm64:
+    name: OpenWinch - RaspberryPI4 (arm64)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install extra package
+      run: |
+        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+        sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
+        sudo apt-get update
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+    - name: Add external libraries
+      run: |
+        vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
+        cp -r ${GITHUB_WORKSPACE}/cmake/extra/* ${GITHUB_WORKSPACE}/lib
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnuaarch64.toolchain.cmake
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build .
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ctest
+    - name: Make Package
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cpack
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages-All (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload Artifact (build)
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages-arm64 (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
