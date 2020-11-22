@@ -22,3 +22,6 @@ cmake:
 
 make:
 - any: ['Makefile']
+
+github:
+- any: ['.github/**/*']
