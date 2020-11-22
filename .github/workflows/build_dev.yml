@@ -37,10 +37,15 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: cpack
-    - name: Upload Artifact
+    - name: Upload Artifact (All)
       uses: actions/upload-artifact@v2
       with:
-        name: Packages (DEB)
+        name: Packages-All (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload Artifact (build)
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages-x86_64 (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
 
 
@@ -80,5 +85,10 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: Packages (DEB)
+        name: Packages-All (DEB)
+        path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload Artifact (build)
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packages-armhf (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
