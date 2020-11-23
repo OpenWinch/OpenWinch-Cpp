@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.17.0 FATAL_ERROR)
 ### Config ###
 set(OW_NAME "OpenWinch")
 set(OW_TARGET "openwinch")
+set(OW_VERSION "0.0.0" CACHE INTERNAL "")
 
 set(CMAKE_PROJECT_DESCRIPTION "Winch main app.")
 set(CMAKE_PROJECT_HOMEPAGE_URL "http://")

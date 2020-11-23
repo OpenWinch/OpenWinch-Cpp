@@ -14,9 +14,9 @@ endif()
 # if there was an error, just use the user agent as a version
 if(_git_tag_error OR NOT Git_FOUND)
 	message(WARNING "OpenWinch failed to find the latest Git tag, falling back to using user agent as the version.")
-  set(OW_VERSION "0.0.0")
+  set(OW_VERSION "0.0.0" CACHE INTERNAL "")
 endif()
 
 # Needed since git tags have "v" prefixing them.
 # Also used if the fallback to user agent string is being used.
-#string(REGEX MATCH "([0-9]+\\.?)+" OW_VERSION "${_raw_version_string}")
+string(REGEX MATCH "([0-9]+\\.?)+" OW_VERSION "${_raw_version_string}")

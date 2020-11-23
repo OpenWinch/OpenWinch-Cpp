@@ -1,11 +1,36 @@
-name: OpenWinch CI
+name: OpenWinch Release
 
 on:
-  pull_request:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
 
 jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: OpenWinch ${{ github.ref }}
+          body: |
+            # RELEASE NOTES...
+            ## Changelog
+            //TODO
+          draft: true
+          prerelease: false
+
   openwinch-amd64:
     name: OpenWinch - Emulator (amd64)
+    needs: create_release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -28,11 +53,11 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build . --config $BUILD_TYPE
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest
+      run: ctest -C $BUILD_TYPE
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -47,10 +72,32 @@ jobs:
       with:
         name: Packages-amd64 (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload to Release
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const root = '${{ runner.workspace }}/build/packages/';
+          const path = require('path');
+          const fs = require('fs');
+          const release_id = '${{ needs.create_release.outputs.release_id }}';
+          for (let file of await fs.readdirSync(root)) {
+            if (path.extname(file) === '.deb') {
+              console.log('uploadReleaseAsset', file);
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release_id,
+                name: file,
+                data: await fs.readFileSync(`${root}/${file}`)
+              });
+            }
+          }
 
 
   openwinch-armhf:
     name: OpenWinch - RaspberryPI (armhf)
+    needs: create_release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -73,11 +120,11 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build . --config $BUILD_TYPE
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest
+      run: ctest -C $BUILD_TYPE
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -92,9 +139,31 @@ jobs:
       with:
         name: Packages-armhf (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload to Release
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const root = '${{ runner.workspace }}/build/packages/';
+          const path = require('path');
+          const fs = require('fs');
+          const release_id = '${{ needs.create_release.outputs.release_id }}';
+          for (let file of await fs.readdirSync(root)) {
+            if (path.extname(file) === '.deb') {
+              console.log('uploadReleaseAsset', file);
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release_id,
+                name: file,
+                data: await fs.readFileSync(`${root}/${file}`)
+              });
+            }
+          }
 
   openwinch-arm64:
     name: OpenWinch - RaspberryPI4 (arm64)
+    needs: create_release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -117,11 +186,11 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build . --config $BUILD_TYPE
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest
+      run: ctest -C $BUILD_TYPE
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -136,3 +205,24 @@ jobs:
       with:
         name: Packages-arm64 (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
+    - name: Upload to Release
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const root = '${{ runner.workspace }}/build/packages/';
+          const path = require('path');
+          const fs = require('fs');
+          const release_id = '${{ needs.create_release.outputs.release_id }}';
+          for (let file of await fs.readdirSync(root)) {
+            if (path.extname(file) === '.deb') {
+              console.log('uploadReleaseAsset', file);
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release_id,
+                name: file,
+                data: await fs.readFileSync(`${root}/${file}`)
+              });
+            }
+          }
