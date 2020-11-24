@@ -1,0 +1,44 @@
+#! /bin/bash
+# postinst script for openwinch
+#
+# see: dh_installdeb(1)
+
+set -e
+
+SYSD_SERVICE=openwinch.service
+INIT_SERVICE=openwinch
+
+# Automatically added by dh_systemd_enable/12.1.1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask "${SYSD_SERVICE}" >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled "${SYSD_SERVICE}"; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable "${SYSD_SERVICE}" >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state "${SYSD_SERVICE}" >/dev/null || true
+	fi
+fi
+# End automatically added section
+
+# Automatically added by dh_installinit/12.1.1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -x "/etc/init.d/${INIT_SERVICE}" ]; then
+		update-rc.d ${INIT_SERVICE} defaults >/dev/null
+		if [ -n "$2" ]; then
+			_dh_action=restart
+		else
+			_dh_action=start
+		fi
+		invoke-rc.d ${INIT_SERVICE} $_dh_action || true
+	fi
+fi
+# End automatically added section
+
+
+exit 0
