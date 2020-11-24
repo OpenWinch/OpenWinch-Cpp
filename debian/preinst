@@ -1,0 +1,8 @@
+#! /bin/bash
+# preinst script for openwinch
+#
+# see: dh_installdeb(1)
+
+set -e
+
+exit 0
