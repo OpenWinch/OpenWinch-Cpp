@@ -39,7 +39,13 @@ jobs:
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
         sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
         sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck googletest
+        sudo cd /usr/src/googletest/
+        sudo mkdir build
+        cd build
+        sudo cmake ..
+        sudo make
+        sudo make install
     - name: Add external libraries
       run: |
         vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
@@ -106,7 +112,13 @@ jobs:
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
         sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
         sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck googletest gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+        sudo cd /usr/src/googletest/
+        sudo mkdir build
+        cd build
+        sudo cmake ..
+        sudo make
+        sudo make install
     - name: Add external libraries
       run: |
         vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
@@ -172,7 +184,13 @@ jobs:
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
         sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
         sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck googletest gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+        sudo cd /usr/src/googletest/
+        sudo mkdir build
+        cd build
+        sudo cmake ..
+        sudo make
+        sudo make install
     - name: Add external libraries
       run: |
         vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos

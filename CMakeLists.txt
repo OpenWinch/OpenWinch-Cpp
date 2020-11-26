@@ -61,13 +61,12 @@ list(APPEND OW_PROPERTIES
   CXX_EXTENSIONS NO
 )
 
-set(CMAKE_INSTALL_PREFIX "/opt")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_CPPCHECK "/usr/bin/cppcheck;--std=c++11")
+#set(CMAKE_CXX_CPPLINT "cpplint")
+
+#set(CMAKE_INSTALL_PREFIX "/opt")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules/)
-
-### LIST files ###
-
-file(GLOB_RECURSE OPENWINCH_SRC "src/*.cpp")
-#file(GLOB OPENWINCH_HEADERS "*.hpp")
 
 ### Detect version ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/checker-git.cmake")
@@ -82,43 +81,11 @@ add_subdirectory(lib/cpp-httplib)
 add_subdirectory(lib/lcdgfx)
 add_subdirectory(lib/slog)
 
-### Internal libs ###
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-#find_package(stdc++ REQUIRED)
-#find_package(RT)
+### Build ###
+add_subdirectory(src)
 
 ### Testing ###
-include(CTest)
-enable_testing()
-
-### Build ###
-add_executable(${OW_TARGET} ${OPENWINCH_SRC})
-
-set_target_properties( ${OW_TARGET} PROPERTIES ${OW_PROPERTIES} )
-
-target_link_libraries( ${OW_TARGET} PRIVATE ${_OW_LINK} )
-target_link_directories( ${OW_TARGET} PRIVATE ${_OW_LINK_DIR} )
-target_link_options( ${OW_TARGET} PRIVATE  ${_OW_LINK_OPT} )
-target_include_directories( ${OW_TARGET} PRIVATE ${_OW_INCLUDE} )
-target_compile_options( ${OW_TARGET} PRIVATE ${_OW_COMPILE_OPT} )
-target_compile_definitions( ${OW_TARGET} PRIVATE ${_OW_COMPILE_DEF} )
-
-
-install(TARGETS ${OW_TARGET}
-    COMPONENT bin
-    RUNTIME DESTINATION /opt/openwinch/bin
-    LIBRARY DESTINATION /opt/openwinch/lib
-    DESTINATION /opt/openwinch
-)
-
-install(DIRECTORY public 
-        DESTINATION /opt/openwinch/bin
-        COMPONENT bin)
-
-install(FILES src/raspberry/slog.cfg
-        DESTINATION /opt/openwinch/bin
-        COMPONENT bin)
+add_subdirectory(test)
 
 ### Pack ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/CPack.cmake")
