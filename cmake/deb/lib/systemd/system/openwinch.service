@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenWinch Daemon
+After=network-online.target
+
+[Service] 
+Type=simple
+WorkingDirectory=/opt/openwinch/bin
+ExecStart=/opt/openwinch/bin/openwinch 
+Restart=always
+StandardOutput=syslog
+StandardError=syslog 
+SyslogIdentifier=OpenWinch
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
