@@ -10,7 +10,7 @@
 #include "state.hpp"
 
 bool State::checkRun(State current) {
-    return (State::RUNNING == current|| State::START == current);
+    return (State::RUNNING == current || State::START == current);
 }
 
 bool State::checkStop(State current) {

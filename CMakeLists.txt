@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.17.0 FATAL_ERROR)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 ### Config ###
 set(OW_NAME "OpenWinch")
@@ -15,12 +16,13 @@ set(OW_GPIO  "pigpio")
 set(OW_GUI   "SH1106_I2C")
 set(SDL_EMULATION False)
 
-list(APPEND _OW_INCLUDE 
+list(APPEND _OW_INCLUDE
   ${CMAKE_CURRENT_LIST_DIR}/include
-  ${CMAKE_CURRENT_LIST_DIR}/lib/slog/src
-  ${CMAKE_CURRENT_LIST_DIR}/lib/lcdgfx/src
   ${CMAKE_CURRENT_LIST_DIR}/lib/cpp-httplib
+  ${CMAKE_CURRENT_LIST_DIR}/lib/googletest
+  ${CMAKE_CURRENT_LIST_DIR}/lib/lcdgfx/src
   ${CMAKE_CURRENT_LIST_DIR}/lib/pigpio
+  ${CMAKE_CURRENT_LIST_DIR}/lib/slog/src
 )
 
 set(_OW_LINK_OPT "")
@@ -33,8 +35,8 @@ set(_OW_LINK_DIR "")
 list(APPEND _OW_LINK
   Threads::Threads
   httplib::httplib
-  slog
   lcdgfx
+  slog
 )
 
 set(_OW_COMPILE_DEF "")
@@ -78,6 +80,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/checker-board.cmake")
 
 ### External libs ###
 add_subdirectory(lib/cpp-httplib)
+#add_subdirectory(lib/googletest)
 add_subdirectory(lib/lcdgfx)
 add_subdirectory(lib/slog)
 
@@ -85,7 +88,12 @@ add_subdirectory(lib/slog)
 add_subdirectory(src)
 
 ### Testing ###
-add_subdirectory(test)
+option(PACKAGE_TESTS "Build the tests" ON)
+if(PACKAGE_TESTS)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(test)
+endif()
 
 ### Pack ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/CPack.cmake")
