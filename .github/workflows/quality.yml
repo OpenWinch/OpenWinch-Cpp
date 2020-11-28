@@ -1,3 +1,5 @@
+name: Check Quality
+
 on: [push, pull_request]
 
 jobs:
