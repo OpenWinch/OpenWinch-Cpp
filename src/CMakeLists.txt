@@ -6,9 +6,11 @@ find_package(Threads REQUIRED)
 #find_package(RT)
 
 ### LIST files ###
+set(OW_MAIN "openwinch.cpp")
 
 file(GLOB_RECURSE OPENWINCH_SRC "*.cpp")
-#file(GLOB OPENWINCH_HEADERS "*.hpp")
+list(REMOVE_ITEM OPENWINCH_SRC ${OW_MAIN})
+set(OPENWINCH_SRC ${OPENWINCH_SRC} PARENT_SCOPE)
 
 ## LIBRARY ###
 add_library(${OW_TARGET}_lib STATIC ${OPENWINCH_SRC})
@@ -27,7 +29,7 @@ install(TARGETS ${OW_TARGET}_lib
 )
 
 ### RUNTIME ###
-add_executable(${OW_TARGET} openwinch.cpp)
+add_executable(${OW_TARGET} ${OW_MAIN})
 
 set_target_properties( ${OW_TARGET} PROPERTIES ${OW_PROPERTIES} )
 target_link_libraries( ${OW_TARGET} PRIVATE ${OW_TARGET}_lib )

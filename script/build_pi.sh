@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
 BUILD_DIR='build/cmake/release_pi'
-TOOLCHAIN='../../../cmake/platforms/arm-gnueabi.toolchain.cmake'
-OPTION='-DCMAKE_BUILD_TYPE=Release'
+TOOLCHAIN='../../../cmake/platforms/arm-gnueabihf.toolchain.cmake'
+#OPTION='-DCMAKE_BUILD_TYPE=Release'
 
 cd ..
 

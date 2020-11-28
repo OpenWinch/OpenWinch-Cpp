@@ -16,10 +16,11 @@ set(OW_GPIO  "pigpio")
 set(OW_GUI   "SH1106_I2C")
 set(SDL_EMULATION False)
 
+option(PACKAGE_TESTS "Build the tests" ON)
+
 list(APPEND _OW_INCLUDE
   ${CMAKE_CURRENT_LIST_DIR}/include
   ${CMAKE_CURRENT_LIST_DIR}/lib/cpp-httplib
-  ${CMAKE_CURRENT_LIST_DIR}/lib/googletest
   ${CMAKE_CURRENT_LIST_DIR}/lib/lcdgfx/src
   ${CMAKE_CURRENT_LIST_DIR}/lib/pigpio
   ${CMAKE_CURRENT_LIST_DIR}/lib/slog/src
@@ -27,10 +28,6 @@ list(APPEND _OW_INCLUDE
 
 set(_OW_LINK_OPT "")
 set(_OW_LINK_DIR "")
-
-# list(APPEND _OW_LINK_DIR
-#   ${CMAKE_CURRENT_LIST_DIR}/lib/lcdgfx/bld
-# )
 
 list(APPEND _OW_LINK
   Threads::Threads
@@ -68,7 +65,7 @@ set(CMAKE_CXX_CPPCHECK "/usr/bin/cppcheck;--std=c++11")
 #set(CMAKE_CXX_CPPLINT "cpplint")
 
 #set(CMAKE_INSTALL_PREFIX "/opt")
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules/)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/)
 
 ### Detect version ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/checker-git.cmake")
@@ -78,9 +75,8 @@ project(${OW_TARGET} VERSION ${OW_VERSION} LANGUAGES CXX)
 ### Detect Board ###
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/checker-board.cmake")
 
-### External libs ###
+### External common libs ###
 add_subdirectory(lib/cpp-httplib)
-#add_subdirectory(lib/googletest)
 add_subdirectory(lib/lcdgfx)
 add_subdirectory(lib/slog)
 
@@ -88,10 +84,8 @@ add_subdirectory(lib/slog)
 add_subdirectory(src)
 
 ### Testing ###
-option(PACKAGE_TESTS "Build the tests" ON)
 if(PACKAGE_TESTS)
   enable_testing()
-  include(GoogleTest)
   add_subdirectory(test)
 endif()
 
