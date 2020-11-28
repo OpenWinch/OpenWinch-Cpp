@@ -77,10 +77,6 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: cmake --build .
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: ctest
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -121,10 +117,6 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: cmake --build .
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: ctest
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
