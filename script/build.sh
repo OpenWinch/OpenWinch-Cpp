@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
-BUILD_DIR='build/cmake/release_amd64'
+BUILD_DIR='build/cmake/release'
 #OPTION='-DCMAKE_BUILD_TYPE=Release'
 OPTION='-DCMAKE_BUILD_TYPE=Debug'
-OPTION+='-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON'
+OPTION="${OPTION} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
 cd ..
 

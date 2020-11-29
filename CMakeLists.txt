@@ -14,7 +14,13 @@ set(CMAKE_PROJECT_HOMEPAGE_URL "http://")
 set(OW_BOARD "emulator")
 set(OW_GPIO  "pigpio")
 set(OW_GUI   "SH1106_I2C")
+
 set(SDL_EMULATION False)
+set(CPPHTTPLIB_THREAD_POOL_COUNT 4)
+set(CPPHTTPLIB_OPENSSL_SUPPORT OFF)
+option(HTTPLIB_REQUIRE_OPENSSL OFF)
+option(HTTPLIB_USE_OPENSSL_IF_AVAILABLE OFF)
+
 
 option(PACKAGE_TESTS "Build the tests" ON)
 
@@ -34,6 +40,9 @@ list(APPEND _OW_LINK
   httplib::httplib
   lcdgfx
   slog
+  stdc++
+  m
+  rt
 )
 
 set(_OW_COMPILE_DEF "")
