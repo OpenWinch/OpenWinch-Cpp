@@ -18,25 +18,28 @@ If you like **OpenWinch**, give it a star, or fork it and contribute!
 
 ### From APT package (DEB)
 
-curl -s https://packagecloud.io/install/repositories/Theosakamg/openwinch/script.deb.sh | sudo bash
+```curl -s https://packagecloud.io/install/repositories/Theosakamg/openwinch/script.deb.sh | sudo bash```
 
 OR
-
+```
 curl -L https://packagecloud.io/Theosakamg/openwinch/gpgkey | sudo apt-key add -
 sudo echo "deb https://packagecloud.io/Theosakamg/openwinch/ubuntu/ trusty main" > /etc/apt/source.list.d/openwinch.list
 apt update
 apt install openwinch-bin
+```
 
 ### From Source
 
 first install [VCStool](https://github.com/dirk-thomas/vcstool)
 
+```
 git clone https://github.com/OpenWinch/OpenWinch-Cpp.git
 cd OpenWinch-Cpp
 vcs import ./lib < openwinch.repo
 cp -r cmake/extra/* ./lib
 cd script
 ./build_<arch>.sh
+```
 
 Arhitecture can be :
 - amd64
