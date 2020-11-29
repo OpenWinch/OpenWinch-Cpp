@@ -12,6 +12,7 @@ set(CMAKE_PROJECT_HOMEPAGE_URL "http://")
 ## Board
 # Can be emulator, raspberry, esp32
 set(OW_BOARD "emulator")
+#set(OW_BOARD "raspberry")
 set(OW_GPIO  "pigpio")
 set(OW_GUI   "SH1106_I2C")
 
