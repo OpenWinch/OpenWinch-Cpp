@@ -32,7 +32,7 @@ if(OW_BOARD STREQUAL "emulator")
   message(CHECK_PASS "Emulator")
   set(OW_DETECT_BOARD True) 
 
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules/SDL2/)
+  list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules/SDL2/)
   find_package(SDL2 REQUIRED)
   #find_package(SDL2_net REQUIRED)
   #find_package(SDL2_mixer REQUIRED)
@@ -42,7 +42,7 @@ if(OW_BOARD STREQUAL "emulator")
 
   list(APPEND _OW_COMPILE_DEF "SDL_EMULATION" "OW_BD_EMU")
   list(APPEND _OW_INCLUDE 
-    ${CMAKE_CURRENT_LIST_DIR}/../lib/lcdgfx/tools/sdl
+    ${PROJECT_SOURCE_DIR}/lib/lcdgfx/tools/sdl
     ${SDL2_INCLUDE_DIRS}
   )
   #"ssd1306_sdl"

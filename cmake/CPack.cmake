@@ -103,6 +103,11 @@ install(FILES ${CPACK_PACKAGE_DIRECTORY}/deb/changelog.Debian.gz
         DESTINATION share/doc/openwinch-bin/${file}
         COMPONENT bin)
 
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/cmake/deb/etc
+                  ${CMAKE_SOURCE_DIR}/cmake/deb/lib
+        DESTINATION /
+        COMPONENT bin)
+
 # set packaging by components
 set(CPACK_DEB_COMPONENT_INSTALL ON)
 set(CPACK_COMPONENTS_ALL bin dev)

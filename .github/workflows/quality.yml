@@ -1,0 +1,24 @@
+name: Check Quality
+
+on: [pull_request]
+
+jobs:
+  cpp_style_check:
+    runs-on: ubuntu-latest
+    name: Check C++ Style
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Run style checks
+      uses: coleaeason/actions-uncrustify@v1
+  include-guards:
+    name: Check include guards
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Check include guards
+      uses: sbeyer/include-guards-check-action@v1.0.0
+      with:
+        path: 'include/'
+        pattern: '{file}_'

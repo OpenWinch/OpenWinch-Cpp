@@ -5,6 +5,8 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+env:
+  BUILD_TYPE: Release
 
 jobs:
   create_release:
@@ -49,15 +51,15 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build .
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: ctest
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -93,6 +95,11 @@ jobs:
               });
             }
           }
+    - uses: docker://lpenz/ghaction-packagecloud:v0.1
+        with:
+          repository: Theosakamg/openwinch/debian/buster
+        env:
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
 
   openwinch-armhf:
@@ -116,15 +123,11 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabihf.toolchain.cmake
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabihf.toolchain.cmake
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: cmake --build .
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -160,6 +163,11 @@ jobs:
               });
             }
           }
+    - uses: docker://lpenz/ghaction-packagecloud:v0.1
+        with:
+          repository: Theosakamg/openwinch/debian/buster
+        env:
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
   openwinch-arm64:
     name: OpenWinch - RaspberryPI4 (arm64)
@@ -182,15 +190,11 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnuaarch64.toolchain.cmake
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnuaarch64.toolchain.cmake
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: cmake --build .
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -226,3 +230,8 @@ jobs:
               });
             }
           }
+    - uses: docker://lpenz/ghaction-packagecloud:v0.1
+        with:
+          repository: Theosakamg/openwinch/debian/buster
+        env:
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}

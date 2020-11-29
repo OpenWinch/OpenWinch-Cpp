@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 
-BUILD_DIR='build/cmake/release_pi'
+BUILD_DIR='build/cmake/release_eabihf'
 TOOLCHAIN='../../../cmake/platforms/arm-gnueabi.toolchain.cmake'
-OPTION='-DCMAKE_BUILD_TYPE=Release'
+OPTION='-DCMAKE_BUILD_TYPE=Debug'
 
 cd ..
 
 echo "Make folder..."
-rm -rf ${BUILD_DIR}
+#rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 

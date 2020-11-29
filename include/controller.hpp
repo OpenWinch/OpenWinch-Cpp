@@ -52,7 +52,7 @@ class Winch {
   void manualForward();
   void manualReverse();
 
- private:
+ protected:
   Logger* logger = nullptr;
   Board* board = nullptr;
   Gui* gui = nullptr;
