@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 
 BUILD_DIR='build/cmake/release'
-#OPTION='-DCMAKE_BUILD_TYPE=Release'
 OPTION='-DCMAKE_BUILD_TYPE=Debug'
 OPTION="${OPTION} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
