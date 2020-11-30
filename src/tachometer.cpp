@@ -17,15 +17,22 @@
 #include <iostream>
 #include <functional>
 
+Tachometer& Tachometer::get() {
+  static Tachometer tacho(
+    new InputDevice(IN_HS_U),
+    new InputDevice(IN_HS_W),
+    new InputDevice(IN_HS_V));
+  return tacho;
+}
 
-Tachometer::Tachometer() {
+Tachometer::Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice *sensor_v) {
   this->logger = &Logger::get();
   this->logger->debug("IO-T : Init Tachometer...");
 
   this->initialize();
 
   // Sensor U
-  this->input_hal_u = new InputDevice(IN_HS_U);
+  this->input_hal_u = sensor_u;
   this->input_hal_u->when_pressed(std::bind(
                                   &Tachometer::int_hall_U,
                                   this,
@@ -34,7 +41,7 @@ Tachometer::Tachometer() {
                                   std::placeholders::_3));
 
   // Sensor W
-  this->input_hal_w = new InputDevice(IN_HS_W);
+  this->input_hal_w = sensor_w;
   this->input_hal_w->when_pressed(std::bind(
                                   &Tachometer::int_hall_W,
                                   this,
@@ -43,7 +50,7 @@ Tachometer::Tachometer() {
                                   std::placeholders::_3));
 
   // Sensor V
-  this->input_hal_v = new InputDevice(IN_HS_V);
+  this->input_hal_v = sensor_v;
   this->input_hal_v->when_pressed(std::bind(
                                   &Tachometer::int_hall_V,
                                   this,

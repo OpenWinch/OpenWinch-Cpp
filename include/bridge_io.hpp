@@ -37,8 +37,8 @@ class InputDevice {
   // InputDevice(const InputDevice&) = 0;
   virtual ~InputDevice();
   uint8_t digitalRead();
-  void when_pressed(const cb_t &);
-  void when_released(const cb_t &);
+  virtual void when_pressed(const cb_t &);
+  virtual void when_released(const cb_t &);
  protected:
   uint8_t pin;
   uint8_t pull;

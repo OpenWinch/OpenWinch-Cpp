@@ -10,6 +10,7 @@
 #include "webserver.hpp"
 
 #include <iostream>
+#include <unistd.h>
 
 #define DEBUG
 
@@ -41,13 +42,20 @@ int main(int argc, char *argv[])  {
   // Start Winch engine.
   Winch *winch = &Winch::get();
 
+  uid_t uid = getuid(), euid = geteuid();
+  if (uid > 0 || uid != euid) {
+    std::cout << "You are not root!" << std::endl;
+    exit(-1);
+  }
+
+
   // Debug
 #ifdef DEBUG
   Logger *logger = &Logger::get();
   Tachometer *tacho = &Tachometer::get();
 #endif
 
-  std::thread t(debug); 
+  std::thread t(debug);
 
   // Start Web stack.
   WebServer srv;

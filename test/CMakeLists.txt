@@ -32,7 +32,7 @@ target_compile_definitions( ${OW_TEST}_lib PRIVATE ${_OW_COMPILE_DEF} )
 
 ## TESTS ###
 add_executable(${OW_TEST} ${TEST_SRC})
-target_link_libraries(${OW_TEST} PRIVATE ${OW_TEST}_lib gtest gmock gmock_main)
+target_link_libraries(${OW_TEST} PRIVATE ${OW_TEST}_lib ${_OW_LINK} gtest gmock gmock_main)
 target_include_directories(${OW_TEST} PRIVATE ${_OW_INCLUDE})
 
 add_test(NAME AllTestsIn${OW_TEST} COMMAND ${OW_TEST})
@@ -64,7 +64,7 @@ setup_target_for_coverage_gcovr_html(
 )
 
 setup_target_for_coverage_lcov(
-    NAME       ctest_coverage_lcov
+    NAME ctest_coverage_lcov
     BASE_DIRECTORY ${BASE_DIRECTORY}
     EXCLUDE ${COVERAGE_EXCLUDES}
     EXECUTABLE ctest -j ${PROCESSOR_COUNT}

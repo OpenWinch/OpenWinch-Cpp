@@ -1,19 +1,20 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+set -euo pipefail
+set -a
 
 BUILD_DIR='build/cmake/release_aarch64'
 TOOLCHAIN='../../../cmake/platforms/arm-aarch64.toolchain.cmake'
-OPTION='-DCMAKE_BUILD_TYPE=Debug'
+TYPE='Debug'
 
-cd ..
+OPTION="-DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN"
 
-echo "Make folder..."
-#rm -rf ${BUILD_DIR}
-mkdir -p ${BUILD_DIR}
-cd ${BUILD_DIR}
+## Debug
+#OPTION="-LAH ${OPTION} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
-echo "Build stack..."
-cmake ${OPTION} -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN} ../../..
-cmake --build .
+## Clean
+#CLEAN='1'
 
-echo "Package..."
-cpack
+set +a
+
+bash common_build.sh

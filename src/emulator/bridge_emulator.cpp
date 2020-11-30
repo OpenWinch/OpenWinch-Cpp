@@ -31,7 +31,7 @@ uint8_t InputDevice::digitalRead() {
   return 0;
 }
 void InputDevice::interruptEdge(int gpio, int level, uint32_t tick, void *data) { }
-void InputDevice::when_pressed(const cb_t &callback) { }
-void InputDevice::when_released(const cb_t &callback) { }
+void InputDevice::when_pressed(const cb_t &callback) { this->pressedEvent = callback; }
+void InputDevice::when_released(const cb_t &callback) { this->releasedEvent = callback; }
 
 #endif  // OW_BD_EMU
