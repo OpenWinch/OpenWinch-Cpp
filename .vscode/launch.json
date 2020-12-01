@@ -2,6 +2,7 @@
   "version": "0.2.0",
   "configurations": [
 
+
   {
     "name": "OpenWinch Ctest",
     "type": "cppdbg",
@@ -40,7 +41,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "Make build"
+      "preLaunchTask": "CMake build"
     }
   ]
 }

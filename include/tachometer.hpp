@@ -43,6 +43,8 @@ class Tachometer {
   void initialize();
   void hall_debug(tacho_hallSensor_t sensor, std::string name);
   uint32_t get_rpm(uint32_t pulseTime);
+  rotation_t get_rotation();
+
 
   tacho_hallSensor_t get_hall_sensorU();
   tacho_hallSensor_t get_hall_sensorW();

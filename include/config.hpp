@@ -15,7 +15,7 @@
 
 // Debug Tachometer
 #ifndef OW_TA_DEBUG
-#define OW_TA_DEBUG
+//#define OW_TA_DEBUG
 #endif  // OW_TA_DEBUG
 
 // Debug Bridge

@@ -88,6 +88,7 @@ void Tachometer::int_hall_W(int /*gpio*/, int level, uint32_t tick) {
 
     // Calculate Rotation Per Minute
     //rpmW = get_rpm(pulseTimeW);
+    // std::cout << "dW:" << unsigned(this->tacho_hsw.pulseTime) << std::endl;
     this->tacho_hsw.pulseCount = this->tacho_hsw.pulseCount + (1 * this->tacho_direct);
 }
 
@@ -105,6 +106,7 @@ void Tachometer::int_hall_V(int /*gpio*/, int level, uint32_t tick) {
     this->tacho_hsv.prevTime = this->tacho_hsv.startTime;
 
     //self.rpmV = self.__get_rpm(self.pulseTimeV);
+    // std::cout << "dV:" << unsigned(this->tacho_hsv.pulseTime) << std::endl;
     this->tacho_hsv.pulseCount = this->tacho_hsv.pulseCount + (1 * this->tacho_direct);
 }
 
@@ -122,6 +124,7 @@ void Tachometer::int_hall_U(int /*gpio*/, int level, uint32_t tick) {
     this->tacho_hsu.prevTime = this->tacho_hsu.startTime;
 
     //this->rpmU = self.__get_rpm(self.pulseTimeU)
+    // std::cout << "dU:" << unsigned(this->tacho_hsu.pulseTime) << std::endl;
     this->tacho_hsu.pulseCount = this->tacho_hsu.pulseCount + (1 * this->tacho_direct);
 }
 
@@ -133,10 +136,14 @@ uint32_t Tachometer::get_rpm(uint32_t pulseTime) {
     // (1000 / pulseTime) * 60
     uint32_t PPM = (60000 / pulseTime);
     // Calculate revs per minute based on number of pulses per rev
-    RPM = PPM / (MOTOR_PPR / 3);
+    RPM = PPM / (MOTOR_PPR/3);
   }
 
   return RPM;
+}
+
+rotation_t Tachometer::get_rotation() {
+  return this->tacho_direct;
 }
 
 void Tachometer::hall_init(tacho_hallSensor_t *sensor) {

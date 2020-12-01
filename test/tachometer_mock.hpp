@@ -11,6 +11,7 @@
 #include "bridge_io.hpp"
 #include <iostream>
 #include <functional>
+#include <chrono>
 
 class MockInputDevice : public InputDevice {
  public:
@@ -22,7 +23,7 @@ class MockInputDevice : public InputDevice {
     if (this->pos <= 0) {
       this->state = 1;
     }
-
+    this->start = std::chrono::high_resolution_clock::now();
     std::cout <<  "Initialise sensor : " << this->name << "(" << unsigned(this->pos) << ")" << std::endl;
   }
   uint8_t digitalRead() { return this->state; }
@@ -52,12 +53,13 @@ class MockInputDevice : public InputDevice {
  private:
   char name;
   uint8_t nb;
-  uint8_t pos;
-  uint8_t count = 0;
+  uint16_t pos;
+  uint32_t count = 2100000000;
   uint8_t state;
+  std::chrono::time_point<std::chrono::system_clock> start;
 
   void simulate() {
-    uint8_t subcnt = this->count + this->pos;
+    uint32_t subcnt = this->count + this->pos;
     // std::cout <<  "pulse from : " << this->name << "(" << unsigned(this->pos) << ")"
     //   << " count=" << unsigned(this->count)
     //   << " subcn=" << unsigned(subcnt)
@@ -72,7 +74,8 @@ class MockInputDevice : public InputDevice {
       if (this->pressedEvent != nullptr) {
         int gpio = this->pos;
         int level = 0;
-        uint32_t tick = this->count;
+        auto duration = std::chrono::system_clock::now() - this->start;
+        uint32_t tick = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
         this->pressedEvent(gpio, level, tick);
       }
     } else if ((subcnt % this->nb == 0)) {
@@ -81,7 +84,8 @@ class MockInputDevice : public InputDevice {
       if (this->releasedEvent != nullptr) {
         int gpio = this->pos;
         int level = 0;
-        uint32_t tick = this->count;
+        auto duration = std::chrono::system_clock::now() - this->start;
+        uint32_t tick = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
         this->releasedEvent(gpio, level, tick);
       }
     }
