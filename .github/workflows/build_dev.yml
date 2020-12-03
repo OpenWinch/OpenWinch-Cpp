@@ -39,7 +39,9 @@ jobs:
     - name: Report Coverage
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+      run: |
+        make ctest_coverage_lcov
+        bash <(curl -s https://codecov.io/bash) -f ctest_coverage_lcov.info || echo "Codecov did not collect coverage reports"
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash

@@ -59,7 +59,13 @@ jobs:
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest
+      run: ctest --output-on-failure
+    - name: Report Coverage
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        make ctest_coverage_lcov
+        bash <(curl -s https://codecov.io/bash) -f ctest_coverage_lcov.info || echo "Codecov did not collect coverage reports"
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash

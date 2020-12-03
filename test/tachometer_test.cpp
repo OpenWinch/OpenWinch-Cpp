@@ -236,12 +236,12 @@ TEST_F(TachometerTest, MethodForwardBakward) {
 
 TEST_F(TachometerTest, MethodForward6000) {
   const uint32_t RPM = 6000;
-  this->TestMethodForward(RPM, 350, 20000);
+  this->TestMethodForward(RPM, 1000, 20000);
 }
 
 TEST_F(TachometerTest, MethodBackward6000) {
   const uint32_t RPM = 6000;
-  this->TestMethodBackward(RPM, 350, 20000);
+  this->TestMethodBackward(RPM, 1000, 20000);
 }
 
 /******************************************************************************/
@@ -250,12 +250,12 @@ TEST_F(TachometerTest, MethodBackward6000) {
 
 TEST_F(TachometerTest, MethodForward3000) {
   const uint32_t RPM = 3000;
-  this->TestMethodForward(RPM, 250, 10000);
+  this->TestMethodForward(RPM, 500, 10000);
 }
 
 TEST_F(TachometerTest, MethodBackward3000) {
   const uint32_t RPM = 3000;
-  this->TestMethodBackward(RPM, 250, 10000);
+  this->TestMethodBackward(RPM, 500, 10000);
 }
 
 /******************************************************************************/
