@@ -1,20 +1,19 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+set -euo pipefail
+set -a
 
 BUILD_DIR='build/cmake/release'
-OPTION='-DCMAKE_BUILD_TYPE=Debug'
-OPTION="${OPTION} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+TYPE='Debug'
 
-cd ..
+OPTION="-DCMAKE_BUILD_TYPE=$TYPE"
 
-echo "Make folder..."
-rm -rf ${BUILD_DIR}
-mkdir -p ${BUILD_DIR}
-cd ${BUILD_DIR}
+## Debug
+#OPTION="-LAH ${OPTION} -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 
-echo "Build stack..."
-cmake -LAH ${OPTION} ../../..
-cmake --build .
+## Clean
+#CLEAN='1'
 
-echo "Package..."
-cpack
+set +a
 
+bash common_build.sh

@@ -2,12 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "CMake build",
       "type": "shell",
-      "label": "Make build",
-      "command": "/usr/bin/make",
-      "args": ["BOARD=emulator"],
+      "command": "${workspaceFolder}/script/bt.sh",
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/script"
       },
       "problemMatcher": ["$gcc"],
       "group": {
@@ -15,33 +14,47 @@
         "isDefault": true
       }
     },
-    {
-      "type": "shell",
-      "label": "Clean & Make build",
-      "command": "/usr/bin/make",
-      "args": ["clean", "all", "BOARD=emulator"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": ["$gcc"],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
-      "type": "shell",
-      "label": "Clean build",
-      "command": "/usr/bin/make",
-      "args": ["clean"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": ["$gcc"],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
+    // {
+    //   "type": "shell",
+    //   "label": "Make build",
+    //   "command": "/usr/bin/make",
+    //   "args": ["BOARD=emulator"],
+    //   "options": {
+    //     "cwd": "${workspaceFolder}"
+    //   },
+    //   "problemMatcher": ["$gcc"],
+    //   "group": {
+    //     "kind": "build",
+    //     "isDefault": true
+    //   }
+    // },
+    // {
+    //   "type": "shell",
+    //   "label": "Clean & Make build",
+    //   "command": "/usr/bin/make",
+    //   "args": ["clean", "all", "BOARD=emulator"],
+    //   "options": {
+    //     "cwd": "${workspaceFolder}"
+    //   },
+    //   "problemMatcher": ["$gcc"],
+    //   "group": {
+    //     "kind": "build",
+    //     "isDefault": true
+    //   }
+    // },
+    // {
+    //   "type": "shell",
+    //   "label": "Clean build",
+    //   "command": "/usr/bin/make",
+    //   "args": ["clean"],
+    //   "options": {
+    //     "cwd": "${workspaceFolder}"
+    //   },
+    //   "problemMatcher": ["$gcc"],
+    //   "group": {
+    //     "kind": "build",
+    //     "isDefault": true
+    //   }
+    // },
   ]
 }

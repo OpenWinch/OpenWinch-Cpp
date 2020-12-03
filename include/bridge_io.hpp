@@ -36,9 +36,9 @@ class InputDevice {
   explicit InputDevice(uint8_t _pin, uint8_t _pull = PI_PUD_UP, bool _inverse = false);
   // InputDevice(const InputDevice&) = 0;
   virtual ~InputDevice();
-  uint8_t digitalRead();
-  void when_pressed(const cb_t &);
-  void when_released(const cb_t &);
+  virtual uint8_t digitalRead();
+  virtual void when_pressed(const cb_t &);
+  virtual void when_released(const cb_t &);
  protected:
   uint8_t pin;
   uint8_t pull;

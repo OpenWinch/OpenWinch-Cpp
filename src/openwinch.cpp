@@ -10,6 +10,7 @@
 #include "webserver.hpp"
 
 #include <iostream>
+#include <unistd.h>
 
 #define DEBUG
 
@@ -26,7 +27,7 @@ void debug() {
     tacho->hall_debug(tacho->get_hall_sensorU(), "U");
     tacho->hall_debug(tacho->get_hall_sensorW(), "W");
     tacho->hall_debug(tacho->get_hall_sensorV(), "V");
-    logger->debug("RPM %d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+    logger->debug("RPM %d", tacho->get_rpm());
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -41,13 +42,20 @@ int main(int argc, char *argv[])  {
   // Start Winch engine.
   Winch *winch = &Winch::get();
 
+  uid_t uid = getuid(), euid = geteuid();
+  if (uid > 0 || uid != euid) {
+    std::cout << "You are not root!" << std::endl;
+    exit(-1);
+  }
+
+
   // Debug
 #ifdef DEBUG
   Logger *logger = &Logger::get();
   Tachometer *tacho = &Tachometer::get();
 #endif
 
-  std::thread t(debug); 
+  std::thread t(debug);
 
   // Start Web stack.
   WebServer srv;
@@ -60,7 +68,7 @@ int main(int argc, char *argv[])  {
 //     tacho->hall_debug(tacho->get_hall_sensorU(), "U");
 //     tacho->hall_debug(tacho->get_hall_sensorW(), "W");
 //     tacho->hall_debug(tacho->get_hall_sensorV(), "V");
-//     logger->debug("%d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+//     logger->debug("%d", tacho->get_rpm());
 // #endif
 
     // ++j;
