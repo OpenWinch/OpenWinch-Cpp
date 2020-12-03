@@ -40,6 +40,13 @@ Tachometer::Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice
                                   std::placeholders::_2,
                                   std::placeholders::_3));
 
+  this->input_hal_u->when_released(std::bind(
+                                  &Tachometer::int_hall_U,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
+
   // Sensor W
   this->input_hal_w = sensor_w;
   this->input_hal_w->when_pressed(std::bind(
@@ -49,9 +56,23 @@ Tachometer::Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice
                                   std::placeholders::_2,
                                   std::placeholders::_3));
 
+  this->input_hal_w->when_released(std::bind(
+                                  &Tachometer::int_hall_W,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
+
   // Sensor V
   this->input_hal_v = sensor_v;
   this->input_hal_v->when_pressed(std::bind(
+                                  &Tachometer::int_hall_V,
+                                  this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3));
+  
+  this->input_hal_v->when_released(std::bind(
                                   &Tachometer::int_hall_V,
                                   this,
                                   std::placeholders::_1,
@@ -132,11 +153,11 @@ uint32_t Tachometer::get_rpm(uint32_t pulseTime) {
   uint32_t RPM = 0;
 
   if (pulseTime != 0) {
-    // Calculate the pulses per min (1000 millis in 1 second)
-    // (1000 / pulseTime) * 60
-    uint32_t PPM = (60000 / pulseTime);
+    // Calculate the pulses per min (1000000 microSecondes in 1 second)
+    // (1000000 / pulseTime) * 60
+    uint32_t PPM = (60000000 / pulseTime);
     // Calculate revs per minute based on number of pulses per rev
-    RPM = PPM / (MOTOR_PPR/3);
+    RPM = PPM / MOTOR_PPR;
   }
 
   return RPM;

@@ -9,13 +9,16 @@
 //#include "gmock/gmock.h"  // Brings in gMock.
 #include "tachometer.hpp"
 #include "bridge_io.hpp"
+
 #include <iostream>
 #include <functional>
 #include <chrono>
 
 class MockInputDevice : public InputDevice {
  public:
-  MockInputDevice(uint8_t nbSensor, uint8_t posSensor, char nameSensor) : InputDevice(0) {
+  MockInputDevice(uint8_t nbSensor, uint8_t posSensor, char nameSensor)
+      : InputDevice(0) {
+
     this->nb = nbSensor;
     this->pos = posSensor;
     this->name = nameSensor;
@@ -23,8 +26,12 @@ class MockInputDevice : public InputDevice {
     if (this->pos <= 0) {
       this->state = 1;
     }
+
     this->start = std::chrono::high_resolution_clock::now();
-    std::cout <<  "Initialise sensor : " << this->name << "(" << unsigned(this->pos) << ")" << std::endl;
+    std::cout <<  "Initialise sensor : "
+              << this->name
+              << "(" << unsigned(this->pos) << ")"
+              << std::endl;
   }
   uint8_t digitalRead() { return this->state; }
   uint8_t getCount() { return this->count; }
@@ -40,13 +47,10 @@ class MockInputDevice : public InputDevice {
   }
 
   void when_pressed(const cb_t &callback) override {
-    std::cout << "IO: Set pressed callback : " << std::endl;  // reinterpret_cast<unsigned char *>(callback) << std::endl;
     this->pressedEvent = callback;
   }
 
   void when_released(const cb_t &callback) override {
-    std::cout << "IO: Set released callback : " << std::endl;  // reinterpret_cast<unsigned char *>(callback) << std::endl;
-
     this->releasedEvent = callback;
   }
 
@@ -75,7 +79,7 @@ class MockInputDevice : public InputDevice {
         int gpio = this->pos;
         int level = 0;
         auto duration = std::chrono::system_clock::now() - this->start;
-        uint32_t tick = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        uint32_t tick = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
         this->pressedEvent(gpio, level, tick);
       }
     } else if ((subcnt % this->nb == 0)) {
@@ -85,7 +89,7 @@ class MockInputDevice : public InputDevice {
         int gpio = this->pos;
         int level = 0;
         auto duration = std::chrono::system_clock::now() - this->start;
-        uint32_t tick = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        uint32_t tick = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
         this->releasedEvent(gpio, level, tick);
       }
     }

@@ -5,6 +5,7 @@
  * 
  * @copyright Copyright © 2020
  */
+#include "constantes.hpp"
 #include "tachometer.hpp"
 #include "tachometer_mock.hpp"
 #include <thread>
@@ -31,9 +32,9 @@ class TachometerTest : public ::testing::Test {
   // and cleaning up each test, you can define the following methods:
 
   void SetUp() override {
-    this->devU = new MockInputDevice(nb_sensor, 4, 'U');
-    this->devW = new MockInputDevice(nb_sensor, 2, 'W');
-    this->devV = new MockInputDevice(nb_sensor, 0, 'V');
+    this->devU = new MockInputDevice(this->nb_sensor, 4, 'U');
+    this->devW = new MockInputDevice(this->nb_sensor, 2, 'W');
+    this->devV = new MockInputDevice(this->nb_sensor, 0, 'V');
 
     this->tacho = new Tachometer(devU, devW, devV);
   }
@@ -51,14 +52,88 @@ class TachometerTest : public ::testing::Test {
      this->devV = nullptr;
   }
 
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
+  void TestMethodForward(const uint32_t rpm,
+                         const uint16_t variation,
+                         const uint16_t iter) {
+
+    const uint32_t mSPP = ((60000000/rpm)/MOTOR_PPR)/this->nb_sensor;
+
+    std::cout << "RPM : " << unsigned(rpm)
+      << " Microsecond by pulse : " << mSPP
+      << std::endl;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    auto const start_time = std::chrono::steady_clock::now();
+    auto const wait_time = std::chrono::microseconds{mSPP};
+    auto next_time = start_time + wait_time;
+    for (size_t i = 0; i < iter; i++) {
+      this->devV->pulse_forward();
+      this->devW->pulse_forward();
+      this->devU->pulse_forward();
+
+      std::this_thread::sleep_until(next_time);
+      next_time += wait_time;
+    }
+
+    auto duration = std::chrono::system_clock::now() - start;
+    std::cout << "Duration : " << unsigned(duration.count()) << std::endl;
+
+    uint32_t actual =
+      this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
+
+    std::cout 
+      << "Avg Pulse : " << unsigned(this->tacho->get_hall_sensorV().pulseTime)
+      << " RPM : " << unsigned(actual)
+      << std::endl;
+
+    EXPECT_LE(rpm - variation, actual);
+    EXPECT_GE(rpm + variation, actual);
+    EXPECT_EQ(rotation_t::Clock, this->tacho->get_rotation());
+  }
+
+  void TestMethodBackward(const uint32_t rpm,
+                          const uint16_t variation,
+                          const uint16_t iter) {
+
+    const uint32_t mSPP = ((60000000/rpm)/MOTOR_PPR)/this->nb_sensor;
+
+    std::cout << "RPM : " << unsigned(rpm)
+      << " Microsecond by pulse : " << mSPP
+      << std::endl;
+
+    auto const start_time = std::chrono::steady_clock::now();
+    auto const wait_time = std::chrono::microseconds{mSPP};
+    auto next_time = start_time + wait_time;
+    for (size_t i = 0; i < iter; i++) {
+      this->devV->pulse_backward();
+      this->devW->pulse_backward();
+      this->devU->pulse_backward();
+
+      std::this_thread::sleep_until(next_time);
+      next_time += wait_time;
+    }
+
+    uint32_t actual =
+        this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
+
+    std::cout 
+      << "Avg Pulse : " << unsigned(this->tacho->get_hall_sensorV().pulseTime)
+      << " RPM : " << unsigned(actual)
+      << std::endl;
+
+    EXPECT_LE(rpm - variation, actual);
+    EXPECT_GE(rpm + variation, actual);
+    EXPECT_EQ(rotation_t::CounterClock, this->tacho->get_rotation());
+  }
 };
+
+/******************************************************************************/
 
 TEST_F(TachometerTest, MethodForwardBakward) {
   const int spd = 10;
 
-  std::cout <<  "cnt\t | VWU "<< std::endl;
+  std::cout <<  "cnt\t | VWU " << std::endl << "----------" << std::endl;
   for (size_t i = 0; i < 12; i++) {
     this->devV->pulse_forward();
     this->devW->pulse_forward();
@@ -71,7 +146,7 @@ TEST_F(TachometerTest, MethodForwardBakward) {
     std::this_thread::sleep_for(std::chrono::milliseconds(spd));
   }
 
-  std::cout <<  "cnt\t | VWU "<< std::endl;
+  std::cout <<  "cnt\t | VWU " << std::endl << "----------" << std::endl;
   for (size_t i = 0; i < 12; i++) {
     this->devV->pulse_backward();
     this->devW->pulse_backward();
@@ -86,85 +161,71 @@ TEST_F(TachometerTest, MethodForwardBakward) {
 }
 
 /******************************************************************************/
-// RPM 66
+// RPM 6000
 /******************************************************************************/
 
-TEST_F(TachometerTest, MethodForward66) {
-  const int spd = 10;
-  const int iter = 120;
-
-  for (size_t i = 0; i < iter; i++) {
-    this->devV->pulse_forward();
-    this->devW->pulse_forward();
-    this->devU->pulse_forward();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(spd));
-  }
-
-  uint32_t actual = this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
-  uint32_t ref = (60000/(spd*nb_sensor*2)/(45/3));
-  EXPECT_LE(ref - spd, actual);
-  EXPECT_GE(ref + spd, actual);
-  EXPECT_EQ(rotation_t::Clock, this->tacho->get_rotation());
+TEST_F(TachometerTest, MethodForward6000) {
+  const uint32_t RPM = 6000;
+  this->TestMethodForward(RPM, 200, 2400);
 }
 
-TEST_F(TachometerTest, MethodBackward66) {
-  const int spd = 10;
-  const int iter = 120;
-
-  for (size_t i = 0; i < iter; i++) {
-    this->devV->pulse_backward();
-    this->devW->pulse_backward();
-    this->devU->pulse_backward();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(spd));
-  }
-
-  uint32_t actual = this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
-  uint32_t ref = (60000/(spd*nb_sensor*2)/(45/3));
-  EXPECT_LE(ref - spd, actual);
-  EXPECT_GE(ref + spd, actual);
-  EXPECT_EQ(rotation_t::CounterClock, this->tacho->get_rotation());
+TEST_F(TachometerTest, MethodBackward6000) {
+  const uint32_t RPM = 6000;
+  this->TestMethodBackward(RPM, 200, 2400);
 }
 
 /******************************************************************************/
-// RPM 5000
+// RPM 3000
 /******************************************************************************/
 
-TEST_F(TachometerTest, MethodForward67) {
-  const int spd = 100000;
-  const int iter = 120;
-
-  for (size_t i = 0; i < iter; i++) {
-    this->devV->pulse_forward();
-    this->devW->pulse_forward();
-    this->devU->pulse_forward();
-
-    std::this_thread::sleep_for(std::chrono::nanoseconds(spd));
-  }
-
-  uint32_t actual = this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
-  uint32_t ref = ((60000*1000000)/(spd*nb_sensor*2)/(45/3));
-  EXPECT_LE(ref - spd, actual);
-  EXPECT_GE(ref + spd, actual);
-  EXPECT_EQ(rotation_t::Clock, this->tacho->get_rotation());
+TEST_F(TachometerTest, MethodForward3000) {
+  const uint32_t RPM = 3000;
+  this->TestMethodForward(RPM, 200, 2400);
 }
 
-TEST_F(TachometerTest, MethodBackward67) {
-  const int spd = 100000;
-  const int iter = 120;
+TEST_F(TachometerTest, MethodBackward3000) {
+  const uint32_t RPM = 3000;
+  this->TestMethodBackward(RPM, 200, 2400);
+}
 
-  for (size_t i = 0; i < iter; i++) {
-    this->devV->pulse_backward();
-    this->devW->pulse_backward();
-    this->devU->pulse_backward();
+/******************************************************************************/
+// RPM 1000
+/******************************************************************************/
 
-    std::this_thread::sleep_for(std::chrono::nanoseconds(spd));
-  }
+TEST_F(TachometerTest, MethodForward1000) {
+  const uint32_t RPM = 1000;
+  this->TestMethodForward(RPM, 100, 1200);
+}
 
-  uint32_t actual = this->tacho->get_rpm(this->tacho->get_hall_sensorV().pulseTime);
-  uint32_t ref = ((60000*1000000)/(spd*nb_sensor*2)/(45/3));
-  EXPECT_LE(ref - spd, actual);
-  EXPECT_GE(ref + spd, actual);
-  EXPECT_EQ(rotation_t::CounterClock, this->tacho->get_rotation());
+TEST_F(TachometerTest, MethodBackward1000) {
+  const uint32_t RPM = 1000;
+  this->TestMethodBackward(RPM, 100, 1200);
+}
+
+/******************************************************************************/
+// RPM 100
+/******************************************************************************/
+
+TEST_F(TachometerTest, MethodForward100) {
+  const uint32_t RPM = 100;
+  this->TestMethodForward(RPM, 20, 300);
+}
+
+TEST_F(TachometerTest, MethodBackward100) {
+  const uint32_t RPM = 100;
+  this->TestMethodBackward(RPM, 20, 300);
+}
+
+/******************************************************************************/
+// RPM 10
+/******************************************************************************/
+
+TEST_F(TachometerTest, MethodForward10) {
+  const uint32_t RPM = 10;
+  this->TestMethodForward(RPM, 10, 100);
+}
+
+TEST_F(TachometerTest, MethodBackward10) {
+  const uint32_t RPM = 10;
+  this->TestMethodBackward(RPM, 10, 100);
 }

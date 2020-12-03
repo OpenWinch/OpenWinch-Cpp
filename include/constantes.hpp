@@ -11,7 +11,7 @@
 
 /* Hardware */
 #define MOTOR_MAX 38
-#define MOTOR_PPR 45      // pulse by turn
+#define MOTOR_PPR 18      // pulse by turn 45 on gear (but not from motor)
 
 /* LCD */
 #define LCD_FPS 10
