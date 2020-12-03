@@ -37,14 +37,22 @@ typedef struct tacho_hallSensor {
 class Tachometer {
  public:
   static Tachometer& get();
+  static uint32_t get_rpm(uint32_t pulseTime);
+  static uint32_t reduce_rpm(uint32_t rpm_motor);
 
   Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice *sensor_v);
+  Tachometer(const Tachometer&)= delete;
+  Tachometer& operator=(const Tachometer&)= delete;
   ~Tachometer()= default;
+
   void initialize();
   void hall_debug(tacho_hallSensor_t sensor, std::string name);
-  uint32_t get_rpm(uint32_t pulseTime);
   rotation_t get_rotation();
 
+  uint32_t get_rpm();
+  uint32_t get_rpmU();
+  uint32_t get_rpmW();
+  uint32_t get_rpmV();
 
   tacho_hallSensor_t get_hall_sensorU();
   tacho_hallSensor_t get_hall_sensorW();
@@ -69,11 +77,8 @@ class Tachometer {
 
   // Tachometer();
   //~Tachometer()= default;
-  Tachometer(const Tachometer&)= delete;
-  Tachometer& operator=(const Tachometer&)= delete;
 
   void hall_init(tacho_hallSensor_t *sensor);
-  void error_exit(std::string msg);
 };
 
 #endif  // TACHOMETER_HPP_

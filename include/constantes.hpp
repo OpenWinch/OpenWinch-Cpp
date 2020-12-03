@@ -10,8 +10,9 @@
 #define CONSTANTES_HPP_
 
 /* Hardware */
-#define MOTOR_MAX 38
-#define MOTOR_PPR 18      // pulse by turn 45 on gear (but not from motor)
+#define MOTOR_MAX 38          // DEPRECATED prefere to use SPEED_MAX
+#define MOTOR_PPR 18          // pulse by turn 45 on gear (but not from motor)
+#define MOTOR_REDUCE (52/11)
 
 /* LCD */
 #define LCD_FPS 10

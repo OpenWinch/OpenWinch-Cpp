@@ -18,7 +18,6 @@ class MockInputDevice : public InputDevice {
  public:
   MockInputDevice(uint8_t nbSensor, uint8_t posSensor, char nameSensor)
       : InputDevice(0) {
-
     this->nb = nbSensor;
     this->pos = posSensor;
     this->name = nameSensor;
@@ -33,7 +32,16 @@ class MockInputDevice : public InputDevice {
               << "(" << unsigned(this->pos) << ")"
               << std::endl;
   }
-  uint8_t digitalRead() { return this->state; }
+  uint8_t digitalRead() override { return this->state; }
+
+  void when_pressed(const cb_t &callback) override {
+    this->pressedEvent = callback;
+  }
+
+  void when_released(const cb_t &callback) override {
+    this->releasedEvent = callback;
+  }
+
   uint8_t getCount() { return this->count; }
 
   void pulse_forward() {
@@ -44,14 +52,6 @@ class MockInputDevice : public InputDevice {
   void pulse_backward() {
     this->count -= 1;
     this->simulate();
-  }
-
-  void when_pressed(const cb_t &callback) override {
-    this->pressedEvent = callback;
-  }
-
-  void when_released(const cb_t &callback) override {
-    this->releasedEvent = callback;
   }
 
  private:

@@ -27,7 +27,7 @@ void debug() {
     tacho->hall_debug(tacho->get_hall_sensorU(), "U");
     tacho->hall_debug(tacho->get_hall_sensorW(), "W");
     tacho->hall_debug(tacho->get_hall_sensorV(), "V");
-    logger->debug("RPM %d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+    logger->debug("RPM %d", tacho->get_rpm());
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])  {
 //     tacho->hall_debug(tacho->get_hall_sensorU(), "U");
 //     tacho->hall_debug(tacho->get_hall_sensorW(), "W");
 //     tacho->hall_debug(tacho->get_hall_sensorV(), "V");
-//     logger->debug("%d", tacho->get_rpm(tacho->get_hall_sensorV().pulseTime));
+//     logger->debug("%d", tacho->get_rpm());
 // #endif
 
     // ++j;

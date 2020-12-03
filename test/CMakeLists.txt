@@ -1,5 +1,5 @@
 
-set(OW_TEST OpenWinchTest)
+set(OW_TEST openwinch_test)
 
 include(GoogleTest)
 include(CodeCoverage)
@@ -35,7 +35,7 @@ add_executable(${OW_TEST} ${TEST_SRC})
 target_link_libraries(${OW_TEST} PRIVATE ${OW_TEST}_lib ${_OW_LINK} gtest gmock gmock_main)
 target_include_directories(${OW_TEST} PRIVATE ${_OW_INCLUDE})
 
-add_test(NAME AllTestsIn${OW_TEST} COMMAND ${OW_TEST})
+#add_test(NAME AllTestsIn${OW_TEST} COMMAND ${OW_TEST})
 
 if(OW_BOARD STREQUAL "emulator")
   gtest_discover_tests(${OW_TEST}
