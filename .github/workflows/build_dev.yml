@@ -17,7 +17,7 @@ jobs:
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
         sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
         sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr curl
     - name: Add external libraries
       run: |
         vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
@@ -35,7 +35,11 @@ jobs:
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest
+      run: ctest --output-on-failure
+    - name: Report Coverage
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
     - name: Make Package
       working-directory: ${{runner.workspace}}/build
       shell: bash
