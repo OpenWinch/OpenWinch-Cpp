@@ -9,6 +9,6 @@
 #ifndef VERSION_HPP_
 #define VERSION_HPP_
 
-#define VERSION "0.2.1"
+#define VERSION "0.3.0"
 
 #endif  // VERSION_HPP_
