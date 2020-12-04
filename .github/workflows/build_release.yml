@@ -106,7 +106,8 @@ jobs:
       run: cp ${{runner.workspace}}/build/packages/*.deb ${GITHUB_WORKSPACE}/
     - uses: docker://lpenz/ghaction-packagecloud:v0.1
       with:
-        repository: Theosakamg/openwinch/debian/buster
+        user: Theosakamg
+        repository: openwinch/debian/buster
       env:
         PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
