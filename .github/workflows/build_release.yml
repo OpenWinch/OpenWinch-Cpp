@@ -173,10 +173,13 @@ jobs:
               });
             }
           }
+    - name: Copy DEB for export to repository
+      shell: bash
+      run: cp ${{runner.workspace}}/build/packages/*.deb ${GITHUB_WORKSPACE}/
     - uses: docker://lpenz/ghaction-packagecloud:v0.1
       with:
-        repository: Theosakamg/openwinch/debian/buster
-        directory: ${{ runner.workspace }}/build/packages/
+        user: Theosakamg
+        repository: openwinch/debian/buster
       env:
         PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
@@ -241,9 +244,12 @@ jobs:
               });
             }
           }
+    - name: Copy DEB for export to repository
+      shell: bash
+      run: cp ${{runner.workspace}}/build/packages/*.deb ${GITHUB_WORKSPACE}/
     - uses: docker://lpenz/ghaction-packagecloud:v0.1
       with:
-        repository: Theosakamg/openwinch/debian/buster
-        directory: ${{ runner.workspace }}/build/packages/
+        user: Theosakamg
+        repository: openwinch/debian/buster
       env:
         PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
