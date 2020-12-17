@@ -12,8 +12,6 @@
 #include "constantes.hpp"
 #include "state.hpp"
 
-#include <thread>
-
 class Logger;
 class Board;
 class Gui;
@@ -25,11 +23,44 @@ class ModeType;
 
 class Winch {
  public:
+  // Winch() {};
+  virtual ~Winch() {};
+
+  virtual void boot() = 0;
+  virtual void initialize() = 0;
+  virtual void initialized() = 0;
+  virtual void start() = 0;
+  virtual void started() = 0;
+  virtual void stop() = 0;
+  virtual void stopped() = 0;
+  virtual void emergency() = 0;
+  virtual void display() = 0;
+  virtual void exit() = 0;
+  virtual ModeType getMode() = 0;
+  virtual uint8_t getSpeedTarget() = 0;
+  virtual State getState() = 0;
+  virtual uint8_t getBattery() = 0;
+  virtual uint8_t getRemote() = 0;
+  virtual float getDistance() = 0;
+  virtual void speedUp(uint8_t value = 1) = 0;
+  virtual void speedDown(uint8_t value = 1) = 0;
+  virtual void speedValue(uint8_t) = 0;
+  virtual void enterGui(InputType) = 0;
+  virtual void manualForward() = 0;
+  virtual void manualReverse() = 0;
+};
+
+class WinchControl : public Winch {
+ public:
   static Winch& get() {
-    static Winch instance;
+    static WinchControl instance;
     return instance;
   }
 
+  WinchControl();
+  ~WinchControl() = default;
+
+  void boot();
   void initialize();
   void initialized();
   void start();
@@ -58,13 +89,10 @@ class Winch {
   Gui* gui = nullptr;
   Keyboard* input = nullptr;
   ModeEngine* mode = nullptr;
-  std::thread* controlLoop;
 
   State state = State::UNKNOWN;
   uint8_t speed_target = SPEED_INIT;
 
-  Winch();
-  ~Winch()= default;
   void banner();
   void loadConfig();
   void initControlLoop();

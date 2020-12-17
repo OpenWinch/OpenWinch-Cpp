@@ -15,7 +15,17 @@
 
 #define CPPHTTPLIB_THREAD_POOL_COUNT 5
 
-#define HTTP_ROUTE_EXTRA "/extra"
+#define HTTP_ROUTE_ROOT "/"
 #define HTTP_ROUTE_INDEX "/index"
+#define HTTP_ROUTE_START "/start"
+#define HTTP_ROUTE_STOP "/stop"
+#define HTTP_ROUTE_UP "/up"
+#define HTTP_ROUTE_DOWN "/down"
+#define HTTP_ROUTE_HALT "/halt"
+
+#define HTTP_ROUTE_EXTRA "/extra"
+#define HTTP_ROUTE_RESET "/reset"
+#define HTTP_ROUTE_LEFT "/left"
+#define HTTP_ROUTE_RIGHT "/right"
 
 #endif  // WEBSERVER_CONFIG_HPP_

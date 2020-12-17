@@ -10,6 +10,7 @@
 #include "mode.hpp"
 
 #include "hardware.hpp"
+#include <stdexcept>
 
 
 // ModeEngine
@@ -17,6 +18,23 @@
 ModeEngine::ModeEngine(Board *_board, Winch *_winch) : board(_board), winch(_winch) {
     this->logger = &Logger::get();
     this->speed_ratio = 1 / MOTOR_MAX;
+}
+
+void ModeEngine::run() {
+  this->abortRequested.store(false);
+  this->controlLoop = std::thread(&ModeEngine::runControlLoop, this);
+}
+
+void ModeEngine::abort() {
+  this->abortRequested.store(true);
+
+  if(this->controlLoop.joinable()) {
+    this->controlLoop.join();
+  }
+}
+
+bool ModeEngine::isRunning() const {
+  return this->running.load();
 }
 
 void ModeEngine::applyThrottleValue() {
@@ -42,40 +60,55 @@ uint8_t ModeEngine::getSpeedCurrent() {
 void ModeEngine::runControlLoop() {
   //auto t = std::this_thread;
   this->logger->debug("MOD : Starting Control Loop.");
+  this->running.store(true);
 
-  while (true) {
-      this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
-                          std::string(this->winch->getState()).c_str(),
-                          std::to_string(this->speed_current).c_str(),
-                          std::to_string(this->board->getRotationFromBegin()).c_str());
+  while (false == abortRequested.load()) {
+    //synchronized {
+      try {
+        this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
+                            std::string(this->winch->getState()).c_str(),
+                            std::to_string(this->speed_current).c_str(),
+                            std::to_string(this->board->getRotationFromBegin()).c_str());
 
-      // INIT
-      if (this->winch->getState().isInit()) {
-        this->initialize();
+        // INIT
+        if (this->winch->getState().isInit()) {
+          this->initialize();
+        }
+
+        // STARTING or RUNNING
+        if (this->winch->getState().isRun()) {
+          this->starting();
+        }
+
+        // STOP
+        if (this->winch->getState().isStop()) {
+          this->stopping();
+        }
+
+        // Specifical mode
+        this->extraMode();
+
+        // EMERGENCY
+        if (this->winch->getState().isFault()) {
+          this->fault();
+        }
+
+        this->applyThrottleValue();
+
+        // CPU idle
+        std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
       }
-
-      // STARTING or RUNNING
-      if (this->winch->getState().isRun()) {
-        this->starting();
+      catch(std::runtime_error& e) 
+      {
+          // Some more specific
       }
-
-      // STOP
-      if (this->winch->getState().isStop()) {
-        this->stopping();
+      catch(...) 
+      {
+          // Make sure that nothing leaves the thread for now...
       }
+    //}
 
-      // Specifical mode
-      this->extraMode();
-
-      // EMERGENCY
-      if (this->winch->getState().isFault()) {
-        this->fault();
-      }
-
-      this->applyThrottleValue();
-
-      // CPU idle
-      std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
+    this->running.store(false);
   }
 
   this->logger->debug("MOD : Stopping Control Loop.");

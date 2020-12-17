@@ -28,6 +28,11 @@
 // #define OW_LOG_DEBUG
 #endif  // OW_LOG_DEBUG
 
+// Web Logger
+#ifndef OW_WEB_DEBUG
+// #define OW_WEB_DEBUG
+#endif  // OW_WEB_DEBUG
+
 /***************/
 /* CONFIG      */
 /***************/

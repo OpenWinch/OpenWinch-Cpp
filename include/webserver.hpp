@@ -10,7 +10,7 @@
 #define WEBSERVER_HPP_
 
 #include <string>
-#include <map> 
+#include <map>
 
 #define TPL_URL         "{{ request.url_root }}"
 #define TPL_MODE        "{{ mode }}"
@@ -39,11 +39,12 @@ using Headers = std::multimap<std::string, std::string, detail::ci>;
 }
 
 class Logger;
+class Winch;
 
 
 class WebServer {
  public:
-  WebServer();
+  WebServer(Winch*);
   ~WebServer();
   void run();
   httplib::Server* getServer();
@@ -64,20 +65,20 @@ class WebServer {
 
 class WebMain {
  public:
-  explicit WebMain(WebServer*);
+  explicit WebMain(WebServer*, Winch*);
 
  private:
-  WebServer* server = nullptr;
-  httplib::Server* srv = nullptr;
+  httplib::Server* srv;
+  Winch* winch;
 };
 
 class WebExtra {
  public:
-  explicit WebExtra(WebServer*);
+  explicit WebExtra(WebServer*, Winch*);
 
  private:
-  WebServer* server = nullptr;
-  httplib::Server* srv = nullptr;
+  httplib::Server* srv;
+  Winch* winch;
 };
 
 #endif  // WEBSERVER_HPP_

@@ -6,78 +6,110 @@
  * @copyright Copyright © 2020
  */
 #include "mode.hpp"
-#include "controller_mock.h"
-#include "hardware_mock.h"
+#include "controller_mock.hpp"
+#include "hardware_mock.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-class OneWayModeTest : public ::testing::Test {
+class ModeTypeTest : public ::testing::Test {
  private:
 
  protected:
+  ModeTypeTest() { }
+  ~ModeTypeTest() override { }
 
-  OneWayModeTest() {
-     // You can do set-up work for each test here.
-  }
+  void SetUp() override { }
+  void TearDown() override { }
+};
 
-  ~OneWayModeTest() override {
-     // You can do clean-up work that doesn't throw exceptions here.
-  }
+TEST_F(ModeTypeTest, MethodCheckFault) {
+  EXPECT_TRUE(State::checkFault(State::ERROR));
+  EXPECT_FALSE(State::checkFault(State::UNKNOWN));
+}
 
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
+class OneWayModeTest : public ::testing::Test {
+ protected:
+  ModeEngine* entity = nullptr;
+  Winch* winch = nullptr;
+  Board* board = nullptr;
+
+  OneWayModeTest() { }
+  ~OneWayModeTest() override { }
 
   void SetUp() override {
-     // Code here will be called immediately after the constructor (right
-     // before each test).
-  }
+    this->winch = new MockWinch();
+    this->board = new MockBoard(this->winch);
 
+    this->entity = new OneWayMode(this->board, this->winch);
+  }
   void TearDown() override {
-     // Code here will be called immediately after each test (right
-     // before the destructor).
-  }
+    delete this->entity;
+    delete this->board;
+    delete this->winch;
 
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
+    this->entity = 0;
+  }
 };
 
 TEST_F(OneWayModeTest, MethodExtraMode) {
+
+  MockWinch* twinch = (MockWinch *)this->winch;
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::BOOTED));
+
+  this->entity->run();
+
+  while (!this->entity->isRunning()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::INIT));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::START));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::STOP));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+  
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::ERROR));
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+
   EXPECT_TRUE(1);
+
+  this->entity->abort();
+  ASSERT_FALSE(this->entity->isRunning());
 }
 
 
 class TwoWayModeTest : public ::testing::Test {
- private:
-
  protected:
+  ModeEngine* entity = nullptr;
 
-  TwoWayModeTest() {
-     // You can do set-up work for each test here.
-  }
-
-  ~TwoWayModeTest() override {
-     // You can do clean-up work that doesn't throw exceptions here.
-  }
-
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
+  TwoWayModeTest() { }
+  ~TwoWayModeTest() override { }
 
   void SetUp() override {
-     // Code here will be called immediately after the constructor (right
-     // before each test).
-  }
+    Winch* winch = new MockWinch();
+    Board* board = new MockBoard(winch);
 
+    this->entity = new TwoWayMode(board, winch);
+  }
   void TearDown() override {
-     // Code here will be called immediately after each test (right
-     // before the destructor).
+    delete this->entity;
+    this->entity = 0;
   }
-
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
 };
 
 TEST_F(TwoWayModeTest, MethodExtraMode) {
+  // this->entity->extraMode();
   EXPECT_TRUE(1);
 }
 
@@ -87,38 +119,25 @@ TEST_F(TwoWayModeTest, MethodIsEndSecurity) {
 
 
 class InfinityModeTest : public ::testing::Test {
- private:
-  ModeEngine* entity;
-
  protected:
+  ModeEngine* entity = nullptr;
 
-  InfinityModeTest() {
-    // You can do set-up work for each test here.
-  }
-
-  ~InfinityModeTest() override {
-    // You can do clean-up work that doesn't throw exceptions here.
-  }
-
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
+  InfinityModeTest() { }
+  ~InfinityModeTest() override { }
 
   void SetUp() override {
-    // Winch* winch = new MockWinch();
-    // Board* board = new MockBoard(winch);
+    Winch* winch = new MockWinch();
+    Board* board = new MockBoard(winch);
 
-    // this->entity = new InfinityMode(board, winch);
+    this->entity = new InfinityMode(board, winch);
   }
-
   void TearDown() override {
     delete this->entity;
     this->entity = 0;
   }
-
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
 };
 
 TEST_F(InfinityModeTest, MethodExtraMode) {
+  // this->entity->extraMode();
   EXPECT_TRUE(1);
 }

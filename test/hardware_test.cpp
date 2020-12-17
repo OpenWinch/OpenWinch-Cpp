@@ -6,8 +6,8 @@
  * @copyright Copyright © 2020
  */
 #include "mode.hpp"
-#include "controller_mock.h"
-#include "hardware_mock.h"
+#include "controller_mock.hpp"
+#include "hardware_mock.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

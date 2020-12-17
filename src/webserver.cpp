@@ -14,6 +14,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <mutex>
 
 #include <httplib.h>
 
@@ -27,7 +28,7 @@
 #endif
 
 
-WebServer::WebServer() {
+WebServer::WebServer(Winch* _winch) {
   this->logger = &Logger::get();
   this->logger->debug("WEB : Initialize web server stack...");
 
@@ -52,8 +53,8 @@ WebServer::WebServer() {
   this->setStaticFile();
 
   this->logger->debug("WEB : Initialize routing...");
-  WebMain main(this);
-  WebExtra extra(this);
+  WebMain main(this, _winch);
+  WebExtra extra(this, _winch);
 }
 
 WebServer::~WebServer() {
@@ -89,6 +90,7 @@ void WebServer::setStaticFile() {
 
   bool ret = this->srv->set_mount_point("/css", "./public/css");
   if (!ret) { throw ret; }
+  
   ret = this->srv->set_mount_point("/img", "./public/img");
   if (!ret) { throw ret; }
 }
@@ -102,54 +104,58 @@ void WebServer::run() {
   this->srv->listen("0.0.0.0", PORT);
 }
 
-std::string WebServer::log(const httplib::Request &req, const httplib::Response &res) {
-  std::string s;
-  char buf[BUFSIZ];
+#ifdef OW_WEB_DEBUG
 
-  s += "================================\n";
-  snprintf(buf, sizeof(buf), "%s %s %s",
-            req.method.c_str(),
-            req.version.c_str(),
-            req.path.c_str());
-  s += buf;
+// std::string WebServer::log(const httplib::Request &req, const httplib::Response &res) {
+//   std::string s;
+//   char buf[BUFSIZ];
 
-  s += "#################################\n";
-  std::string query;
-  for (auto it = req.params.begin(); it != req.params.end(); ++it) {
-    const auto &x = *it;
-    snprintf(buf, sizeof(buf), "%c%s=%s",
-             (it == req.params.begin()) ? '?' : '&', x.first.c_str(),
-             x.second.c_str());
-    query += buf;
-  }
-  snprintf(buf, sizeof(buf), "%s\n", query.c_str());
-  s += buf;
-  s += WebServer::dump_headers(req.headers);
-  s += "--------------------------------\n";
+//   s += "================================\n";
+//   snprintf(buf, sizeof(buf), "%s %s %s",
+//             req.method.c_str(),
+//             req.version.c_str(),
+//             req.path.c_str());
+//   s += buf;
 
-  snprintf(buf, sizeof(buf), "%d %s\n", res.status, res.version.c_str());
-  s += buf;
-  s += WebServer::dump_headers(res.headers);
-  s += "\n";
+//   s += "#################################\n";
+//   std::string query;
+//   for (auto it = req.params.begin(); it != req.params.end(); ++it) {
+//     const auto &x = *it;
+//     snprintf(buf, sizeof(buf), "%c%s=%s",
+//              (it == req.params.begin()) ? '?' : '&', x.first.c_str(),
+//              x.second.c_str());
+//     query += buf;
+//   }
+//   snprintf(buf, sizeof(buf), "%s\n", query.c_str());
+//   s += buf;
+//   s += WebServer::dump_headers(req.headers);
+//   s += "--------------------------------\n";
 
-  // if (!res.body.empty()) { s += res.body; }
-  // s += "\n";
+//   snprintf(buf, sizeof(buf), "%d %s\n", res.status, res.version.c_str());
+//   s += buf;
+//   s += WebServer::dump_headers(res.headers);
+//   s += "\n";
 
-  return s;
-}
+//   // if (!res.body.empty()) { s += res.body; }
+//   // s += "\n";
 
-std::string WebServer::dump_headers(const httplib::Headers &headers) {
-  std::string s("HEADER :\n***************************\n");
-  char buf[BUFSIZ];
+//   return s;
+// }
 
-  for (auto it = headers.begin(); it != headers.end(); ++it) {
-    const auto &x = *it;
-    snprintf(buf, sizeof(buf), "%s: %s\n", x.first.c_str(), x.second.c_str());
-    s += buf;
-  }
+// std::string WebServer::dump_headers(const httplib::Headers &headers) {
+//   std::string s("HEADER :\n***************************\n");
+//   char buf[BUFSIZ];
 
-  return s;
-}
+//   for (auto it = headers.begin(); it != headers.end(); ++it) {
+//     const auto &x = *it;
+//     snprintf(buf, sizeof(buf), "%s: %s\n", x.first.c_str(), x.second.c_str());
+//     s += buf;
+//   }
+
+//   return s;
+// }
+
+#endif  // OW_WEB_DEBUG
 
 void findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr)
 {
@@ -165,93 +171,102 @@ void findAndReplaceAll(std::string & data, std::string toSearch, std::string rep
     }
 }
 
-WebMain::WebMain(WebServer* _server) : server(_server) {
-  this->srv = this->server->getServer();
+WebMain::WebMain(WebServer* _server, Winch* _winch) : srv(_server->getServer()), winch(_winch) {
+  auto winch = this->winch;
 
-  this->srv->Get("/", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_ROOT,
+    [this](const httplib::Request &/*req*/, httplib::Response &res) {
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 
-  this->srv->Get(HTTP_ROUTE_INDEX, [this](const httplib::Request &req, httplib::Response &res) {
-    std::string content(index_html);
-    Winch* winch = &Winch::get();
-    const auto host = req.headers.find("HOST");
+  this->srv->Get(HTTP_ROUTE_INDEX, 
+    [winch](const httplib::Request &req, httplib::Response &res) {
+      std::string content(index_html);
+      const auto host = req.headers.find("HOST");
 
-    auto enable = "white";
-    if (winch->getState().isRun()) {
-      enable = "lime";
-    } else if (winch->getState() == State::ERROR) {
-      enable = "red";
-    } else if (winch->getState() == State::UNKNOWN or winch->getState() == State::INIT) {
-      enable = "orange";
-    }
+      auto enable = "white";
+      if (winch->getState().isRun()) {
+        enable = "lime";
+      } else if (winch->getState() == State::ERROR) {
+        enable = "red";
+      } else if (winch->getState() == State::UNKNOWN or winch->getState() == State::INIT) {
+        enable = "orange";
+      }
 
-    findAndReplaceAll(content, TPL_URL,  "http://" + host->second + HTTP_ROUTE_INDEX);
-    findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
-    findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
-    findAndReplaceAll(content, TPL_ENABLE, enable);
-    findAndReplaceAll(content, TPL_SPD_TARGET, std::to_string(winch->getSpeedTarget()));
-    findAndReplaceAll(content, TPL_SPD_UNIT, SPEED_UNIT);
-    findAndReplaceAll(content, TPL_VERSION, VERSION);
+      findAndReplaceAll(content, TPL_URL,  "http://" + host->second + HTTP_ROUTE_INDEX);
+      findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
+      findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
+      findAndReplaceAll(content, TPL_ENABLE, enable);
+      findAndReplaceAll(content, TPL_SPD_TARGET, std::to_string(winch->getSpeedTarget()));
+      findAndReplaceAll(content, TPL_SPD_UNIT, SPEED_UNIT);
+      findAndReplaceAll(content, TPL_VERSION, VERSION);
 
-    res.set_content(content.c_str(), content.size(), "text/html");
+      res.set_content(content.c_str(), content.size(), "text/html");
   });
 
-  this->srv->Get("/start", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().start();
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_START,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->start();
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 
-  this->srv->Get("/stop", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().stop();
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_STOP,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->stop();
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 
-  this->srv->Get("/up", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().speedUp();
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_UP,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->speedUp();
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 
-  this->srv->Get("/down", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().speedDown();
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_DOWN,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->speedDown();
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 
-  this->srv->Get("/halt", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().emergency();
-    res.set_redirect(HTTP_ROUTE_INDEX);
+  this->srv->Get(HTTP_ROUTE_HALT,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->emergency();
+      res.set_redirect(HTTP_ROUTE_INDEX);
   });
 }
 
-WebExtra::WebExtra(WebServer* _server) : server(_server) {
-  this->srv = this->server->getServer();
+WebExtra::WebExtra(WebServer* _server, Winch* _winch) : srv(_server->getServer()), winch(_winch) {
+  auto winch = this->winch;
 
-  this->srv->Get(HTTP_ROUTE_EXTRA, [this](const httplib::Request &req, httplib::Response &res) {
-    std::string content(extra_html);
-    Winch* winch = &Winch::get();
-    const auto host = req.headers.find("HOST");
+  this->srv->Get(HTTP_ROUTE_EXTRA,
+    [winch](const httplib::Request &req, httplib::Response &res) {
+      std::string content(extra_html);
+      const auto host = req.headers.find("HOST");
 
-    findAndReplaceAll(content, TPL_URL, "http://" + host->second + HTTP_ROUTE_EXTRA);
-    findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
-    findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
-    findAndReplaceAll(content, TPL_ENABLE, "white");
-    findAndReplaceAll(content, TPL_SPD_TARGET, std::to_string(winch->getSpeedTarget()));
-    findAndReplaceAll(content, TPL_SPD_UNIT, SPEED_UNIT);
-    findAndReplaceAll(content, TPL_VERSION, VERSION);
+      findAndReplaceAll(content, TPL_URL, "http://" + host->second + HTTP_ROUTE_EXTRA);
+      findAndReplaceAll(content, TPL_MODE, std::string(winch->getMode()).c_str());
+      findAndReplaceAll(content, TPL_BAT, std::to_string(winch->getBattery()));
+      findAndReplaceAll(content, TPL_ENABLE, "white");
+      findAndReplaceAll(content, TPL_SPD_TARGET, std::to_string(winch->getSpeedTarget()));
+      findAndReplaceAll(content, TPL_SPD_UNIT, SPEED_UNIT);
+      findAndReplaceAll(content, TPL_VERSION, VERSION);
 
-    res.set_content(content.c_str(), content.size(), "text/html");
+      res.set_content(content.c_str(), content.size(), "text/html");
   });
 
-  this->srv->Get("/reset", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    Winch::get().initialize();
-    res.set_redirect(HTTP_ROUTE_EXTRA);
+  this->srv->Get(HTTP_ROUTE_RESET,
+    [winch](const httplib::Request &/*req*/, httplib::Response &res) {
+      winch->initialize();
+      res.set_redirect(HTTP_ROUTE_EXTRA);
   });
 
-  this->srv->Get("/left", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    res.set_redirect(HTTP_ROUTE_EXTRA);
+  this->srv->Get(HTTP_ROUTE_LEFT,
+    [this](const httplib::Request &/*req*/, httplib::Response &res) {
+      res.set_redirect(HTTP_ROUTE_EXTRA);
   });
 
-  this->srv->Get("/right", [this](const httplib::Request &/*req*/, httplib::Response &res) {
-    res.set_redirect(HTTP_ROUTE_EXTRA);
+  this->srv->Get(HTTP_ROUTE_RIGHT,
+    [this](const httplib::Request &/*req*/, httplib::Response &res) {
+      res.set_redirect(HTTP_ROUTE_EXTRA);
   });
 }

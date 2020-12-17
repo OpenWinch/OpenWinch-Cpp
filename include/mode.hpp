@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <atomic>
+#include <thread>
 
 class Board;
 class Winch;
@@ -55,6 +57,11 @@ class ModeType {
 class ModeEngine {
  public:
   explicit ModeEngine(Board*, Winch*);
+
+  void run();
+  void abort();
+  bool isRunning() const;
+
   void applyThrottleValue();
   float getDistance();
   uint8_t getSpeedCurrent();
@@ -70,6 +77,10 @@ class ModeEngine {
   bool isBeginSecurity();
 
  private:
+  std::atomic_bool abortRequested = ATOMIC_VAR_INIT(false);
+  std::atomic_bool running = ATOMIC_VAR_INIT(false);
+  std::thread controlLoop;
+
   uint8_t security_begin = 20;
   uint8_t speed_ratio = 1;
   uint8_t velocity_start = 1;

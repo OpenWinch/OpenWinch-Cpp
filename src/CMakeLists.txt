@@ -39,6 +39,8 @@ target_include_directories( ${OW_TARGET} PRIVATE ${_OW_INCLUDE} )
 target_compile_options( ${OW_TARGET} PRIVATE ${_OW_COMPILE_OPT} )
 target_compile_definitions( ${OW_TARGET} PRIVATE ${_OW_COMPILE_DEF} )
 
+file(COPY ../public DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) 
+
 install(TARGETS ${OW_TARGET}
         DESTINATION /opt/openwinch/bin
         COMPONENT bin

@@ -13,30 +13,11 @@ class StateTest : public ::testing::Test {
  private:
 
  protected:
+  StateTest() { }
+  ~StateTest() override { }
 
-  StateTest() {
-     // You can do set-up work for each test here.
-  }
-
-  ~StateTest() override {
-     // You can do clean-up work that doesn't throw exceptions here.
-  }
-
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
-
-  void SetUp() override {
-     // Code here will be called immediately after the constructor (right
-     // before each test).
-  }
-
-  void TearDown() override {
-     // Code here will be called immediately after each test (right
-     // before the destructor).
-  }
-
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
+  void SetUp() override { }
+  void TearDown() override { }
 };
 
 TEST_F(StateTest, MethodCheckRun) {
@@ -67,9 +48,9 @@ TEST_F(StateTest, MethodCheckBoot) {
 }
 
 // TEST_F(StateTest, MethodIsRun) {
-//   EXPECT_TRUE(State::RUNNING.isRun());
-//   EXPECT_TRUE(State::START.isRun());
-//   EXPECT_FALSE(State::UNKNOWN.isRun());
+//   EXPECT_TRUE(State::RUNNING::isRun());
+//   EXPECT_TRUE(State::START::isRun());
+//   EXPECT_FALSE(State::UNKNOWN::isRun());
 // }
 
 // TEST_F(StateTest, MethodIsStop) {

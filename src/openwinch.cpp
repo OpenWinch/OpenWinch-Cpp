@@ -40,7 +40,8 @@ int main(int argc, char *argv[])  {
   int j = 0;
 
   // Start Winch engine.
-  Winch *winch = &Winch::get();
+  Winch *winch = &WinchControl::get();
+  winch->boot();
 
   uid_t uid = getuid(), euid = geteuid();
   if (uid > 0 || uid != euid) {
@@ -58,7 +59,7 @@ int main(int argc, char *argv[])  {
   std::thread t(debug);
 
   // Start Web stack.
-  WebServer srv;
+  WebServer srv(winch);
   srv.run();
 
 

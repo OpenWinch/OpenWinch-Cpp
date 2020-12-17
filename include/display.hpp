@@ -140,9 +140,9 @@ class MainScreen: public ScreenBase {
   void enter(InputType, uint8_t) override;
 
  private:
-  std::vector<std::string> ITEMS_IDLE = { u8"1", u8"2", "3" }; // { u8"", u8"", " " };
-  std::vector<std::string> ITEMS_RUNNING = { u8"4", u8"5", "6" }; // { u8"", u8"", " " };
-  std::vector<std::string> ITEMS_ERROR = { u8"7", u8"8", "9" }; // { u8"", u8"", u8"" };
+  std::vector<std::string> ITEMS_IDLE {u8"1", u8"2", "3"}; // { u8"", u8"", " " };
+  std::vector<std::string> ITEMS_RUNNING {u8"4", u8"5", "6"}; // { u8"", u8"", " " };
+  std::vector<std::string> ITEMS_ERROR {u8"7", u8"8", "9"}; // { u8"", u8"", u8"" };
   uint8_t count = 1;
 };
 
