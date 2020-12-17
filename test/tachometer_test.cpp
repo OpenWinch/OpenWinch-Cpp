@@ -236,7 +236,7 @@ TEST_F(TachometerTest, MethodForwardBakward) {
 
 TEST_F(TachometerTest, MethodForward6000) {
   const uint32_t RPM = 6000;
-  this->TestMethodForward(RPM, 1000, 20000);
+  this->TestMethodForward(RPM, 2000, 20000);
 }
 
 TEST_F(TachometerTest, MethodBackward6000) {
