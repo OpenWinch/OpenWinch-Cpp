@@ -12,7 +12,7 @@
 #include "mode.hpp"
 
 class TestWinch : public Winch {
-  State getState() override {}
+  State getState() override { return State::UNKNOWN; }
 };
 
 class MockWinch : public TestWinch {

@@ -65,8 +65,8 @@ class Board {
   int getRotationFromEnd();
 
  protected:
-  Logger *logger = nullptr;
-  Winch *winch = nullptr;
+  Logger* logger = nullptr;
+  Winch* winch = nullptr;
   SpeedMode speed_mode = SpeedMode::LOW;
   bool reverse = false;
   int rotation_from_init = 0;

@@ -50,7 +50,7 @@ class WebServer {
   httplib::Server* getServer();
 
  private:
-  Logger *logger = nullptr;
+  Logger* logger = nullptr;
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
   httplib::SSLServer* srv = nullptr;
 #else

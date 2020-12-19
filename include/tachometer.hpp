@@ -64,10 +64,10 @@ class Tachometer {
   void int_hall_U(int, int, uint32_t);
 
  private:
-  Logger *logger = nullptr;
-  InputDevice *input_hal_u;
-  InputDevice *input_hal_w;
-  InputDevice *input_hal_v;
+  Logger* logger = nullptr;
+  InputDevice* input_hal_u;
+  InputDevice* input_hal_w;
+  InputDevice* input_hal_v;
 
   rotation_t tacho_direct = rotation::Clock;
 

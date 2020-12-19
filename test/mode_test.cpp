@@ -23,17 +23,77 @@ class ModeTypeTest : public ::testing::Test {
   void TearDown() override { }
 };
 
-TEST_F(ModeTypeTest, MethodCheckFault) {
-  EXPECT_TRUE(State::checkFault(State::ERROR));
-  EXPECT_FALSE(State::checkFault(State::UNKNOWN));
+TEST_F(ModeTypeTest, MethodToString) {
+  EXPECT_STRCASEEQ("OneWay", std::string(ModeType(ModeType::OneWay)).c_str());
+  EXPECT_STRCASEEQ("TwoWay", std::string(ModeType(ModeType::TwoWay)).c_str());
+  EXPECT_STRCASEEQ("Infinity", std::string(ModeType(ModeType::Infinity)).c_str());
 }
 
-class OneWayModeTest : public ::testing::Test {
+TEST_F(ModeTypeTest, MethodOperator) {
+  EXPECT_TRUE(ModeType(ModeType::OneWay) == ModeType(ModeType::OneWay));
+  EXPECT_FALSE(ModeType(ModeType::OneWay) == ModeType(ModeType::Infinity));
+
+  EXPECT_TRUE(ModeType(ModeType::OneWay) != ModeType(ModeType::Infinity));
+  EXPECT_FALSE(ModeType(ModeType::OneWay) != ModeType(ModeType::OneWay));
+}
+
+
+class BaseModeTest : public ::testing::Test {
  protected:
   ModeEngine* entity = nullptr;
-  Winch* winch = nullptr;
-  Board* board = nullptr;
+  MockWinch* winch = nullptr;
+  MockBoard* board = nullptr;
 
+  BaseModeTest() { }
+  ~BaseModeTest() override { }
+
+  void PostSetUp() {
+    this->winch = new MockWinch();
+    this->board = new MockBoard(this->winch);
+
+    this->entity = new OneWayMode(this->board, this->winch);
+
+    EXPECT_CALL(*board, getThrottleValue())
+      .WillRepeatedly(testing::Return(1));
+
+    EXPECT_CALL(*board, setThrottleValue(testing::_))
+      .Times(testing::AnyNumber());
+
+    EXPECT_CALL(*board, initialize())
+      .Times(testing::AnyNumber());
+
+    EXPECT_CALL(*board, emergency())
+      .Times(testing::AnyNumber());
+
+    EXPECT_CALL(*winch, initialized())
+      .Times(testing::AnyNumber());
+
+    EXPECT_CALL(*winch, getSpeedTarget())
+      .WillRepeatedly(testing::Return(0));
+
+    EXPECT_CALL(*winch, stop())
+      .Times(testing::AnyNumber());
+
+    EXPECT_CALL(*winch, started())
+      .Times(testing::AnyNumber());
+    
+    EXPECT_CALL(*winch, stopped())
+      .Times(testing::AnyNumber());
+  }
+  void TearDown() override {
+    delete this->entity;
+    delete this->board;
+    delete this->winch;
+
+    this->entity = nullptr;
+    this->board = nullptr;
+    this->winch = nullptr;
+  }
+};
+
+
+class OneWayModeTest : public BaseModeTest {
+ protected:
   OneWayModeTest() { }
   ~OneWayModeTest() override { }
 
@@ -42,17 +102,81 @@ class OneWayModeTest : public ::testing::Test {
     this->board = new MockBoard(this->winch);
 
     this->entity = new OneWayMode(this->board, this->winch);
-  }
-  void TearDown() override {
-    delete this->entity;
-    delete this->board;
-    delete this->winch;
-
-    this->entity = 0;
+    this->PostSetUp();
   }
 };
 
 TEST_F(OneWayModeTest, MethodExtraMode) {
+
+  MockWinch* twinch = (MockWinch*)this->winch;
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::BOOTED));
+
+  this->entity->run();
+
+  while (!this->entity->isRunning()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::INIT));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::START));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(5));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::STOP));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::ERROR));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_TRUE(1);
+
+  this->entity->abort();
+  ASSERT_FALSE(this->entity->isRunning());
+}
+
+TEST_F(OneWayModeTest, MethodGetSpeedCurrent) {
+  this->entity->getSpeedCurrent();
+  EXPECT_TRUE(1);
+}
+
+TEST_F(OneWayModeTest, MethodGetDistance) {
+  this->entity->getDistance();
+  EXPECT_TRUE(1);
+}
+
+
+class TwoWayModeTest : public BaseModeTest {
+ protected:
+  TwoWayModeTest() { }
+  ~TwoWayModeTest() override { }
+
+  void SetUp() override {
+    this->winch = new MockWinch();
+    this->board = new MockBoard(this->winch);
+
+    this->entity = new TwoWayMode(this->board, this->winch);
+    this->PostSetUp();
+  }
+};
+
+
+TEST_F(TwoWayModeTest, MethodExtraMode) {
 
   MockWinch* twinch = (MockWinch *)this->winch;
   EXPECT_CALL(*twinch, getState())
@@ -64,23 +188,31 @@ TEST_F(OneWayModeTest, MethodExtraMode) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
   EXPECT_CALL(*twinch, getState())
     .WillRepeatedly(testing::Return(State::INIT));
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
   EXPECT_CALL(*twinch, getState())
     .WillRepeatedly(testing::Return(State::START));
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(5));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   EXPECT_CALL(*twinch, getState())
     .WillRepeatedly(testing::Return(State::STOP));
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   
   EXPECT_CALL(*twinch, getState())
     .WillRepeatedly(testing::Return(State::ERROR));
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   EXPECT_TRUE(1);
 
@@ -88,56 +220,66 @@ TEST_F(OneWayModeTest, MethodExtraMode) {
   ASSERT_FALSE(this->entity->isRunning());
 }
 
+// TEST_F(TwoWayModeTest, MethodIsEndSecurity) {
+//   this->entity->isEndSecurity();
+//   EXPECT_TRUE(1);
+// }
 
-class TwoWayModeTest : public ::testing::Test {
+
+class InfinityModeTest : public BaseModeTest {
  protected:
-  ModeEngine* entity = nullptr;
-
-  TwoWayModeTest() { }
-  ~TwoWayModeTest() override { }
-
-  void SetUp() override {
-    Winch* winch = new MockWinch();
-    Board* board = new MockBoard(winch);
-
-    this->entity = new TwoWayMode(board, winch);
-  }
-  void TearDown() override {
-    delete this->entity;
-    this->entity = 0;
-  }
-};
-
-TEST_F(TwoWayModeTest, MethodExtraMode) {
-  // this->entity->extraMode();
-  EXPECT_TRUE(1);
-}
-
-TEST_F(TwoWayModeTest, MethodIsEndSecurity) {
-  EXPECT_TRUE(1); // .isEndSecurity()
-}
-
-
-class InfinityModeTest : public ::testing::Test {
- protected:
-  ModeEngine* entity = nullptr;
-
   InfinityModeTest() { }
   ~InfinityModeTest() override { }
 
   void SetUp() override {
-    Winch* winch = new MockWinch();
-    Board* board = new MockBoard(winch);
+    this->winch = new MockWinch();
+    this->board = new MockBoard(this->winch);
 
-    this->entity = new InfinityMode(board, winch);
-  }
-  void TearDown() override {
-    delete this->entity;
-    this->entity = 0;
+    this->entity = new InfinityMode(this->board, this->winch);
+    this->PostSetUp();
   }
 };
 
 TEST_F(InfinityModeTest, MethodExtraMode) {
-  // this->entity->extraMode();
+
+  MockWinch* twinch = (MockWinch *)this->winch;
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::BOOTED));
+
+  this->entity->run();
+
+  while (!this->entity->isRunning()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::INIT));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::START));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+
+  EXPECT_CALL(*twinch, getSpeedTarget())
+    .WillRepeatedly(testing::Return(5));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::STOP));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  
+  EXPECT_CALL(*twinch, getState())
+    .WillRepeatedly(testing::Return(State::ERROR));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
   EXPECT_TRUE(1);
+
+  this->entity->abort();
+  ASSERT_FALSE(this->entity->isRunning());
 }

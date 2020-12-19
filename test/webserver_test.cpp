@@ -18,11 +18,12 @@
 
 class WebserverTest : public ::testing::Test {
  protected:
-  const char *host = "localhost";
+  const char* host = "localhost";
   const int port = 8080;
 
-  WebServer *server = nullptr;
-  MockWinch *winch = nullptr;
+  WebServer* server = nullptr;
+  MockWinch* winch = nullptr;
+  std::thread* threadHttp = nullptr;
 
   WebserverTest() { }
   ~WebserverTest() override { }
@@ -68,88 +69,60 @@ class WebserverTest : public ::testing::Test {
     this->winch = nullptr;
   }
 
+  void serverStart() {
+    this->threadHttp = new std::thread([&]() {
+      this->server->getServer()->listen(this->host, this->port);
+    });
+
+    while (!this->server->getServer()->is_running()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    // Give GET time to get a few messages.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  void serverStop() {
+    this->server->getServer()->stop();
+    this->threadHttp->join();
+    ASSERT_FALSE(this->server->getServer()->is_running());
+  }
+
+  void testPage(httplib::Client &cli, const char *path, const int httpCode) {
+    auto res = cli.Get(path);
+    ASSERT_TRUE(res);
+    EXPECT_EQ(httpCode,  res->status);
+  }
+
 };
 
 TEST_F(WebserverTest, MethodPageRoot) {
-  auto thread8080 = std::thread([&]() {
-    this->server->getServer()->listen(this->host, this->port);
-  });
-
-  while (!this->server->getServer()->is_running()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  }
-
-  // Give GET time to get a few messages.
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  this->serverStart();
 
   httplib::Client cli(this->host, this->port);
   cli.set_connection_timeout(5);
 
-  auto res = cli.Get(HTTP_ROUTE_ROOT);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
+  this->testPage(cli, HTTP_ROUTE_ROOT, 302);
+  this->testPage(cli, HTTP_ROUTE_INDEX, 200);
+  this->testPage(cli, HTTP_ROUTE_START, 302);
+  this->testPage(cli, HTTP_ROUTE_STOP, 302);
+  this->testPage(cli, HTTP_ROUTE_UP, 302);
+  this->testPage(cli, HTTP_ROUTE_DOWN, 302);
+  this->testPage(cli, HTTP_ROUTE_HALT, 302);
 
-  res = cli.Get(HTTP_ROUTE_INDEX);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(200,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_START);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_STOP);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_UP);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_DOWN);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_HALT);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  this->server->getServer()->stop();
-  thread8080.join();
-  ASSERT_FALSE(this->server->getServer()->is_running());
+  this->serverStop();
 }
 
 TEST_F(WebserverTest, MethodPageExtra) {
-  auto thread8080 = std::thread([&]() {
-    this->server->getServer()->listen(this->host, this->port);
-  });
-
-  while (!this->server->getServer()->is_running()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  }
-
-  // Give GET time to get a few messages.
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  this->serverStart();
 
   httplib::Client cli(this->host, this->port);
   cli.set_connection_timeout(2);
 
-  auto res = cli.Get(HTTP_ROUTE_EXTRA);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(200,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_RESET);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_LEFT);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
-
-  res = cli.Get(HTTP_ROUTE_RIGHT);
-  ASSERT_TRUE(res);
-  EXPECT_EQ(302,  res->status);
+  this->testPage(cli, HTTP_ROUTE_EXTRA, 200);
+  this->testPage(cli, HTTP_ROUTE_RESET, 302);
+  this->testPage(cli, HTTP_ROUTE_LEFT, 302);
+  this->testPage(cli, HTTP_ROUTE_RIGHT, 302);
   
-  this->server->getServer()->stop();
-  thread8080.join();
-  ASSERT_FALSE(this->server->getServer()->is_running());
+  this->serverStop();
 }

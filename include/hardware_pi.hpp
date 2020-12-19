@@ -31,15 +31,15 @@ class Raspberrypi : virtual public Board {
   uint8_t getBattery() override;
 
  protected:
-  Logger *logger = nullptr;
-  Tachometer *tacho = nullptr;
-  OutputDevice *power_cmd = nullptr;
-  OutputDevice *reverse_cmd = nullptr;
-  OutputDevice *speed_cmd = nullptr;
-  PWMOutputDevice *throttle_cmd = nullptr;
-  InputDevice *key_enter_btn = nullptr;
-  InputDevice *key_left_btn = nullptr;
-  InputDevice *key_right_btn = nullptr;
+  Logger* logger = nullptr;
+  Tachometer* tacho = nullptr;
+  OutputDevice* power_cmd = nullptr;
+  OutputDevice* reverse_cmd = nullptr;
+  OutputDevice* speed_cmd = nullptr;
+  PWMOutputDevice* throttle_cmd = nullptr;
+  InputDevice* key_enter_btn = nullptr;
+  InputDevice* key_left_btn = nullptr;
+  InputDevice* key_right_btn = nullptr;
   uint32_t last_tick_btn;
 
   bool debounced(uint32_t);

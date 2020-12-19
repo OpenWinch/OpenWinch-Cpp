@@ -123,8 +123,8 @@ class ScreenBase {
   virtual void enter(InputType, uint8_t) = 0;
 
  protected:
-  Gui *gui = nullptr;
-  Winch *winch = nullptr;
+  Gui* gui = nullptr;
+  Winch* winch = nullptr;
   std::string title;
   bool inver = false;
   explicit ScreenBase(Gui*, std::string);

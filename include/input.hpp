@@ -10,6 +10,7 @@
 #define INPUT_HPP_
 
 #include <cstdint>
+#include <string>
 #include <thread>
 #include <termios.h>
 #include <unistd.h>
@@ -31,6 +32,23 @@ class InputType {
   constexpr InputType& operator=(ValueInputType v) { value = v; return *this;}
   constexpr bool operator==(const ValueInputType v) const { return value == v; }
   constexpr bool operator!=(const ValueInputType v) const { return value != v; }
+
+  operator std::string() const {
+    std::string result("No available");
+
+    switch (value) {
+      case UP:    result = "UP"; break;
+      case RIGHT: result = "RIGHT"; break;
+      case DOWN:  result = "DOWN"; break;
+      case LEFT:  result = "LEFT"; break;
+      //case ENTER: result = "ENTER"; break;
+      case NONE:
+      default:
+        result = "NONE";
+    }
+
+    return result;
+  }
 
   InputType list();
 

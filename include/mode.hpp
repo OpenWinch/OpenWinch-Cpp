@@ -68,9 +68,9 @@ class ModeEngine {
   void runControlLoop();
 
  protected:
-  Logger *logger = nullptr;
-  Board *board = nullptr;
-  Winch *winch = nullptr;
+  Logger* logger = nullptr;
+  Board* board = nullptr;
+  Winch* winch = nullptr;
   uint8_t speed_current = 0;
 
   virtual void extraMode() = 0;

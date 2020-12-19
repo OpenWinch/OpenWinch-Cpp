@@ -564,8 +564,9 @@ uint8_t ModeSelectorScreen::countItems() {
 }
 
 void ModeSelectorScreen::display(NanoCanvasOps<1>* draw) {
-  ModeType mode = ModeType::OneWay;
-  this->gui->createMenuScroll(draw, this->ITEMS_MENU, std::string(mode));
+  this->gui->createMenuScroll(draw,
+                              this->ITEMS_MENU,
+                              std::string(ModeType(ModeType::OneWay)));
 }
 
 void ModeSelectorScreen::enter(InputType key, uint8_t /* cursor_pos */) {
