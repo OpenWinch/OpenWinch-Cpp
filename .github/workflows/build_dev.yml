@@ -9,7 +9,7 @@ env:
 jobs:
   openwinch-amd64:
     name: OpenWinch - Emulator (amd64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install extra package
@@ -60,7 +60,7 @@ jobs:
 
   openwinch-armhf:
     name: OpenWinch - RaspberryPI (armhf)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install extra package
@@ -100,7 +100,7 @@ jobs:
 
   openwinch-arm64:
     name: OpenWinch - RaspberryPI4 (arm64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install extra package
