@@ -8,8 +8,22 @@ env:
 
 jobs:
   openwinch-amd64:
-    name: OpenWinch - Emulator (amd64)
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - name: OpenWinch - Emulator (amd64)
+            id: amd64
+            package: curl
+          - name: OpenWinch - RaspberryPI (armhf)
+            id: armhf
+            package: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            toolchain: -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabihf.toolchain.cmake
+          - name: OpenWinch - RaspberryPI4 (arm64)
+            id: arm64
+            package: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            toolchain: -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnuaarch64.toolchain.cmake
+    name: ${{ matrix.name }}
     steps:
     - uses: actions/checkout@v2
     - name: Install extra package
@@ -17,7 +31,7 @@ jobs:
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
         sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
         sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr curl
+        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr ${{ matrix.package }}
     - name: Add external libraries
       run: |
         vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
@@ -27,16 +41,18 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${{ matrix.toolchain }}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: cmake --build .
     - name: Test
+      if: ${{ matrix.id=='amd64' }}
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: ctest --output-on-failure
     - name: Report Coverage
+      if: ${{ matrix.id=='amd64' }}
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
@@ -54,86 +70,5 @@ jobs:
     - name: Upload Artifact (build)
       uses: actions/upload-artifact@v2
       with:
-        name: Packages-amd64 (DEB)
-        path: ${{runner.workspace}}/build/packages/*.deb
-
-
-  openwinch-armhf:
-    name: OpenWinch - RaspberryPI (armhf)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install extra package
-      run: |
-        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-        sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
-        sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-    - name: Add external libraries
-      run: |
-        vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
-        cp -r ${GITHUB_WORKSPACE}/cmake/extra/* ${GITHUB_WORKSPACE}/lib
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build
-    - name: Configure CMake
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnueabihf.toolchain.cmake
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: cmake --build .
-    - name: Make Package
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: cpack
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Packages-All (DEB)
-        path: ${{runner.workspace}}/build/packages/*.deb
-    - name: Upload Artifact (build)
-      uses: actions/upload-artifact@v2
-      with:
-        name: Packages-armhf (DEB)
-        path: ${{runner.workspace}}/build/packages/*.deb
-
-  openwinch-arm64:
-    name: OpenWinch - RaspberryPI4 (arm64)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install extra package
-      run: |
-        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-        sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xAB17C654
-        sudo apt-get update
-        sudo apt-get install python3-vcstool libsdl2-dev cppcheck lcov gcovr gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-    - name: Add external libraries
-      run: |
-        vcs import ${GITHUB_WORKSPACE}/lib/ < ${GITHUB_WORKSPACE}/openwinch.repos
-        cp -r ${GITHUB_WORKSPACE}/cmake/extra/* ${GITHUB_WORKSPACE}/lib
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build
-    - name: Configure CMake
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: cmake ${GITHUB_WORKSPACE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/cmake/platforms/arm-gnuaarch64.toolchain.cmake
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: cmake --build .
-    - name: Make Package
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: cpack
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Packages-All (DEB)
-        path: ${{runner.workspace}}/build/packages/*.deb
-    - name: Upload Artifact (build)
-      uses: actions/upload-artifact@v2
-      with:
-        name: Packages-arm64 (DEB)
+        name: Packages-${{ matrix.id }} (DEB)
         path: ${{runner.workspace}}/build/packages/*.deb
