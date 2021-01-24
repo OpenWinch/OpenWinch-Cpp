@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef WEBSERVER_HPP_
