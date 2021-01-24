@@ -9,9 +9,11 @@
 #ifndef INPUT_HPP_
 #define INPUT_HPP_
 
+#include "runnable.hpp"
+
 #include <cstdint>
 #include <string>
-#include <thread>
+
 #include <termios.h>
 #include <unistd.h>
 
@@ -58,14 +60,17 @@ class InputType {
 };
 
 class Winch;
-class Keyboard {
+class Keyboard : public Runnable {
  public:
   Keyboard(Winch *);
   virtual ~Keyboard() = default;
+
+ protected:
+  void runLoop();
+
  private:
   Winch* winch = nullptr;
-  std::thread* controlLoop = nullptr;
-  void runControlLoop();
+
   InputType get();
 };
 
@@ -79,7 +84,6 @@ class BufferToggle
         /*
          * Disables buffered input
          */
-
         void off(void)
         {
             tcgetattr(STDIN_FILENO, &t); //get the current terminal I/O structure
@@ -91,7 +95,6 @@ class BufferToggle
         /*
          * Enables buffered input
          */
-
         void on(void)
         {
             tcgetattr(STDIN_FILENO, &t); //get the current terminal I/O structure

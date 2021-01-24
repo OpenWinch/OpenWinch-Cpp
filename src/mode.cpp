@@ -20,23 +20,6 @@ ModeEngine::ModeEngine(Board *_board, Winch *_winch) : board(_board), winch(_win
     this->speed_ratio = 1 / MOTOR_MAX;
 }
 
-void ModeEngine::run() {
-  this->abortRequested.store(false);
-  this->controlLoop = std::thread(&ModeEngine::runControlLoop, this);
-}
-
-void ModeEngine::abort() {
-  this->abortRequested.store(true);
-
-  if(this->controlLoop.joinable()) {
-    this->controlLoop.join();
-  }
-}
-
-bool ModeEngine::isRunning() const {
-  return this->running.load();
-}
-
 void ModeEngine::applyThrottleValue() {
   this->logger->live("MOD : Calculate throttle value.");
   uint32_t value = this->speed_ratio * this->speed_current;
@@ -57,12 +40,10 @@ uint8_t ModeEngine::getSpeedCurrent() {
   return this->speed_current;
 }
 
-void ModeEngine::runControlLoop() {
-  //auto t = std::this_thread;
+void ModeEngine::runLoop() {
   this->logger->debug("MOD : Starting Control Loop.");
-  this->running.store(true);
 
-  while (false == abortRequested.load()) {
+  while (this->isNotAbort()) {
     //synchronized {
       try {
         this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
@@ -107,8 +88,6 @@ void ModeEngine::runControlLoop() {
           // Make sure that nothing leaves the thread for now...
       }
     //}
-
-    this->running.store(false);
   }
 
   this->logger->debug("MOD : Stopping Control Loop.");

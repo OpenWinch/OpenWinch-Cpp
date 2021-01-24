@@ -9,11 +9,11 @@
 #ifndef MODE_HPP_
 #define MODE_HPP_
 
+#include "runnable.hpp"
+
 #include <cstdint>
 #include <vector>
 #include <string>
-#include <atomic>
-#include <thread>
 
 class Board;
 class Winch;
@@ -54,19 +54,14 @@ class ModeType {
   ModeType() = default;
 };
 
-class ModeEngine {
+class ModeEngine : public Runnable {
  public:
   explicit ModeEngine(Board*, Winch*);
-
-  void run();
-  void abort();
-  bool isRunning() const;
   virtual ~ModeEngine() = default;
 
   void applyThrottleValue();
   float getDistance();
   uint8_t getSpeedCurrent();
-  void runControlLoop();
 
  protected:
   Logger* logger = nullptr;
@@ -75,13 +70,10 @@ class ModeEngine {
   uint8_t speed_current = 0;
 
   virtual void extraMode() = 0;
+  void runLoop();
   bool isBeginSecurity();
 
  private:
-  std::atomic_bool abortRequested = ATOMIC_VAR_INIT(false);
-  std::atomic_bool running = ATOMIC_VAR_INIT(false);
-  std::thread controlLoop;
-
   uint8_t security_begin = 20;
   uint8_t speed_ratio = 1;
   uint8_t velocity_start = 1;

@@ -85,10 +85,11 @@ Gui::~Gui() {
   if (this->device != nullptr) {
     this->draw->clear();
     this->device->clear();
+    this->device->end();
     
     delete this->draw;
 //    delete this->engine;
-    delete this->device;
+//    delete this->device;
   }
 }
 
@@ -98,8 +99,7 @@ Winch* Gui::getWinch() {
 
 void Gui::boot() {
   this->drawBoot();
-  this->logger->debug("GUI : Start Thread...");
-  this->display_draw_Loop = std::thread(&Gui::draw_loop, this);
+  this->run();
 }
 
 void Gui::display() {
@@ -364,13 +364,13 @@ void Gui::drawBoot() {
   }
 }
 
-void Gui::draw_loop() {
-  // auto t = std::this_thread;
+void Gui::runLoop() {
+  this->logger->debug("GUI : Start Thread...");
   const GuiType config = GuiType::valueof(OW_GUI);
 
   if (GuiType::DISABLE != config) {
     if (GuiType::CAPTURE != config) {
-      while (true) {
+      while (this->isNotAbort()) {
           if (this->winch->getState().isBoot()) {
             this->display();
             std::this_thread::sleep_for(std::chrono::milliseconds(1000/LCD_FPS));
@@ -598,7 +598,7 @@ void VelocityStartScreen::enter(InputType key, uint8_t /* cursor_pos */) {
 
 //////////////////////////////////////////////////////////
 
-VelocityStopScreen::VelocityStopScreen(Gui *_gui) : 
+VelocityStopScreen::VelocityStopScreen(Gui *_gui) :
     ScreenBase{_gui, "Velocity Stop"} {
   this->gui->cursor_pos = 128;  // TODO
 }

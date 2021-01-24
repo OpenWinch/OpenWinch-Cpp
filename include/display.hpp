@@ -10,11 +10,11 @@
 #define DISPLAY_HPP_
 
 #include "display_config.hpp"
+#include "runnable.hpp"
 
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <thread>
 
 class Winch;
 class InputType;
@@ -82,7 +82,7 @@ class GuiType {
 class ScreenBase;
 class Logger;
 
-class Gui {
+class Gui : public Runnable {
  public:
   ScreenBase* screen = nullptr;
   int16_t cursor_pos = 1;
@@ -101,17 +101,19 @@ class Gui {
   void createMenuIcon(NanoCanvasOps<1>*, std::vector<std::string>);
   void extractScreen();
 
+ protected:
+  void runLoop();
+
  private:
-  Logger *logger = nullptr;
+  Logger* logger = nullptr;
   Winch* winch = nullptr;
   
   DisplaySH1106_128x64_I2C* device = nullptr;
   NanoEngine1<DisplaySH1106_128x64_I2C>* engine = nullptr;
   NanoCanvas<128, 64, 1>* draw = nullptr;
-  std::thread display_draw_Loop;
 
   void drawBoot();
-  void draw_loop();
+  void drawLoop();
 };
 
 class ScreenBase {
