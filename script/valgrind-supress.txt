@@ -1,0 +1,49 @@
+{
+   leak_DSL2
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.14.0
+   ...
+}
+{
+   leak_DRI
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/x86_64-linux-gnu/dri/iris_dri.so
+   ...
+}
+{
+   leak_GLXmesa
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+   ...
+}
+{
+   leak_asound
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0
+   ...
+}
+{
+   leak_bus
+   Memcheck:Leak
+   ...
+   obj:/lib/x86_64-linux-gnu/libdbus-1.so.3.19.13
+   ...
+}
+{
+   leak_LLVM
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/x86_64-linux-gnu/libLLVM-11.so.1
+   ...
+}
+{
+   leak_dynamic_load_lib
+   Memcheck:Leak
+   ...
+   fun:_dl_open
+   ...
+}
