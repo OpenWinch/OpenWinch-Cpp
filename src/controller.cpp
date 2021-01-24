@@ -23,8 +23,9 @@
 
 #endif  // OW_BD_EMU || OW_BD_PI
 
-#include <iostream>
+#include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 #include <thread>
 #include <typeinfo>  
@@ -45,7 +46,7 @@ WinchControl::WinchControl() : Winch() {
 void WinchControl::boot() {
   const int result_1 = std::atexit(terminate);
   if (result_1 != 0) {
-    std::cerr << "Registration failed\n";
+    std::cerr << "Registration failed" << std::endl;
     //return EXIT_FAILURE;
   }
 
@@ -148,6 +149,16 @@ void WinchControl::exit() {
   this->emergency();
 
   this->changeState(State::HALT);
+
+  this->mode->abort();
+  this->input->abort();
+  this->gui->abort();
+
+  delete this->mode;
+  #if defined(OW_BD_EMU) || defined(OW_BD_PI)
+  delete this->input;
+  #endif  // OW_BD_EMU || OW_BD_PI
+  delete this->board;
   delete this->gui;
 }
 

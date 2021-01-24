@@ -79,11 +79,11 @@ void ModeEngine::runLoop() {
         // CPU idle
         std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
       }
-      catch(std::runtime_error& e) 
+      catch(std::runtime_error& e)
       {
           // Some more specific
       }
-      catch(...) 
+      catch(...)
       {
           // Make sure that nothing leaves the thread for now...
       }
@@ -118,8 +118,8 @@ void ModeEngine::starting() {
 
   // Decrement speed
   if (this->speed_current > this->winch->getSpeedTarget()) {
-    uint16_t vel_stop = this->velocity_stop;
-    uint16_t diff_stop = this->speed_current - this->winch->getSpeedTarget();
+    uint8_t vel_stop = this->velocity_stop;
+    uint8_t diff_stop = this->speed_current - this->winch->getSpeedTarget();
 
     if (vel_stop > diff_stop) {
       vel_stop = diff_stop;
@@ -137,8 +137,8 @@ void ModeEngine::stopping() {
   this->logger->live("MOD : Apply stopping...");
 
   if (this->speed_current > 0) {
-    uint16_t vel_stop = this->velocity_stop;
-    uint16_t diff_stop = this->speed_current - 0;
+    uint8_t vel_stop = this->velocity_stop;
+    uint8_t diff_stop = this->speed_current;
 
     if (vel_stop > diff_stop) {
       vel_stop = diff_stop;
@@ -151,7 +151,7 @@ void ModeEngine::stopping() {
       this->winch->stopped();
     }
 
-  } else if (this->speed_current < 0) {
+  } else if (this->speed_current <= 0) {
     this->speed_current = 0;
     this->winch->stopped();
   }

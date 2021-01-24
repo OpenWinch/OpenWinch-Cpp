@@ -88,7 +88,7 @@ void Tachometer::initialize() {
   this->hall_init(&this->tacho_hsv);
 }
 
-void Tachometer::int_hall_W(int /*gpio*/, int level, uint32_t tick) {
+void Tachometer::int_hall_W(int /*gpio*/, int /*level*/, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse W" << std::endl;
 #endif
@@ -110,7 +110,7 @@ void Tachometer::int_hall_W(int /*gpio*/, int level, uint32_t tick) {
     this->tacho_hsw.prevTime = this->tacho_hsw.startTime;
 }
 
-void Tachometer::int_hall_V(int /*gpio*/, int level, uint32_t tick) {
+void Tachometer::int_hall_V(int /*gpio*/, int /*level*/, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse V" << std::endl;
 #endif
@@ -125,7 +125,7 @@ void Tachometer::int_hall_V(int /*gpio*/, int level, uint32_t tick) {
     this->tacho_hsv.prevTime = this->tacho_hsv.startTime;
 }
 
-void Tachometer::int_hall_U(int /*gpio*/, int level, uint32_t tick) {
+void Tachometer::int_hall_U(int /*gpio*/, int /*level*/, uint32_t tick) {
 #ifdef OW_TA_DEBUG
     std::cout << "IO-T : Pulse U" << std::endl;
 #endif
