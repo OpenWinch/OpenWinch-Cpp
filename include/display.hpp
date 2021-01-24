@@ -89,7 +89,7 @@ class Gui {
   uint8_t view_pos = 0;
 
   explicit Gui(Winch*);
-  ~Gui();
+  virtual ~Gui();
   Winch* getWinch();
   void boot();
   void display();
@@ -117,7 +117,7 @@ class Gui {
 class ScreenBase {
  public:
   explicit ScreenBase(Gui*);
-  ~ScreenBase() = default;
+  virtual ~ScreenBase() = default;
   virtual uint8_t countItems() = 0;
   virtual void display(NanoCanvasOps<1>*) = 0;
   virtual void enter(InputType, uint8_t) = 0;

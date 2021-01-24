@@ -61,6 +61,7 @@ class ModeEngine {
   void run();
   void abort();
   bool isRunning() const;
+  virtual ~ModeEngine() = default;
 
   void applyThrottleValue();
   float getDistance();

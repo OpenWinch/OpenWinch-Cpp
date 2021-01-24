@@ -61,6 +61,7 @@ class Winch;
 class Keyboard {
  public:
   Keyboard(Winch *);
+  virtual ~Keyboard() = default;
  private:
   Winch* winch = nullptr;
   std::thread* controlLoop = nullptr;

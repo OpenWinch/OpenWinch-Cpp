@@ -24,7 +24,7 @@ class ModeType;
 class Winch {
  public:
   // Winch() {};
-  virtual ~Winch() {};
+  virtual ~Winch() = default;
 
   virtual void boot() = 0;
   virtual void initialize() = 0;
@@ -58,7 +58,7 @@ class WinchControl : public Winch {
   }
 
   WinchControl();
-  ~WinchControl() = default;
+  virtual ~WinchControl() = default;
 
   void boot();
   void initialize();

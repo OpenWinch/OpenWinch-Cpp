@@ -43,7 +43,7 @@ class Tachometer {
   Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice *sensor_v);
   Tachometer(const Tachometer&)= delete;
   Tachometer& operator=(const Tachometer&)= delete;
-  ~Tachometer()= default;
+  virtual ~Tachometer() = default;
 
   void initialize();
   void hall_debug(tacho_hallSensor_t sensor, std::string name);

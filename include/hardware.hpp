@@ -52,6 +52,7 @@ class SpeedMode {
 class Board {
  public:
   explicit Board(Winch*);
+  virtual ~Board() = default;
   virtual void initialize() = 0;
   virtual void emergency() = 0;
   virtual void setThrottleValue(uint8_t) = 0;

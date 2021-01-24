@@ -35,7 +35,7 @@ class Logger {
 
  private:
   Logger();
-  ~Logger()= default;
+  virtual ~Logger() = default;
   Logger(const Logger&)= delete;
   Logger& operator=(const Logger&)= delete;
 };

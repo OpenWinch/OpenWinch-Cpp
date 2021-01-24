@@ -45,7 +45,7 @@ class Winch;
 class WebServer {
  public:
   WebServer(Winch*);
-  ~WebServer();
+  virtual ~WebServer();
   void run();
   httplib::Server* getServer();
 
@@ -66,6 +66,7 @@ class WebServer {
 class WebMain {
  public:
   explicit WebMain(WebServer*, Winch*);
+  virtual ~WebMain() = default;
 
  private:
   httplib::Server* srv;
@@ -75,6 +76,8 @@ class WebMain {
 class WebExtra {
  public:
   explicit WebExtra(WebServer*, Winch*);
+  virtual ~WebExtra() = default;
+
 
  private:
   httplib::Server* srv;
