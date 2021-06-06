@@ -3,11 +3,13 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef MODE_HPP_
 #define MODE_HPP_
+
+#include "runnable.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -52,21 +54,23 @@ class ModeType {
   ModeType() = default;
 };
 
-class ModeEngine {
+class ModeEngine : public Runnable {
  public:
   explicit ModeEngine(Board*, Winch*);
+  virtual ~ModeEngine() = default;
+
   void applyThrottleValue();
   float getDistance();
   uint8_t getSpeedCurrent();
-  void runControlLoop();
 
  protected:
-  Logger *logger = nullptr;
-  Board *board = nullptr;
-  Winch *winch = nullptr;
+  Logger* logger = nullptr;
+  Board* board = nullptr;
+  Winch* winch = nullptr;
   uint8_t speed_current = 0;
 
   virtual void extraMode() = 0;
+  void runLoop();
   bool isBeginSecurity();
 
  private:

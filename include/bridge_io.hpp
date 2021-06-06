@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef BRIDGE_IO_HPP_
@@ -26,9 +26,9 @@ class Device {
   static void terminate_gpio();
  private:
   Device();
-  ~Device()= default;
-  Device(const Device&)= delete;
-  Device& operator=(const Device&)= delete;
+  virtual ~Device() = default;
+  Device(const Device&) = delete;
+  Device& operator=(const Device&) = delete;
 };
 
 class InputDevice {

@@ -12,32 +12,41 @@ file(GLOB_RECURSE OPENWINCH_SRC "*.cpp")
 list(REMOVE_ITEM OPENWINCH_SRC ${OW_MAIN})
 set(OPENWINCH_SRC ${OPENWINCH_SRC} PARENT_SCOPE)
 
-## LIBRARY ###
-add_library(${OW_TARGET}_lib STATIC ${OPENWINCH_SRC})
+### LIBRARY ###
+add_library(${OW_TARGET}_lib OBJECT ${OPENWINCH_SRC})
+add_library(${OW_TARGET}_lib_shared SHARED $<TARGET_OBJECTS:${OW_TARGET}_lib>)
+add_library(${OW_TARGET}_lib_static STATIC $<TARGET_OBJECTS:${OW_TARGET}_lib>)
 
-set_target_properties( ${OW_TARGET}_lib PROPERTIES ${OW_PROPERTIES} )
-target_link_libraries( ${OW_TARGET}_lib PRIVATE ${_OW_LINK} )
-target_link_directories( ${OW_TARGET}_lib PRIVATE ${_OW_LINK_DIR} )
-target_link_options( ${OW_TARGET}_lib PRIVATE  ${_OW_LINK_OPT} )
-target_include_directories( ${OW_TARGET}_lib PRIVATE ${_OW_INCLUDE} )
-target_compile_options( ${OW_TARGET}_lib PRIVATE ${_OW_COMPILE_OPT} )
-target_compile_definitions( ${OW_TARGET}_lib PRIVATE ${_OW_COMPILE_DEF} )
+foreach(OW_TARGET_EXT lib;lib_shared;lib_static)
+    set_target_properties(      ${OW_TARGET}_${OW_TARGET_EXT} PROPERTIES ${OW_PROPERTIES} )
+    target_link_libraries(      ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_LINK} )
+    target_link_directories(    ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_LINK_DIR} )
+    target_link_options(        ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_LINK_OPT} )
+    target_include_directories( ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_INCLUDE} )
+    target_compile_options(     ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_COMPILE_OPT} )
+    target_compile_definitions( ${OW_TARGET}_${OW_TARGET_EXT} PRIVATE ${_OW_COMPILE_DEF} )
 
-install(TARGETS ${OW_TARGET}_lib
-        DESTINATION /opt/openwinch/bin
-        COMPONENT bin
-)
+    set_target_properties(${OW_TARGET}_${OW_TARGET_EXT} PROPERTIES OUTPUT_NAME "${OW_TARGET}")
+    install(TARGETS ${OW_TARGET}_${OW_TARGET_EXT}
+            DESTINATION /opt/openwinch/bin
+            COMPONENT bin
+    )
+
+endforeach()
+
 
 ### RUNTIME ###
 add_executable(${OW_TARGET} ${OW_MAIN})
 
 set_target_properties( ${OW_TARGET} PROPERTIES ${OW_PROPERTIES} )
-target_link_libraries( ${OW_TARGET} PRIVATE ${OW_TARGET}_lib )
+target_link_libraries( ${OW_TARGET} PRIVATE ${OW_TARGET}_lib_static )
 target_link_directories( ${OW_TARGET} PRIVATE ${_OW_LINK_DIR} )
 target_link_options( ${OW_TARGET} PRIVATE  ${_OW_LINK_OPT} )
 target_include_directories( ${OW_TARGET} PRIVATE ${_OW_INCLUDE} )
 target_compile_options( ${OW_TARGET} PRIVATE ${_OW_COMPILE_OPT} )
 target_compile_definitions( ${OW_TARGET} PRIVATE ${_OW_COMPILE_DEF} )
+
+file(COPY ../public DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) 
 
 install(TARGETS ${OW_TARGET}
         DESTINATION /opt/openwinch/bin

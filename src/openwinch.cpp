@@ -2,8 +2,8 @@
  * @file openwinch.cpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
- * 
- * @copyright Copyright © 2020
+ *
+ * @copyright Copyright © 2020-2021
  */
 
 #include "openwinch.hpp"
@@ -34,31 +34,36 @@ void debug() {
 }
 #endif
 
-
-
-int main(int argc, char *argv[])  {
-  int j = 0;
-
-  // Start Winch engine.
-  Winch *winch = &Winch::get();
-
+void is_root() {
   uid_t uid = getuid(), euid = geteuid();
   if (uid > 0 || uid != euid) {
     std::cout << "You are not root!" << std::endl;
     exit(-1);
   }
+}
 
+
+int main(int /*argc*/, char *argv[])  {
+  std::string argv_str(argv[0]);
+  std::string base = argv_str.substr(0, argv_str.find_last_of("/"));
+  std::cout << base << std::endl;
+
+  is_root();
+
+  // Start Winch engine.
+  Winch *winch = &WinchControl::get();
+  winch->boot();
 
   // Debug
 #ifdef DEBUG
-  Logger *logger = &Logger::get();
-  Tachometer *tacho = &Tachometer::get();
-#endif
+  // Logger *logger = &Logger::get();
+  // Tachometer *tacho = &Tachometer::get();
 
   std::thread t(debug);
+#endif
 
   // Start Web stack.
-  WebServer srv;
+  WebServer srv(winch);
   srv.run();
 
 

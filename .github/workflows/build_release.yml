@@ -11,7 +11,7 @@ env:
 jobs:
   create_release:
     name: Create release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
     steps:
@@ -114,7 +114,7 @@ jobs:
 
   openwinch-armhf:
     name: OpenWinch - RaspberryPI (armhf)
-    needs: create_release
+    needs: ubuntu-20.04
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -186,7 +186,7 @@ jobs:
   openwinch-arm64:
     name: OpenWinch - RaspberryPI4 (arm64)
     needs: create_release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Install extra package

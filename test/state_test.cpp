@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 #include "state.hpp"
 
@@ -13,31 +13,32 @@ class StateTest : public ::testing::Test {
  private:
 
  protected:
+  StateTest() { }
+  ~StateTest() override { }
 
-  StateTest() {
-     // You can do set-up work for each test here.
-  }
-
-  ~StateTest() override {
-     // You can do clean-up work that doesn't throw exceptions here.
-  }
-
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
-
-  void SetUp() override {
-     // Code here will be called immediately after the constructor (right
-     // before each test).
-  }
-
-  void TearDown() override {
-     // Code here will be called immediately after each test (right
-     // before the destructor).
-  }
-
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
+  void SetUp() override { }
+  void TearDown() override { }
 };
+
+TEST_F(StateTest, MethodToString) {
+  EXPECT_STRCASEEQ("UNKNOWN", std::string(State(State::UNKNOWN)).c_str());
+  EXPECT_STRCASEEQ("HALT", std::string(State(State::HALT)).c_str());
+  EXPECT_STRCASEEQ("BOOTED", std::string(State(State::BOOTED)).c_str());
+  EXPECT_STRCASEEQ("ERROR", std::string(State(State::ERROR)).c_str());
+  EXPECT_STRCASEEQ("INIT", std::string(State(State::INIT)).c_str());
+  EXPECT_STRCASEEQ("IDLE", std::string(State(State::IDLE)).c_str());
+  EXPECT_STRCASEEQ("START", std::string(State(State::START)).c_str());
+  EXPECT_STRCASEEQ("RUNNING", std::string(State(State::RUNNING)).c_str());
+  EXPECT_STRCASEEQ("STOP", std::string(State(State::STOP)).c_str());
+}
+
+TEST_F(StateTest, MethodOperator) {
+  EXPECT_TRUE(State(State::UNKNOWN) == State(State::UNKNOWN));
+  EXPECT_FALSE(State(State::UNKNOWN) == State(State::ERROR));
+
+  EXPECT_TRUE(State(State::UNKNOWN) != State(State::ERROR));
+  EXPECT_FALSE(State(State::UNKNOWN) != State(State::UNKNOWN));
+}
 
 TEST_F(StateTest, MethodCheckRun) {
   EXPECT_TRUE(State::checkRun(State::RUNNING));
@@ -66,29 +67,29 @@ TEST_F(StateTest, MethodCheckBoot) {
   EXPECT_FALSE(State::checkBoot(State::UNKNOWN));
 }
 
-// TEST_F(StateTest, MethodIsRun) {
-//   EXPECT_TRUE(State::RUNNING.isRun());
-//   EXPECT_TRUE(State::START.isRun());
-//   EXPECT_FALSE(State::UNKNOWN.isRun());
-// }
+TEST_F(StateTest, MethodIsRun) {
+  EXPECT_TRUE(State(State::RUNNING).isRun());
+  EXPECT_TRUE(State(State::START).isRun());
+  EXPECT_FALSE(State(State::UNKNOWN).isRun());
+}
 
-// TEST_F(StateTest, MethodIsStop) {
-//   EXPECT_TRUE(State::STOP.isStop());
-//   EXPECT_TRUE(State::IDLE.isStop());
-//   EXPECT_FALSE(State::UNKNOWN.isStop());
-// }
+TEST_F(StateTest, MethodIsStop) {
+  EXPECT_TRUE(State(State::STOP).isStop());
+  EXPECT_TRUE(State(State::IDLE).isStop());
+  EXPECT_FALSE(State(State::UNKNOWN).isStop());
+}
 
-// TEST_F(StateTest, MethodIsFault) {
-//   EXPECT_TRUE(State::ERROR.isFault());
-//   EXPECT_FALSE(State::UNKNOWN.isFault());
-// }
+TEST_F(StateTest, MethodIsFault) {
+  EXPECT_TRUE(State(State::ERROR).isFault());
+  EXPECT_FALSE(State(State::UNKNOWN).isFault());
+}
 
-// TEST_F(StateTest, MethodIsInit) {
-//   EXPECT_TRUE(State::INIT.isInit());
-//   EXPECT_FALSE(State::UNKNOWN.isInit());
-// }
+TEST_F(StateTest, MethodIsInit) {
+  EXPECT_TRUE(State(State::INIT).isInit());
+  EXPECT_FALSE(State(State::UNKNOWN).isInit());
+}
 
-// TEST_F(StateTest, MethodIsBoot) {
-//   EXPECT_TRUE(State::UNKNOWN.isBoot());
-//   EXPECT_FALSE(State::INIT.isBoot());
-// }
+TEST_F(StateTest, MethodIsBoot) {
+  EXPECT_TRUE(State(State::INIT).isBoot());
+  EXPECT_FALSE(State(State::UNKNOWN).isBoot());
+}

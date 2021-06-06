@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef TACHOMETER_HPP_
@@ -43,7 +43,7 @@ class Tachometer {
   Tachometer(InputDevice *sensor_u, InputDevice *sensor_w, InputDevice *sensor_v);
   Tachometer(const Tachometer&)= delete;
   Tachometer& operator=(const Tachometer&)= delete;
-  ~Tachometer()= default;
+  virtual ~Tachometer() = default;
 
   void initialize();
   void hall_debug(tacho_hallSensor_t sensor, std::string name);
@@ -64,10 +64,10 @@ class Tachometer {
   void int_hall_U(int, int, uint32_t);
 
  private:
-  Logger *logger = nullptr;
-  InputDevice *input_hal_u;
-  InputDevice *input_hal_w;
-  InputDevice *input_hal_v;
+  Logger* logger = nullptr;
+  InputDevice* input_hal_u;
+  InputDevice* input_hal_w;
+  InputDevice* input_hal_v;
 
   rotation_t tacho_direct = rotation::Clock;
 

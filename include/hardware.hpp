@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef HARDWARE_HPP_
@@ -52,6 +52,7 @@ class SpeedMode {
 class Board {
  public:
   explicit Board(Winch*);
+  virtual ~Board() = default;
   virtual void initialize() = 0;
   virtual void emergency() = 0;
   virtual void setThrottleValue(uint8_t) = 0;
@@ -65,8 +66,8 @@ class Board {
   int getRotationFromEnd();
 
  protected:
-  Logger *logger = nullptr;
-  Winch *winch = nullptr;
+  Logger* logger = nullptr;
+  Winch* winch = nullptr;
   SpeedMode speed_mode = SpeedMode::LOW;
   bool reverse = false;
   int rotation_from_init = 0;

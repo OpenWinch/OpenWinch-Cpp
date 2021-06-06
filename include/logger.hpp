@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef LOGGER_HPP_
@@ -35,7 +35,7 @@ class Logger {
 
  private:
   Logger();
-  ~Logger()= default;
+  virtual ~Logger() = default;
   Logger(const Logger&)= delete;
   Logger& operator=(const Logger&)= delete;
 };

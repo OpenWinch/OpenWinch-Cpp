@@ -2,19 +2,19 @@
  * @file display.hpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
- * 
- * @copyright Copyright © 2020
+ *
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef DISPLAY_HPP_
 #define DISPLAY_HPP_
 
 #include "display_config.hpp"
+#include "runnable.hpp"
 
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <thread>
 
 class Winch;
 class InputType;
@@ -82,14 +82,14 @@ class GuiType {
 class ScreenBase;
 class Logger;
 
-class Gui {
+class Gui : public Runnable {
  public:
   ScreenBase* screen = nullptr;
   int16_t cursor_pos = 1;
   uint8_t view_pos = 0;
 
   explicit Gui(Winch*);
-  ~Gui();
+  virtual ~Gui();
   Winch* getWinch();
   void boot();
   void display();
@@ -101,30 +101,32 @@ class Gui {
   void createMenuIcon(NanoCanvasOps<1>*, std::vector<std::string>);
   void extractScreen();
 
+ protected:
+  void runLoop();
+
  private:
-  Logger *logger = nullptr;
+  Logger* logger = nullptr;
   Winch* winch = nullptr;
   
   DisplaySH1106_128x64_I2C* device = nullptr;
   NanoEngine1<DisplaySH1106_128x64_I2C>* engine = nullptr;
   NanoCanvas<128, 64, 1>* draw = nullptr;
-  std::thread display_draw_Loop;
 
   void drawBoot();
-  void draw_loop();
+  void drawLoop();
 };
 
 class ScreenBase {
  public:
   explicit ScreenBase(Gui*);
-  ~ScreenBase() = default;
+  virtual ~ScreenBase() = default;
   virtual uint8_t countItems() = 0;
   virtual void display(NanoCanvasOps<1>*) = 0;
   virtual void enter(InputType, uint8_t) = 0;
 
  protected:
-  Gui *gui = nullptr;
-  Winch *winch = nullptr;
+  Gui* gui = nullptr;
+  Winch* winch = nullptr;
   std::string title;
   bool inver = false;
   explicit ScreenBase(Gui*, std::string);
@@ -140,9 +142,9 @@ class MainScreen: public ScreenBase {
   void enter(InputType, uint8_t) override;
 
  private:
-  std::vector<std::string> ITEMS_IDLE = { u8"1", u8"2", "3" }; // { u8"", u8"", " " };
-  std::vector<std::string> ITEMS_RUNNING = { u8"4", u8"5", "6" }; // { u8"", u8"", " " };
-  std::vector<std::string> ITEMS_ERROR = { u8"7", u8"8", "9" }; // { u8"", u8"", u8"" };
+  std::vector<std::string> ITEMS_IDLE {u8"1", u8"2", "3"}; // { u8"", u8"", " " };
+  std::vector<std::string> ITEMS_RUNNING {u8"4", u8"5", "6"}; // { u8"", u8"", " " };
+  std::vector<std::string> ITEMS_ERROR {u8"7", u8"8", "9"}; // { u8"", u8"", u8"" };
   uint8_t count = 1;
 };
 

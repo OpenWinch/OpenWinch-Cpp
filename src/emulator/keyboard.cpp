@@ -3,29 +3,30 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #include "openwinch.hpp"
 #include "input.hpp"
 
 #include <iostream>
-#include <thread>
 
 Keyboard::Keyboard(Winch* _winch) : winch(_winch) {
-  this->controlLoop = new std::thread(&Keyboard::runControlLoop, this);
+  this->run();
 }
 
-void Keyboard::runControlLoop() {
+void Keyboard::runLoop() {
   auto input = InputType::NONE;
 
   BufferToggle bt;
   bt.off();
 
-  while(true) {
+  while (this->isNotAbort()) {
     input = this->get();
     this->winch->enterGui(input);
   }
+
+  bt.on();
 }
 
 InputType Keyboard::get() {

@@ -34,6 +34,7 @@ target_compile_definitions( ${OW_TEST}_lib PRIVATE ${_OW_COMPILE_DEF} )
 add_executable(${OW_TEST} ${TEST_SRC})
 target_link_libraries(${OW_TEST} PRIVATE ${OW_TEST}_lib ${_OW_LINK} gtest gmock gmock_main)
 target_include_directories(${OW_TEST} PRIVATE ${_OW_INCLUDE})
+file(COPY ../public DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) 
 
 #add_test(NAME AllTestsIn${OW_TEST} COMMAND ${OW_TEST})
 

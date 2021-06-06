@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef CONSTANTES_HPP_
@@ -12,7 +12,7 @@
 /* Hardware */
 #define MOTOR_MAX 38          // DEPRECATED prefere to use SPEED_MAX
 #define MOTOR_PPR 18          // pulse by turn 45 on gear (but not from motor)
-#define MOTOR_REDUCE (52/11)
+#define MOTOR_REDUCE (54/11)
 
 /* LCD */
 #define LCD_FPS 10

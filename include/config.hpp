@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef CONFIG_HPP_
@@ -27,6 +27,11 @@
 #ifndef OW_LOG_DEBUG
 // #define OW_LOG_DEBUG
 #endif  // OW_LOG_DEBUG
+
+// Web Logger
+#ifndef OW_WEB_DEBUG
+// #define OW_WEB_DEBUG
+#endif  // OW_WEB_DEBUG
 
 /***************/
 /* CONFIG      */

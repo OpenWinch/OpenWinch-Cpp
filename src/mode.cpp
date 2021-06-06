@@ -2,14 +2,15 @@
  * @file mode.cpp
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
- * 
- * @copyright Copyright © 2020
+ *
+ * @copyright Copyright © 2020-2021
  */
 
 #include "openwinch.hpp"
 #include "mode.hpp"
 
 #include "hardware.hpp"
+#include <stdexcept>
 
 
 // ModeEngine
@@ -39,43 +40,54 @@ uint8_t ModeEngine::getSpeedCurrent() {
   return this->speed_current;
 }
 
-void ModeEngine::runControlLoop() {
-  //auto t = std::this_thread;
+void ModeEngine::runLoop() {
   this->logger->debug("MOD : Starting Control Loop.");
 
-  while (true) {
-      this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
-                          std::string(this->winch->getState()).c_str(),
-                          std::to_string(this->speed_current).c_str(),
-                          std::to_string(this->board->getRotationFromBegin()).c_str());
+  while (this->isNotAbort()) {
+    //synchronized {
+      try {
+        this->logger->live("MOD : Current : state=%s - speed=%s - counter=%s",
+                            std::string(this->winch->getState()).c_str(),
+                            std::to_string(this->speed_current).c_str(),
+                            std::to_string(this->board->getRotationFromBegin()).c_str());
 
-      // INIT
-      if (this->winch->getState().isInit()) {
-        this->initialize();
+        // INIT
+        if (this->winch->getState().isInit()) {
+          this->initialize();
+        }
+
+        // STARTING or RUNNING
+        if (this->winch->getState().isRun()) {
+          this->starting();
+        }
+
+        // STOP
+        if (this->winch->getState().isStop()) {
+          this->stopping();
+        }
+
+        // Specifical mode
+        this->extraMode();
+
+        // EMERGENCY
+        if (this->winch->getState().isFault()) {
+          this->fault();
+        }
+
+        this->applyThrottleValue();
+
+        // CPU idle
+        std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
       }
-
-      // STARTING or RUNNING
-      if (this->winch->getState().isRun()) {
-        this->starting();
+      catch(std::runtime_error& e)
+      {
+          // Some more specific
       }
-
-      // STOP
-      if (this->winch->getState().isStop()) {
-        this->stopping();
+      catch(...)
+      {
+          // Make sure that nothing leaves the thread for now...
       }
-
-      // Specifical mode
-      this->extraMode();
-
-      // EMERGENCY
-      if (this->winch->getState().isFault()) {
-        this->fault();
-      }
-
-      this->applyThrottleValue();
-
-      // CPU idle
-      std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DELAY));
+    //}
   }
 
   this->logger->debug("MOD : Stopping Control Loop.");
@@ -106,8 +118,8 @@ void ModeEngine::starting() {
 
   // Decrement speed
   if (this->speed_current > this->winch->getSpeedTarget()) {
-    uint16_t vel_stop = this->velocity_stop;
-    uint16_t diff_stop = this->speed_current - this->winch->getSpeedTarget();
+    uint8_t vel_stop = this->velocity_stop;
+    uint8_t diff_stop = this->speed_current - this->winch->getSpeedTarget();
 
     if (vel_stop > diff_stop) {
       vel_stop = diff_stop;
@@ -125,8 +137,8 @@ void ModeEngine::stopping() {
   this->logger->live("MOD : Apply stopping...");
 
   if (this->speed_current > 0) {
-    uint16_t vel_stop = this->velocity_stop;
-    uint16_t diff_stop = this->speed_current - 0;
+    uint8_t vel_stop = this->velocity_stop;
+    uint8_t diff_stop = this->speed_current;
 
     if (vel_stop > diff_stop) {
       vel_stop = diff_stop;
@@ -139,7 +151,7 @@ void ModeEngine::stopping() {
       this->winch->stopped();
     }
 
-  } else if (this->speed_current < 0) {
+  } else if (this->speed_current <= 0) {
     this->speed_current = 0;
     this->winch->stopped();
   }

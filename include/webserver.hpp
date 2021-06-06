@@ -3,14 +3,14 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #ifndef WEBSERVER_HPP_
 #define WEBSERVER_HPP_
 
 #include <string>
-#include <map> 
+#include <map>
 
 #define TPL_URL         "{{ request.url_root }}"
 #define TPL_MODE        "{{ mode }}"
@@ -39,17 +39,18 @@ using Headers = std::multimap<std::string, std::string, detail::ci>;
 }
 
 class Logger;
+class Winch;
 
 
 class WebServer {
  public:
-  WebServer();
-  ~WebServer();
+  WebServer(Winch*);
+  virtual ~WebServer();
   void run();
   httplib::Server* getServer();
 
  private:
-  Logger *logger = nullptr;
+  Logger* logger = nullptr;
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
   httplib::SSLServer* srv = nullptr;
 #else
@@ -64,20 +65,23 @@ class WebServer {
 
 class WebMain {
  public:
-  explicit WebMain(WebServer*);
+  explicit WebMain(WebServer*, Winch*);
+  virtual ~WebMain() = default;
 
  private:
-  WebServer* server = nullptr;
-  httplib::Server* srv = nullptr;
+  httplib::Server* srv;
+  Winch* winch;
 };
 
 class WebExtra {
  public:
-  explicit WebExtra(WebServer*);
+  explicit WebExtra(WebServer*, Winch*);
+  virtual ~WebExtra() = default;
+
 
  private:
-  WebServer* server = nullptr;
-  httplib::Server* srv = nullptr;
+  httplib::Server* srv;
+  Winch* winch;
 };
 
 #endif  // WEBSERVER_HPP_

@@ -3,7 +3,7 @@
  * @author Mickael GAILLARD (mick.gaillard@gmail.com)
  * @brief OpenWinch Project
  * 
- * @copyright Copyright © 2020
+ * @copyright Copyright © 2020-2021
  */
 
 #include "openwinch.hpp"
@@ -23,14 +23,14 @@
 
 #endif  // OW_BD_EMU || OW_BD_PI
 
-#include <iostream>
+#include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string>
-#include <thread>
 #include <typeinfo>  
 
 void terminate() {
-  Winch::get().exit();
+  WinchControl::get().exit();
   Device::terminate_gpio();
   std::cout << "Stop !!" << std::endl;
 }
@@ -38,18 +38,22 @@ void terminate() {
 /**
  * @brief Construct a new Winch:: Winch object
  */
-Winch::Winch() {
+WinchControl::WinchControl() : Winch() {
   this->logger = &Logger::get();
+}
 
+void WinchControl::boot() {
   const int result_1 = std::atexit(terminate);
   if (result_1 != 0) {
-    std::cerr << "Registration failed\n";
+    std::cerr << "Registration failed" << std::endl;
     //return EXIT_FAILURE;
   }
 
   this->banner();
   this->loadConfig();
   this->initControlLoop();
+
+  this->changeState(State::BOOTED);
 }
 
 /**
@@ -59,7 +63,7 @@ Winch::Winch() {
  *  - Initialise Sensor
  *  - Position at origin
  */
-void Winch::initialize() {
+void WinchControl::initialize() {
   this->logger->info("Initialize Winch hardware... Reset counter !");
   this->changeState(State::INIT);
 }
@@ -67,7 +71,7 @@ void Winch::initialize() {
 /**
  * @brief Call when hardware stop completely. 
  */
-void Winch::initialized() {
+void WinchControl::initialized() {
   if (this->state.isInit()) {
     this->changeState(State::IDLE);
   }
@@ -76,7 +80,7 @@ void Winch::initialized() {
 /**
  * @brief Command Start winch. 
  */
-void Winch::start() {
+void WinchControl::start() {
   this->logger->info("Start");
 
   if (this->state.isStop()) {
@@ -91,7 +95,7 @@ void Winch::start() {
 /**
  * @brief Call when hardware process start completely.
  */
-void Winch::started() {
+void WinchControl::started() {
   if (this->state == State::START) {
     this->changeState(State::RUNNING);
   }
@@ -100,7 +104,7 @@ void Winch::started() {
 /**
  * @brief Command Stop winch.
  */
-void Winch::stop() {
+void WinchControl::stop() {
   this->logger->info("Stop");
 
   if (this->state.isRun()) {
@@ -115,7 +119,7 @@ void Winch::stop() {
 /**
  * @brief Call when hardware stop completely.
  */
-void Winch::stopped() {
+void WinchControl::stopped() {
   if (this->state == State::STOP) {
     this->changeState(State::IDLE);
   }
@@ -124,7 +128,7 @@ void Winch::stopped() {
 /**
  * @brief Command Emergency winch.
  */
-void Winch::emergency() {
+void WinchControl::emergency() {
   this->logger->fatal("HALT EMERGENCY");
   this->changeState(State::ERROR);
 }
@@ -132,18 +136,28 @@ void Winch::emergency() {
 /**
  * @brief Process display in console.
  */
-void Winch::display() {
+void WinchControl::display() {
   printf("State\t: %s\nTarget Speed\t: %s\nCurrent speed\t: %s" ,
           std::string(this->state).c_str(),
           std::to_string(this->speed_target).c_str(),
           std::to_string(this->mode->getSpeedCurrent()).c_str());
 }
 
-void Winch::exit() {
+void WinchControl::exit() {
   this->logger->info("Shutdown...");
   this->emergency();
 
   this->changeState(State::HALT);
+
+  this->mode->abort();
+  this->input->abort();
+  this->gui->abort();
+
+  delete this->mode;
+  #if defined(OW_BD_EMU) || defined(OW_BD_PI)
+  delete this->input;
+  #endif  // OW_BD_EMU || OW_BD_PI
+  delete this->board;
   delete this->gui;
 }
 
@@ -152,7 +166,7 @@ void Winch::exit() {
  * 
  * @return ModeType 
  */
-ModeType Winch::getMode() {
+ModeType WinchControl::getMode() {
   return ModeType::OneWay; // return nullptr;  // this->mode;
 }
 
@@ -161,7 +175,7 @@ ModeType Winch::getMode() {
  * 
  * @return uint8_t Speed targeted in KM/H
  */
-uint8_t Winch::getSpeedTarget() {
+uint8_t WinchControl::getSpeedTarget() {
   return this->speed_target;
 }
 
@@ -170,7 +184,7 @@ uint8_t Winch::getSpeedTarget() {
  * 
  * @return State of winch
  */
-State Winch::getState() {
+State WinchControl::getState() {
   return this->state;
 }
 
@@ -179,7 +193,7 @@ State Winch::getState() {
  * 
  * @return uint8_t 
  */
-uint8_t Winch::getBattery() {
+uint8_t WinchControl::getBattery() {
   return this->board->getBattery();
 }
 
@@ -188,7 +202,7 @@ uint8_t Winch::getBattery() {
  * 
  * @return uint8_t 
  */
-uint8_t Winch::getRemote() {
+uint8_t WinchControl::getRemote() {
   return 15;
 }
 
@@ -197,7 +211,7 @@ uint8_t Winch::getRemote() {
  * 
  * @return float 
  */
-float Winch::getDistance() {
+float WinchControl::getDistance() {
   return this->mode->getDistance();
 }
 
@@ -206,7 +220,7 @@ float Winch::getDistance() {
  * 
  * @param value to increment speed (default is 1)
  */
-void Winch::speedUp(uint8_t value) {
+void WinchControl::speedUp(uint8_t value) {
   if (this->speed_target < SPEED_MAX) {
     this->speed_target += value;
   }
@@ -217,7 +231,7 @@ void Winch::speedUp(uint8_t value) {
  * 
  * @param value to decrement speed (default is 1)
  */
-void Winch::speedDown(uint8_t value) {
+void WinchControl::speedDown(uint8_t value) {
   if (this->speed_target > SPEED_MIN) {
     this->speed_target -= value;
   }
@@ -228,7 +242,7 @@ void Winch::speedDown(uint8_t value) {
  * 
  * @param value 
  */
-void Winch::speedValue(uint8_t value) {
+void WinchControl::speedValue(uint8_t value) {
   if (value >= SPEED_MIN || value < SPEED_MAX) {
     this->speed_target = value;
   }
@@ -239,22 +253,22 @@ void Winch::speedValue(uint8_t value) {
  * 
  * @param value 
  */
-void Winch::enterGui(InputType value) {
+void WinchControl::enterGui(InputType value) {
   this->gui->enter(value);
 }
 
-void Winch::manualForward() {
+void WinchControl::manualForward() {
   this->logger->debug(">>> Forward >>>");
 }
 
-void Winch::manualReverse() {
+void WinchControl::manualReverse() {
   this->logger->debug("<<< Reverse <<<");
 }
 
 /**
  * @brief Display Banner of OpenWinch
  */
-void Winch::banner() {
+void WinchControl::banner() {
   this->logger->info(R"(
    ____                 _       ___            __
   / __ \____  ___  ____| |     / (_)___  _____/ /_
@@ -269,7 +283,7 @@ void Winch::banner() {
 /**
  * @brief Load configuration.
  */
-void Winch::loadConfig() {
+void WinchControl::loadConfig() {
   this->logger->debug("Config stack...");
 
   this->logger->info("Gui config : %s", OW_GUI);
@@ -295,13 +309,12 @@ void Winch::loadConfig() {
 }
 
 /**
- * @brief Initialize Control Loop thread.
+ * @brief Initialize Control Loop.
  */
-void Winch::initControlLoop() {
+void WinchControl::initControlLoop() {
   this->logger->debug("Initialize Control Loop...");
 
-  this->controlLoop = new std::thread(&ModeEngine::runControlLoop, this->mode);
-  this->changeState(State::BOOTED);
+  this->mode->run();
 }
 
 /**
@@ -309,7 +322,7 @@ void Winch::initControlLoop() {
  * 
  * @param value as state enum value.
  */
-void Winch::changeState(State value) {
+void WinchControl::changeState(State value) {
   if (this->state != value) {
     this->logger->debug("Switch state : %s", std::string(value).c_str());
     this->state = value;

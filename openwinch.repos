@@ -18,4 +18,4 @@ repositories:
   slog:
     type: git
     url: https://github.com/kala13x/slog.git
-    version: master
+    version: 667bf2f63bcb37e83a226bb7f8ddf6db734fd166
