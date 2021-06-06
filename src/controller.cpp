@@ -27,7 +27,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <thread>
 #include <typeinfo>  
 
 void terminate() {
@@ -310,7 +309,7 @@ void WinchControl::loadConfig() {
 }
 
 /**
- * @brief Initialize Control Loop thread.
+ * @brief Initialize Control Loop.
  */
 void WinchControl::initControlLoop() {
   this->logger->debug("Initialize Control Loop...");

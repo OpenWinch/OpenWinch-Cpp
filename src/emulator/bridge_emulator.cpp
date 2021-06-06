@@ -26,6 +26,7 @@ float PWMOutputDevice::getValue() {
 
 
 InputDevice::InputDevice(uint8_t _pin, uint8_t _pull, bool _inverse) { }
+InputDevice::~InputDevice() { }
 uint8_t InputDevice::digitalRead() {
   return 0;
 }

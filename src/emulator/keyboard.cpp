@@ -10,7 +10,6 @@
 #include "input.hpp"
 
 #include <iostream>
-#include <thread>
 
 Keyboard::Keyboard(Winch* _winch) : winch(_winch) {
   this->run();

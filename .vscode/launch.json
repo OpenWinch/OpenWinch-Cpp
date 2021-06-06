@@ -1,27 +1,26 @@
 {
   "version": "0.2.0",
-  "configurations": [
-
-
-  {
-    "name": "OpenWinch Ctest",
-    "type": "cppdbg",
-    "request": "launch",
-    "program": "${workspaceFolder}/build/cmake/dev/test/OpenWinchTest",
-    "args": [],
-    "stopAtEntry": false,
-    "cwd": "${workspaceFolder}",
-    "environment": [],
-    "externalConsole": false,
-    "MIMode": "gdb",
-    "setupCommands": [
-        {
-            "description": "Activer l'impression en mode Pretty pour gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-        }
-    ]
-  },
+  "configurations":
+  [
+    {
+      "name": "OpenWinch Ctest",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/cmake/dev/test/OpenWinchTest",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+          {
+              "description": "Activer l'impression en mode Pretty pour gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+          }
+      ]
+    },
     {
       "name": "OpenWinch GDB",
       "type": "cppdbg",

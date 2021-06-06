@@ -33,6 +33,7 @@ apt install openwinch-bin
 first install [VCStool](https://github.com/dirk-thomas/vcstool)
 
 ```
+apt install cmake build-essential libsdl2-dev gcovr cppcheck
 git clone https://github.com/OpenWinch/OpenWinch-Cpp.git
 cd OpenWinch-Cpp
 vcs import ./lib < openwinch.repo
